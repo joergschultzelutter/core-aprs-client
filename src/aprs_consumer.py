@@ -1,0 +1,350 @@
+#!/usr/local/bin/python3
+#
+# Alexa-APRS Gateway: APRS consumer for Alexa messages
+# Receives APRS messages, confirms them (whereas necessary) and
+# adds them to an AWS SQS queue
+# Author: Joerg Schultze-Lutter, 2022
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+import datetime
+
+import sys
+from pprint import pformat
+import signal
+import logging
+import aprslib
+from expiringdict import ExpiringDict
+from utils import (
+    add_aprs_message_to_cache,
+    get_aprs_message_from_cache,
+    get_command_line_params,
+)
+import json
+from uuid import uuid1
+from aprs_communication import send_ack, send_aprs_message_list
+import time
+from datetime import datetime
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(module)s -%(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+# APRS Listener call sign - change this setting
+# this call sign will be used for logging on to APRS-IS
+# and is going to listen to APRS messages which will then
+# be forwarded to AWS / Alexa
+aprsis_callsign = "CAPSRV"
+
+# The bot uses the default APRS "TOCALL" identifier
+# change this whenever necessary
+aprsis_tocall = "APRS"
+
+# Amend parameters if necessary
+aprsis_passcode = aprslib.passcode(aprsis_callsign)
+aprsis_simulate_send = False
+aprsis_server_filter = f"g/{aprsis_callsign}"
+aprsis_server_name = "euro.aprs2.net"
+aprsis_server_port = 14580
+
+msg_cache_max_entries = 2160
+msg_cache_time_to_live = 60 * 60
+msg_packet_delay = 6.0
+
+
+def signal_term_handler(signal_number, frame):
+    """
+    Signal handler for SIGTERM signals. Ensures that the program
+    gets terminated in a safe way, thus allowing all databases etc
+    to be written to disk.
+    Parameters
+    ==========
+    signal_number:
+        The signal number
+    frame:
+        Signal frame
+    Returns
+    =======
+    """
+
+    logger.info(msg="Received SIGTERM; forcing clean program exit")
+    sys.exit(0)
+
+
+# APRSlib callback
+# Extract the fields from the APRS message, start the parsing process,
+# execute the command and send the command output back to the user
+def mycallback(raw_aprs_packet: dict):
+    """
+    aprslib callback; this is the core process that takes care of everything
+    Parameters
+    ==========
+    raw_aprs_packet: 'dict'
+        dict object, containing the raw APRS data
+    Returns
+    =======
+    """
+    global aprs_message_counter
+    global aprs_message_cache
+
+    # Get our relevant fields from the APRS message
+    addresse_string = raw_aprs_packet.get("addresse")
+    message_text_string = raw_aprs_packet.get("message_text")
+    response_string = raw_aprs_packet.get("response")
+    msgno_string = raw_aprs_packet.get("msgNo")
+    from_callsign = raw_aprs_packet.get("from")
+    format_string = raw_aprs_packet.get("format")
+    ackMsgno_string = raw_aprs_packet.get("ackMsgNo")
+
+    # lower the response in case we received one
+    if response_string:
+        response_string = response_string.lower()
+
+    # Check if we need to deal with the old vs the new message format
+    new_ackrej_format = True if ackMsgno_string else False
+
+    # Check if this request supports a msgno
+    msg_no_supported = True if msgno_string else False
+
+    # User's call sign. read: who has sent us this message?
+    if from_callsign:
+        from_callsign = from_callsign.upper()
+
+    # Check if we need to process this message
+    if addresse_string:
+        if format_string == "message" and message_text_string:
+            if response_string not in ["ack", "rej"]:
+                logger.info("Starting processing loop - have entered callback")
+                # Alright, this is a message for us
+                # Check if the message is present in our decaying message cache
+                # If the message can be located, then we can assume that we have
+                # processed (and potentially acknowledged) that message request
+                # within the last e.g. 5 minutes and that this is a delayed / dupe
+                # request, thus allowing us to ignore this request.
+                aprs_message_key = get_aprs_message_from_cache(
+                    message_text=message_text_string,
+                    message_no=msgno_string,
+                    users_callsign=from_callsign,
+                    aprs_cache=aprs_message_cache,
+                )
+                if aprs_message_key:
+                    logger.info(
+                        msg="DUPLICATE APRS PACKET - this message is still in our decaying message cache"
+                    )
+                    logger.info(
+                        msg=f"Ignoring duplicate APRS packet raw_aprs_packet: {raw_aprs_packet}"
+                    )
+                else:
+                    logger.info(msg=f"Received raw_aprs_packet: {raw_aprs_packet}")
+
+                    # Send an ack if we DID receive a message number
+                    # and we DID NOT have received a request in the
+                    # new ack/rej format
+                    # see aprs101.pdf pg. 71ff.
+                    if msg_no_supported and not new_ackrej_format:
+                        send_ack(
+                            myaprsis=AIS,
+                            simulate_send=aprsis_simulate_send,
+                            users_callsign=from_callsign,
+                            source_msg_no=msgno_string,
+                            alias=aprsis_callsign,
+                            tocall=aprsis_tocall,
+                        )
+
+                    # our APRS output message
+                    output_message = []
+
+                    # Add the message to the SQS aprs-to-alexa queue
+                    logger.debug(msg=f"SQS send: message = '{pformat(json_sqs_data)}'")
+                    try:
+                        sqs_message = sqs_aprs_to_alexa_queue.sqs_send_message(
+                            MessageBody=json_sqs_data, MessageGroupId="Alexa-APRS-Bot"
+                        )
+                        output_message.append(
+                            "Success! Your message was forwarded to SQS"
+                        )
+                    except Exception as ex:
+                        logger.info(
+                            f"Cannot add your message to SQS queue. Error: {ex.args[0]}"
+                        )
+                        output_message.append("Error! Cannot add your message to SQS")
+
+                    # get the current value for the APRS message counter from S3
+                    # We share this with AWS Lambda - therefore, this object needs to
+                    # get retrieved every time we interact with APRS-IS and we cannot
+                    # keep it in memory
+                    #
+                    # THIS CODE IS PRONE TO RACE CONDITIONS - SEE DOCUMENTATION (Reason: proof-of-concept approach)
+                    #
+                    aprs_message_counter = s3_get_aprs_msg_counter(
+                        bucket_name=s3_bucket_name,
+                        object_name=s3_object_name,
+                        region=aws_region,
+                    )
+
+                    # Send our message response(s) to APRS-IS
+                    # This WILL generate only one message but could (theoretically) consist of 2..n
+                    # outgoing messages to APRS-IS, so let's use the result value as future
+                    # message counter value
+                    aprs_message_counter = send_aprs_message_list(
+                        myaprsis=AIS,
+                        simulate_send=aprsis_simulate_send,
+                        message_text_array=output_message,
+                        destination_call_sign=from_callsign,
+                        send_with_msg_no=msg_no_supported,
+                        aprs_message_counter=aprs_message_counter,
+                        external_message_number=msgno_string,
+                        new_ackrej_format=new_ackrej_format,
+                    )
+
+                    # Write the number of served packages to S3. Unlike my other APRS software (e.g. MPAD),
+                    # this code uses a message counter that is SHARED with AWS / Lambda which
+                    # means that we need to apply the update immediately
+                    #
+                    # THIS CODE IS PRONE TO RACE CONDITIONS - SEE DOCUMENTATION (Reason: proof-of-concept approach)
+                    #
+                    aprs_message_counter = s3_update_aprs_msg_counter(
+                        bucket_name=s3_bucket_name,
+                        object_name=s3_object_name,
+                        region=aws_region,
+                        aprs_msg_counter=aprs_message_counter,
+                    )
+
+                    # We've finished processing this message. Update the decaying
+                    # cache with our message.
+                    # Store the core message data in our decaying APRS message cache
+                    # Dupe detection is applied regardless of the message's
+                    # processing status
+                    aprs_message_cache = add_aprs_message_to_cache(
+                        message_text=message_text_string,
+                        message_no=msgno_string,
+                        users_callsign=from_callsign,
+                        aprs_cache=aprs_message_cache,
+                    )
+
+def run_listener():
+    """
+    Main listener; either performs the initial AWS setup or
+    establishes a listener to APRS-IS and forwards content
+    to its SQS fifo queue
+
+    Parameters
+    ==========
+
+    Returns
+    =======
+
+    """
+    logger.info(msg="Startup ....")
+
+    # Get the command line params
+    run_aws_setup = get_command_line_params()
+
+
+    #
+    # Read the message counter (function will create the S3 object if it does not exist in the bucket)
+    logger.info(msg="Reading APRS message counter...")
+    aprs_message_counter = s3_get_aprs_msg_counter(
+        bucket_name=s3_bucket_name, object_name=s3_object_name, region=aws_region
+    )
+
+    # Abort the program if we were just to perform the setup tasks
+    if run_aws_setup:
+        logger.info(msg="All setup tasks were completed; exiting ...")
+        sys.exit(0)
+
+    # Register the SIGTERM handler; this will allow a safe shutdown of the program
+    logger.info(msg="Registering SIGTERM handler for safe shutdown...")
+    signal.signal(signal.SIGTERM, signal_term_handler)
+
+    # Initialize the aprs-is object
+    AIS = None
+
+    # Create the decaying APRS message cache. Any APRS message that is present in
+    # this cache will be considered as a duplicate / delayed and will not be processed
+    logger.info(
+        msg=f"APRS message dupe cache set to {msg_cache_max_entries} max possible entries and a TTL of {int(msg_cache_time_to_live / 60)} mins"
+    )
+    aprs_message_cache = ExpiringDict(
+        max_len=msg_cache_max_entries,
+        max_age_seconds=msg_cache_time_to_live,
+    )
+
+    # Enter the 'eternal' receive loop
+    try:
+        while True:
+
+            # Create the APRS-IS object and set user/pass/host/port
+            AIS = aprslib.IS(
+                callsign=aprsis_callsign,
+                passwd=aprsis_passcode,
+                host=aprsis_server_name,
+                port=aprsis_server_port,
+            )
+
+            # Set the APRS-IS server filter
+            AIS.set_filter(aprsis_server_filter)
+
+            # Establish the connection to APRS-IS
+            logger.info(
+                msg=f"Establishing connection to APRS-IS: server={aprsis_server_name},"
+                    f"port={aprsis_server_port}, filter={aprsis_server_filter},"
+                    f"APRS-IS User: {aprsis_callsign}, APRS-IS passcode: {aprsis_passcode}"
+            )
+            AIS.connect(blocking=True)
+
+            # Are we connected?
+            if AIS._connected:
+                logger.debug(msg="Established the connection to APRS-IS")
+
+                # Start the consumer thread
+                logger.info(msg="Starting callback consumer")
+                AIS.consumer(mycallback, blocking=True, immortal=True, raw=False)
+
+                #
+                # We have left the callback, let's clean up a few things before
+                # we try to re-establish our connection
+                logger.debug(msg="Have left the callback consumer")
+                #
+                # Verbindung schließen
+                logger.debug(msg="Closing APRS connection to APRS-IS")
+                AIS.close()
+                AIS = None
+            else:
+                logger.info(msg="Cannot re-establish connection to APRS-IS")
+
+            # Enter sleep mode and then restart the loop
+            logger.info(msg=f"Sleeping {msg_packet_delay} secs")
+            time.sleep(msg_packet_delay)
+
+    except (KeyboardInterrupt, SystemExit):
+        # Tell the user that we are about to terminate our work
+        logger.info(
+            msg="KeyboardInterrupt or SystemExit in progress; shutting down ..."
+        )
+
+        #        if sqs_aprs_to_alexa_queue:
+        #            sqs_remove_queue(queue=sqs_aprs_to_alexa_queue)
+        #        if sqs_alexa_to_aprs_queue:
+        #            sqs_remove_queue(queue=alexa_to_aprs_queue)
+
+        # Close APRS-IS connection whereas still present
+        if AIS:
+            AIS.close()
+
+if __name__ == "__main__":
+    run_listener()
