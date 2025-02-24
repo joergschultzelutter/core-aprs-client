@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 # this call sign will be used for logging on to APRS-IS
 # and is going to listen to APRS messages which will then
 # be forwarded to AWS / Alexa
-aprsis_callsign = "CAPSRV"
+aprsis_callsign = "AMZN"
 
 # The bot uses the default APRS "TOCALL" identifier
 # change this whenever necessary
@@ -165,6 +165,23 @@ def mycallback(raw_aprs_packet: dict):
                             tocall=aprsis_tocall,
                         )
 
+                    # Create our outgoing SQS message item which needs to be a JSON object
+                    # Add some unique data to it (timestamp, uuid)
+                    ts = datetime.utcnow()
+                    ts_string = ts.strftime("%Y-%m-%d %H:%M:%Sz")
+                    msgid = str(uuid1())
+
+                    # Create the data object
+                    sqs_data = {
+                        "from_callsign": from_callsign,
+                        "received": ts_string,
+                        "uuid": msgid,
+                        "message_text": message_text_string,
+                    }
+
+                    # and convert it to a JSON string
+                    json_sqs_data = json.dumps(sqs_data)
+
                     # our APRS output message
                     output_message = []
 
@@ -254,6 +271,50 @@ def run_listener():
     # Get the command line params
     run_aws_setup = get_command_line_params()
 
+    # Get or create the SQS object for 'aprs to alexa'
+    if run_aws_setup:
+        logger.info(
+            msg=f"Performing SQS object setup; name = '{sqs_aprs_to_alexa_name}'"
+        )
+    else:
+        logger.info(
+            msg=f"Performing lookup for SQS object '{sqs_aprs_to_alexa_attributes}'"
+        )
+    sqs_aprs_to_alexa_queue = sqs_create_or_get_object(
+        queue_name=sqs_aprs_to_alexa_name,
+        queue_attributes=sqs_aprs_to_alexa_attributes,
+        region=aws_region,
+        create_if_missing=run_aws_setup,
+    )
+
+    # Get or create the SQS object for 'alexa to aprs'
+    if run_aws_setup:
+        logger.info(
+            msg=f"Performing SQS object setup; name = '{sqs_alexa_to_aprs_name}'"
+        )
+    else:
+        logger.info(
+            msg=f"Performing lookup for SQS object '{sqs_alexa_to_aprs_attributes}'"
+        )
+    sqs_alexa_to_aprs_queue = sqs_create_or_get_object(
+        queue_name=sqs_alexa_to_aprs_name,
+        queue_attributes=sqs_alexa_to_aprs_attributes,
+        region=aws_region,
+        create_if_missing=run_aws_setup,
+    )
+
+    # Get or create the S3 bucket where we share
+    # the message counter with our AWS lambda code
+    if run_aws_setup:
+        logger.info(msg=f"Performing S3 object setup; name = '{s3_bucket_name}'")
+    else:
+        logger.info(msg=f"Performing lookup for S3 object '{s3_bucket_name}'")
+    s3_bucket = s3_create_or_get_bucket(
+        bucket_name=s3_bucket_name,
+        bucket_attributes=s3_bucket_attributes,
+        region=aws_region,
+        create_if_missing=run_aws_setup,
+    )
 
     #
     # Read the message counter (function will create the S3 object if it does not exist in the bucket)

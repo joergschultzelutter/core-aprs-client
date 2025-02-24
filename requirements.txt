@@ -1,0 +1,4 @@
+aprslib
+apprise
+expiringdict
+unidecode
