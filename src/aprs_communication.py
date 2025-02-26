@@ -1,5 +1,5 @@
 #
-# Alexa-APRS Gateway: various APRS routines
+# Core APRS Client: various APRS routines
 # Author: Joerg Schultze-Lutter, 2022
 #
 # This program is free software; you can redistribute it and/or modify

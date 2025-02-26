@@ -23,6 +23,7 @@ import os
 import logging
 from unidecode import unidecode
 import argparse
+import configparser
 
 # this is the name of the  directory where we store
 # our data files
@@ -73,6 +74,22 @@ def add_aprs_message_to_cache(
     # just need to give the dictionary entry a value
     aprs_cache[key] = datetime.now()
     return aprs_cache
+
+
+def does_file_exist(file_name: str):
+    """
+    Checks if the given file exists. Returns True/False.
+
+    Parameters
+    ==========
+    file_name: str
+                    our file name
+    Returns
+    =======
+    status: bool
+        True /False
+    """
+    return os.path.isfile(file_name)
 
 
 def get_aprs_message_from_cache(
@@ -157,17 +174,63 @@ def get_command_line_params():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "--run-aws-setup",
-        dest="run_aws_setup",
-        action="store_true",
-        help="Creates or updates the AWS environment and then continues the regular program flow",
+        "--configfile",
+        default="core_aprs_client.yml",
+        type=argparse.FileType("r"),
+        help="Program config file name",
     )
 
     parser.set_defaults(run_aws_setup=False)
     args = parser.parse_args()
 
-    run_aws_setup = args.run_aws_setup
-    return run_aws_setup
+    configfile = args.core_aprs_client
+    return configfile
+
+
+def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
+    config = configparser.ConfigParser()
+
+    success = False
+    try:
+        config.read(config_filename)
+        aprsis_callsign = config.get("core_aprs_client_config", "aprsis_callsign")
+        aprsis_tocall = config.get("core_aprs_client_config", "aprsis_tocall")
+        aprsis_server_name = config.get("core_aprs_client_config", "aprsis_server_name")
+        aprsis_server_port = config.get("core_aprs_client_config", "aprsis_server_port")
+        aprsis_simulate_send = config.get(
+            "core_aprs_client_config", "aprsis_simulate_send"
+        )
+        aprsis_passcode = config.get("core_aprs_client_config", "aprsis_passcode")
+        msg_cache_max_entries = config.get(
+            "core_aprs_client_config", "msg_cache_max_entries"
+        )
+        msg_cache_time_to_live = config.get(
+            "core_aprs_client_config", "msg_cache_time_to_live"
+        )
+        msg_packet_delay = config.get("core_aprs_client_config", "msg_packet_delay")
+        success = True
+    except Exception as ex:
+        logger.info(
+            msg="Error in configuration file; Check if your config format is correct."
+        )
+        success = False
+        aprsis_callsign = (
+            aprsis_tocall
+        ) = aprsis_server_name = aprsis_server_port = False
+        aprsis_simulate_send = aprsis_passcode = msg_cache_max_entries = False
+        msg_cache_time_to_live = msg_packet_delay = False
+
+    return (
+        aprsis_callsign,
+        aprsis_tocall,
+        aprsis_server_name,
+        aprsis_server_port,
+        aprsis_simulate_send,
+        aprsis_passcode,
+        msg_cache_max_entries,
+        msg_cache_time_to_live,
+        msg_packet_delay,
+    )
 
 
 if __name__ == "__main__":

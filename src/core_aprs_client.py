@@ -1,9 +1,7 @@
 #!/usr/local/bin/python3
 #
-# Alexa-APRS Gateway: APRS consumer for Alexa messages
-# Receives APRS messages, confirms them (whereas necessary) and
-# adds them to an AWS SQS queue
-# Author: Joerg Schultze-Lutter, 2022
+# Core APRS Client
+# Author: Joerg Schultze-Lutter, 2025
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -253,6 +251,7 @@ def mycallback(raw_aprs_packet: dict):
                         aprs_cache=aprs_message_cache,
                     )
 
+
 def run_listener():
     """
     Main listener; either performs the initial AWS setup or
@@ -348,7 +347,6 @@ def run_listener():
     # Enter the 'eternal' receive loop
     try:
         while True:
-
             # Create the APRS-IS object and set user/pass/host/port
             AIS = aprslib.IS(
                 callsign=aprsis_callsign,
@@ -363,8 +361,8 @@ def run_listener():
             # Establish the connection to APRS-IS
             logger.info(
                 msg=f"Establishing connection to APRS-IS: server={aprsis_server_name},"
-                    f"port={aprsis_server_port}, filter={aprsis_server_filter},"
-                    f"APRS-IS User: {aprsis_callsign}, APRS-IS passcode: {aprsis_passcode}"
+                f"port={aprsis_server_port}, filter={aprsis_server_filter},"
+                f"APRS-IS User: {aprsis_callsign}, APRS-IS passcode: {aprsis_passcode}"
             )
             AIS.connect(blocking=True)
 
@@ -406,6 +404,7 @@ def run_listener():
         # Close APRS-IS connection whereas still present
         if AIS:
             AIS.close()
+
 
 if __name__ == "__main__":
     run_listener()
