@@ -29,12 +29,14 @@ from utils import (
     add_aprs_message_to_cache,
     get_aprs_message_from_cache,
     get_command_line_params,
+    signal_term_handler
 )
 import json
 from uuid import uuid1
 from aprs_communication import send_ack, send_aprs_message_list
 import time
 from datetime import datetime
+import atexit
 
 logging.basicConfig(
     level=logging.INFO,
@@ -63,24 +65,6 @@ msg_cache_max_entries = 2160
 msg_cache_time_to_live = 60 * 60
 msg_packet_delay = 6.0
 
-
-def signal_term_handler(signal_number, frame):
-    """
-    Signal handler for SIGTERM signals. Ensures that the program
-    gets terminated in a safe way, thus allowing all databases etc
-    to be written to disk.
-    Parameters
-    ==========
-    signal_number:
-        The signal number
-    frame:
-        Signal frame
-    Returns
-    =======
-    """
-
-    logger.info(msg="Received SIGTERM; forcing clean program exit")
-    sys.exit(0)
 
 
 # APRSlib callback
@@ -266,6 +250,21 @@ def run_listener():
 
     """
     logger.info(msg="Startup ....")
+
+    # Install our custom exception handler, thus allowing us to signal the
+    # user who hosts MPAD with a message whenever the program is prone to crash
+    # OR has ended. In any case, we will then send the file to the host
+    #
+    # if you are not interested in a post-mortem call stack, remove the following
+    # two lines
+    logger.info(msg=f"Activating MPAD exception handler")
+    atexit.register(mpad_exception_handler)
+    sys.excepthook = handle_exception
+
+    # Check whether the data directory exists
+    success = check_and_create_data_directory()
+    if not success:
+        exit(0)
 
     # Get the command line params
     run_aws_setup = get_command_line_params()

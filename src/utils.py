@@ -1,5 +1,5 @@
 #
-# Alexa-APRS Gateway: various utility routines
+# Core APRS Client: various utility routines
 # Author: Joerg Schultze-Lutter, 2022
 #
 # This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,10 @@ import logging
 from unidecode import unidecode
 import argparse
 import configparser
+import zipfile
+
+mpad_data_directory = "data_files"
+mpad_root_directory = os.path.abspath(os.getcwd())
 
 # this is the name of the  directory where we store
 # our data files
@@ -231,6 +235,175 @@ def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
         msg_cache_time_to_live,
         msg_packet_delay,
     )
+
+def read_aprs_message_counter(file_name: str = "core_aprs_client_message_counter.txt"):
+    """
+    Reads the latest message counter from a file
+
+    If file is not present, we will start with '0'
+
+    Parameters
+    ==========
+    file_name: 'str'
+        Name of the file we are going to read the data from
+
+    Returns
+    =======
+    message_counter: 'int'
+        last message counter (or '0')
+    """
+    served_packages = 0
+    absolute_path_filename = build_full_pathname(file_name=file_name)
+    try:
+        with open(f"{absolute_path_filename}", "r") as f:
+            if f.mode == "r":
+                contents = f.read()
+                f.close()
+                served_packages = int(contents)
+    except:
+        served_packages = 0
+        logger.info(
+            msg=f"Cannot read content from message counter file {absolute_path_filename}; will create a new file"
+        )
+    return served_packages
+
+
+def write_aprs_message_counter(
+    aprs_message_counter: int, file_name: str = "core_aprs_client_message_counter.txt"
+):
+    """
+    Writes the latest message counter to a file
+
+    Parameters
+    ==========
+    aprs_message_counter: 'int'
+        latest message counter # from file
+    file_name: 'str'
+        Name of the file we are going to read the data from
+
+    Returns
+    =======
+    Nothing
+    """
+    absolute_path_filename = build_full_pathname(file_name=file_name)
+    try:
+        with open(f"{absolute_path_filename}", "w") as f:
+            f.write("%d" % aprs_message_counter)
+            f.close()
+    except:
+        logger.info(msg=f"Cannot write message counter to {absolute_path_filename}")
+
+def build_full_pathname(
+    file_name: str,
+    root_path_name: str = mpad_config.mpad_root_directory,
+    relative_path_name: str = mpad_config.mpad_data_directory,
+):
+    """
+    Build a full-grown path based on $CWD, an optional relative directory name and a file name.
+
+    Parameters
+    ==========
+    file_name: 'str'
+        file name without path
+    root_path_name: 'str'
+        relative path name that we are going to add.
+    relative_path_name: 'str'
+        relative path name that we are going to add.
+
+    Returns
+    =======
+    full_path_name: 'str'
+        full path, consisting of root path name, the relative path name and the file name
+    """
+    return os.path.join(root_path_name, relative_path_name, file_name)
+
+def create_zip_file_from_log(log_file_name: str):
+    """
+    Creates a zip file from our current log file and
+    returns the file name to the caller
+
+    Parameters
+    ==========
+    log_file_name: 'str'
+        our file name, e.g. 'nohup.out'
+
+    Returns
+    =======
+    success: 'bool'
+        True if we were able to create our zip file, otherwise false
+    """
+
+    # Check if the file actually exists
+    if not log_file_name:
+        return False, file_name
+    if not check_if_file_exists(file_name=log_file_name):
+        return False, None
+
+    # get a UTC time stamp as reference and create the file name
+    _utc = datetime.datetime.utcnow()
+    zip_file_name = datetime.datetime.strftime(
+        _utc, "core_aprs_client_crash_dump_%Y-%m-%d_%H-%M-%S%z.zip"
+    )
+
+    # write the zip file to disk
+    with zipfile.ZipFile(zip_file_name, mode="w") as archive:
+        archive.write(log_file_name)
+
+    # and return the file name
+    return True, zip_file_name
+
+def create_zip_file_from_log(log_file_name: str):
+    """
+    Creates a zip file from our current log file and
+    returns the file name to the caller
+
+    Parameters
+    ==========
+    log_file_name: 'str'
+        our file name, e.g. 'nohup.out'
+
+    Returns
+    =======
+    success: 'bool'
+        True if we were able to create our zip file, otherwise false
+    """
+
+    # Check if the file actually exists
+    if not log_file_name:
+        return False, file_name
+    if not check_if_file_exists(file_name=log_file_name):
+        return False, None
+
+    # get a UTC time stamp as reference and create the file name
+    _utc = datetime.datetime.utcnow()
+    zip_file_name = datetime.datetime.strftime(
+        _utc, "core_aprs_client_crash_dump_%Y-%m-%d_%H-%M-%S%z.zip"
+    )
+
+    # write the zip file to disk
+    with zipfile.ZipFile(zip_file_name, mode="w") as archive:
+        archive.write(log_file_name)
+
+    # and return the file name
+    return True, zip_file_name
+
+def signal_term_handler(signal_number, frame):
+    """
+    Signal handler for SIGTERM signals. Ensures that the program
+    gets terminated in a safe way, thus allowing all databases etc
+    to be written to disk.
+    Parameters
+    ==========
+    signal_number:
+        The signal number
+    frame:
+        Signal frame
+    Returns
+    =======
+    """
+
+    logger.info(msg="Received SIGTERM; forcing clean program exit")
+    sys.exit(0)
 
 
 if __name__ == "__main__":
