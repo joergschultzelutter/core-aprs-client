@@ -25,6 +25,7 @@ from unidecode import unidecode
 import argparse
 import configparser
 import zipfile
+import sys
 
 mpad_data_directory = "data_files"
 mpad_root_directory = os.path.abspath(os.getcwd())
@@ -195,6 +196,15 @@ def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
     config = configparser.ConfigParser()
 
     success = False
+
+    aprsis_callsign = aprsis_tocall = aprsis_server_name = aprsis_server_port = False
+    aprsis_simulate_send = aprsis_passcode = msg_cache_max_entries = False
+    msg_cache_time_to_live = msg_packet_delay = False
+    aprsis_server_filter = aprsis_broadcast_position = False
+    aprsis_table = aprsis_symbol = False
+    aprsis_latitude = aprsis_longitude = False
+    aprsis_altitude_ft = aprsis_broadcast_bulletins = False
+
     try:
         config.read(config_filename)
         aprsis_callsign = config.get("core_aprs_client_config", "aprsis_callsign")
@@ -212,6 +222,21 @@ def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
             "core_aprs_client_config", "msg_cache_time_to_live"
         )
         msg_packet_delay = config.get("core_aprs_client_config", "msg_packet_delay")
+        aprsis_server_filter = config.get(
+            "core_aprs_client_config", "aprsis_server_filter"
+        )
+        aprsis_broadcast_position = config.get(
+            "core_aprs_client_config", "aprsis_broadcast_position"
+        )
+        aprsis_table = config.get("core_aprs_client_config", "aprsis_table")
+        aprsis_symbol = config.get("core_aprs_client_config", "aprsis_symbol")
+        aprsis_latitude = config.get("core_aprs_client_config", "aprsis_latitude")
+        aprsis_longitude = config.get("core_aprs_client_config", "aprsis_longitude")
+        aprsis_altitude_ft = config.get("core_aprs_client_config", "aprsis_altitude_ft")
+        aprsis_broadcast_bulletins = config.get(
+            "core_aprs_client_config", "aprsis_broadcast_bulletins"
+        )
+
         success = True
     except Exception as ex:
         logger.info(
@@ -223,8 +248,13 @@ def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
         ) = aprsis_server_name = aprsis_server_port = False
         aprsis_simulate_send = aprsis_passcode = msg_cache_max_entries = False
         msg_cache_time_to_live = msg_packet_delay = False
+        aprsis_server_filter = aprsis_broadcast_position = False
+        aprsis_table = aprsis_symbol = False
+        aprsis_latitude = aprsis_longitude = False
+        aprsis_altitude_ft = aprsis_broadcast_bulletins = False
 
     return (
+        success,
         aprsis_callsign,
         aprsis_tocall,
         aprsis_server_name,
@@ -234,7 +264,16 @@ def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
         msg_cache_max_entries,
         msg_cache_time_to_live,
         msg_packet_delay,
+        aprsis_server_filter,
+        aprsis_broadcast_position,
+        aprsis_table,
+        aprsis_symbol,
+        aprsis_latitude,
+        aprsis_longitude,
+        aprsis_altitude_ft,
+        aprsis_broadcast_bulletins,
     )
+
 
 def read_aprs_message_counter(file_name: str = "core_aprs_client_message_counter.txt"):
     """
@@ -293,6 +332,7 @@ def write_aprs_message_counter(
     except:
         logger.info(msg=f"Cannot write message counter to {absolute_path_filename}")
 
+
 def build_full_pathname(
     file_name: str,
     root_path_name: str = mpad_config.mpad_root_directory,
@@ -317,40 +357,6 @@ def build_full_pathname(
     """
     return os.path.join(root_path_name, relative_path_name, file_name)
 
-def create_zip_file_from_log(log_file_name: str):
-    """
-    Creates a zip file from our current log file and
-    returns the file name to the caller
-
-    Parameters
-    ==========
-    log_file_name: 'str'
-        our file name, e.g. 'nohup.out'
-
-    Returns
-    =======
-    success: 'bool'
-        True if we were able to create our zip file, otherwise false
-    """
-
-    # Check if the file actually exists
-    if not log_file_name:
-        return False, file_name
-    if not check_if_file_exists(file_name=log_file_name):
-        return False, None
-
-    # get a UTC time stamp as reference and create the file name
-    _utc = datetime.datetime.utcnow()
-    zip_file_name = datetime.datetime.strftime(
-        _utc, "core_aprs_client_crash_dump_%Y-%m-%d_%H-%M-%S%z.zip"
-    )
-
-    # write the zip file to disk
-    with zipfile.ZipFile(zip_file_name, mode="w") as archive:
-        archive.write(log_file_name)
-
-    # and return the file name
-    return True, zip_file_name
 
 def create_zip_file_from_log(log_file_name: str):
     """
@@ -370,13 +376,13 @@ def create_zip_file_from_log(log_file_name: str):
 
     # Check if the file actually exists
     if not log_file_name:
-        return False, file_name
-    if not check_if_file_exists(file_name=log_file_name):
+        return False, None
+    if not does_file_exist(file_name=log_file_name):
         return False, None
 
     # get a UTC time stamp as reference and create the file name
-    _utc = datetime.datetime.utcnow()
-    zip_file_name = datetime.datetime.strftime(
+    _utc = datetime.utcnow()
+    zip_file_name = datetime.strftime(
         _utc, "core_aprs_client_crash_dump_%Y-%m-%d_%H-%M-%S%z.zip"
     )
 
@@ -386,6 +392,7 @@ def create_zip_file_from_log(log_file_name: str):
 
     # and return the file name
     return True, zip_file_name
+
 
 def signal_term_handler(signal_number, frame):
     """
