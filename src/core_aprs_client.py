@@ -29,7 +29,14 @@ from utils import (
     add_aprs_message_to_cache,
     get_aprs_message_from_cache,
     get_command_line_params,
-    signal_term_handler
+    signal_term_handler,
+    get_program_config_from_file,
+    check_if_file_exists,
+    check_and_create_data_directory,
+    create_zip_file_from_log,
+    send_apprise_message,
+    read_aprs_message_counter,
+    write_aprs_message_counter,
 )
 import json
 from uuid import uuid1
@@ -65,6 +72,78 @@ msg_cache_max_entries = 2160
 msg_cache_time_to_live = 60 * 60
 msg_packet_delay = 6.0
 
+
+def client_exception_handler():
+    """
+    This function will be called in case of a regular program exit OR
+    an uncaught exception. If an exception has occurred, we will try to
+    send out an Apprise message along with the stack trace to the user
+
+    Parameters
+    ==========
+
+    Returns
+    =======
+    """
+
+    if not exception_occurred:
+        return
+
+    # Send a message before we hit the bucket
+    message_body = f"The MPAD process has crashed. Reason: {ex_value}"
+
+    # Try to zip the log file if possible
+    success, log_file_name = create_zip_file_from_log(mpad_config.mpad_nohup_filename)
+
+    # check if we can spot a 'nohup' file which already contains our status
+    if log_file_name and check_if_file_exists(log_file_name):
+        message_body = message_body + " (log file attached)"
+
+    # send_apprise_message will check again if the file exists or not
+    # Therefore, we can skip any further detection steps here
+    send_apprise_message(
+        message_header="MPAD process has crashed",
+        message_body=message_body,
+        apprise_config_file=apprise_config_file,
+        message_attachment=log_file_name,
+    )
+
+
+def handle_exception(exc_type, exc_value, exc_traceback):
+    """
+    Custom exception handler which is installed by the
+    main process. We only do a few things:
+    - remember that there has been an uncaught exception
+    - save the exception type / value / tracebace
+
+    Parameters
+    ==========
+    exc_type:
+        exception type object
+    exc_value:
+        exception value object
+    exc_traceback:
+        exception traceback object
+
+    Returns
+    =======
+    """
+
+    global exception_occurred
+    global ex_type
+    global ex_value
+    global ex_traceback
+
+    # set some global values so that we know why the program has crashed
+    exception_occurred = True
+    ex_type = exc_type
+    ex_value = exc_value
+    ex_traceback = exc_traceback
+
+    logger.info(f"Core process has received uncaught exception: {exc_value}")
+
+    # and continue with the regular flow of things
+    sys.__excepthook__(exc_type, exc_value, exc_traceback)
 
 
 # APRSlib callback
@@ -251,6 +330,36 @@ def run_listener():
     """
     logger.info(msg="Startup ....")
 
+    # Get the command line params
+    configfile = get_command_line_params()
+
+    if not configfile:
+        sys.exit(0)
+
+    (
+        success,
+        aprsis_callsign,
+        aprsis_tocall,
+        aprsis_server_name,
+        aprsis_server_port,
+        aprsis_simulate_send,
+        aprsis_passcode,
+        msg_cache_max_entries,
+        msg_cache_time_to_live,
+        msg_packet_delay,
+        aprsis_server_filter,
+        aprsis_broadcast_position,
+        aprsis_table,
+        aprsis_symbol,
+        aprsis_latitude,
+        aprsis_longitude,
+        aprsis_altitude_ft,
+        aprsis_broadcast_bulletins,
+        apprise_config_file,
+    ) = get_program_config_from_file(config_filename=configfile)
+    if not success:
+        sys.exit(0)
+
     # Install our custom exception handler, thus allowing us to signal the
     # user who hosts MPAD with a message whenever the program is prone to crash
     # OR has ended. In any case, we will then send the file to the host
@@ -258,7 +367,7 @@ def run_listener():
     # if you are not interested in a post-mortem call stack, remove the following
     # two lines
     logger.info(msg=f"Activating MPAD exception handler")
-    atexit.register(mpad_exception_handler)
+    atexit.register(client_exception_handler)
     sys.excepthook = handle_exception
 
     # Check whether the data directory exists
@@ -266,65 +375,10 @@ def run_listener():
     if not success:
         exit(0)
 
-    # Get the command line params
-    run_aws_setup = get_command_line_params()
-
-    # Get or create the SQS object for 'aprs to alexa'
-    if run_aws_setup:
-        logger.info(
-            msg=f"Performing SQS object setup; name = '{sqs_aprs_to_alexa_name}'"
-        )
-    else:
-        logger.info(
-            msg=f"Performing lookup for SQS object '{sqs_aprs_to_alexa_attributes}'"
-        )
-    sqs_aprs_to_alexa_queue = sqs_create_or_get_object(
-        queue_name=sqs_aprs_to_alexa_name,
-        queue_attributes=sqs_aprs_to_alexa_attributes,
-        region=aws_region,
-        create_if_missing=run_aws_setup,
-    )
-
-    # Get or create the SQS object for 'alexa to aprs'
-    if run_aws_setup:
-        logger.info(
-            msg=f"Performing SQS object setup; name = '{sqs_alexa_to_aprs_name}'"
-        )
-    else:
-        logger.info(
-            msg=f"Performing lookup for SQS object '{sqs_alexa_to_aprs_attributes}'"
-        )
-    sqs_alexa_to_aprs_queue = sqs_create_or_get_object(
-        queue_name=sqs_alexa_to_aprs_name,
-        queue_attributes=sqs_alexa_to_aprs_attributes,
-        region=aws_region,
-        create_if_missing=run_aws_setup,
-    )
-
-    # Get or create the S3 bucket where we share
-    # the message counter with our AWS lambda code
-    if run_aws_setup:
-        logger.info(msg=f"Performing S3 object setup; name = '{s3_bucket_name}'")
-    else:
-        logger.info(msg=f"Performing lookup for S3 object '{s3_bucket_name}'")
-    s3_bucket = s3_create_or_get_bucket(
-        bucket_name=s3_bucket_name,
-        bucket_attributes=s3_bucket_attributes,
-        region=aws_region,
-        create_if_missing=run_aws_setup,
-    )
-
     #
     # Read the message counter (function will create the S3 object if it does not exist in the bucket)
     logger.info(msg="Reading APRS message counter...")
-    aprs_message_counter = s3_get_aprs_msg_counter(
-        bucket_name=s3_bucket_name, object_name=s3_object_name, region=aws_region
-    )
-
-    # Abort the program if we were just to perform the setup tasks
-    if run_aws_setup:
-        logger.info(msg="All setup tasks were completed; exiting ...")
-        sys.exit(0)
+    aprs_message_counter = read_aprs_message_counter()
 
     # Register the SIGTERM handler; this will allow a safe shutdown of the program
     logger.info(msg="Registering SIGTERM handler for safe shutdown...")

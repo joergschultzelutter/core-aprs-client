@@ -1,11 +1,19 @@
 [core_aprs_client_config]
 
+#
 # APRS Listener call sign
+# Default call sign is COAC
+# Amend both aprsis_callsign and aprsis_server_filter settings
+# in case you want to use a different call sign
+#
 # This is the call sign on which the APRS client listens to
 # while being connected to APRS-IS. Read: you have to send
 # your messages to this call sign
 aprsis_callsign = "COAC"
-
+#
+# APRS-IS message filter. Amend if you
+aprsis_server_filter = f"g/COAC"
+#
 # This is the APRS "tocall" identifier that is used for outgoing messages
 # You might want to request your very own TOCALL for your code
 # Details: https://github.com/aprsorg/aprs-deviceid
@@ -24,8 +32,8 @@ aprsis_server_port = 14580
 aprsis_simulate_send = false
 #
 # APRS-IS passcode (numeric). Replace with your very own passcode
-aprsis_passcode = 12345  
-  
+aprsis_passcode = 12345
+
 # Internal message cache configuration
 #
 # maximum number of messages
@@ -36,10 +44,31 @@ msg_cache_time_to_live = 3600
 #
 # delay between messages if more than one message is to be sent to APRS-IS
 msg_packet_delay = 6.0
-
-
-
-# Amend parameters if necessary
-aprsis_server_filter = f"g/{aprsis_callsign}"
-
-
+#
+# Broadcast position true/false
+aprsis_broadcast_position = false
+#
+# Symbol for position broadcasting (only used for cases where
+# aprsis_broadcast_position = true
+# see http://www.aprs.org/symbols/symbolsX.txt
+aprsis_table = "/"  # APRS symbol table (/=primary \=secondary, or overlay)
+aprsis_symbol = "?"  # APRS symbol: Server
+#
+# Latitude and longitude
+# Location of our process (Details: see aprs101.pdf see aprs101.pdf chapter 6 pg. 23)
+# Ensure to honor the format settings as described in the specification, otherwise
+# your package might get rejected and/or not surface on aprs.fi
+# Degrees: lat: 0-90, lon: 0-180
+# Minutes and Seconds: 00-60
+# Bearing: latitude N or S, longitude: E or W
+aprsis_latitude = "5151.84N"  # 8 chars fixed length, ddmm.ssN
+aprsis_longitude = "00935.48E"  # 9 chars fixed length, dddmm.ssE
+#
+# Altitude in *FEET* (not meters) for APRS beacon. Details: see aprs101.pdf chapter 8
+aprsis_beacon_altitude_ft = 824
+##
+# Broadcast APRS bulletins (BLN0..9) true/false
+aprsis_broadcast_bulletins = false
+#
+# Apprise config file name
+apprise_config_file="apprise.yml"

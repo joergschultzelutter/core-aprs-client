@@ -171,3 +171,4 @@ cython_debug/
 .pypirc
 .DS_Store
 core_aprs_client.yml
+apprise.yml

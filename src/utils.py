@@ -26,6 +26,7 @@ import argparse
 import configparser
 import zipfile
 import sys
+import apprise
 
 mpad_data_directory = "data_files"
 mpad_root_directory = os.path.abspath(os.getcwd())
@@ -81,7 +82,7 @@ def add_aprs_message_to_cache(
     return aprs_cache
 
 
-def does_file_exist(file_name: str):
+def check_if_file_exists(file_name: str):
     """
     Checks if the given file exists. Returns True/False.
 
@@ -201,7 +202,7 @@ def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
     aprsis_simulate_send = aprsis_passcode = msg_cache_max_entries = False
     msg_cache_time_to_live = msg_packet_delay = False
     aprsis_server_filter = aprsis_broadcast_position = False
-    aprsis_table = aprsis_symbol = False
+    aprsis_table = aprsis_symbol = apprise_config_file = False
     aprsis_latitude = aprsis_longitude = False
     aprsis_altitude_ft = aprsis_broadcast_bulletins = False
 
@@ -236,6 +237,9 @@ def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
         aprsis_broadcast_bulletins = config.get(
             "core_aprs_client_config", "aprsis_broadcast_bulletins"
         )
+        apprise_config_file = config.get(
+            "core_aprs_client_config", "apprise_config_file"
+        )
 
         success = True
     except Exception as ex:
@@ -249,7 +253,7 @@ def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
         aprsis_simulate_send = aprsis_passcode = msg_cache_max_entries = False
         msg_cache_time_to_live = msg_packet_delay = False
         aprsis_server_filter = aprsis_broadcast_position = False
-        aprsis_table = aprsis_symbol = False
+        aprsis_table = aprsis_symbol = apprise_config_file = False
         aprsis_latitude = aprsis_longitude = False
         aprsis_altitude_ft = aprsis_broadcast_bulletins = False
 
@@ -272,6 +276,7 @@ def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
         aprsis_longitude,
         aprsis_altitude_ft,
         aprsis_broadcast_bulletins,
+        apprise_config_file,
     )
 
 
@@ -377,7 +382,7 @@ def create_zip_file_from_log(log_file_name: str):
     # Check if the file actually exists
     if not log_file_name:
         return False, None
-    if not does_file_exist(file_name=log_file_name):
+    if not check_if_file_exists(file_name=log_file_name):
         return False, None
 
     # get a UTC time stamp as reference and create the file name
@@ -411,6 +416,126 @@ def signal_term_handler(signal_number, frame):
 
     logger.info(msg="Received SIGTERM; forcing clean program exit")
     sys.exit(0)
+
+
+def send_apprise_message(
+    message_header: str,
+    message_body: str,
+    apprise_config_file: str,
+    message_attachment: str = None,
+):
+    """
+    Generates Apprise messages and triggers transmission to the user
+    We will only use this for post-mortem dumps in case MPAD is on the
+    verge of crashing
+
+    Parameters
+    ==========
+    message_header : 'str'
+        The message header that we want to send to the user
+    message_body : 'str'
+        The message body that we want to send to the user
+    apprise_config_file: 'str'
+        Apprise Yaml configuration file
+
+    Returns
+    =======
+    success: 'bool'
+        True if successful
+    """
+
+    # predefine the output value
+    success = False
+
+    logger.debug(msg="Starting Apprise message processing")
+
+    if not apprise_config_file or apprise_config_file == "NOT_CONFIGURED":
+        logger.debug(msg="Skipping Apprise messaging; message file is not configured")
+        return success
+
+    if not check_if_file_exists(apprise_config_file):
+        logger.error(
+            msg=f"Apprise config file {apprise_config_file} does not exist; aborting"
+        )
+        return success
+
+    if message_attachment and not check_if_file_exists(message_attachment):
+        logger.debug("Attachment file missing; disabling attachments")
+        message_attachment = None
+
+    # Create the Apprise instance
+    apobj = apprise.Apprise()
+
+    # Create an Config instance
+    config = apprise.AppriseConfig()
+
+    # Add a configuration source:
+    config.add(apprise_config_file)
+
+    # Make sure to add our config into our apprise object
+    apobj.add(config)
+
+    if not message_attachment:
+        # Send the notification
+        apobj.notify(
+            body=message_body,
+            title=message_header,
+            tag="all",
+            notify_type=apprise.NotifyType.FAILURE,
+        )
+    else:
+        # Send the notification
+        apobj.notify(
+            body=message_body,
+            title=message_header,
+            tag="all",
+            notify_type=apprise.NotifyType.FAILURE,
+            attach=message_attachment,
+        )
+
+    success = True
+
+    logger.debug(msg="Finished Apprise message processing")
+    return success
+
+
+def check_and_create_data_directory(
+    root_path_name: str = mpad_config.mpad_root_directory,
+    relative_path_name: str = mpad_config.mpad_data_directory,
+):
+    """
+    Check if the data directory is present and create it, if necessary
+
+    Parameters
+    ==========
+    root_path_name: 'str'
+        relative path name that we are going to add.
+    relative_path_name: 'str'
+        relative path name that we are going to add.
+
+    Returns
+    =======
+    success: bool
+        False in case of error
+    """
+    success = True
+    _data_directory = os.path.join(root_path_name, relative_path_name)
+    if not os.path.exists(_data_directory):
+        logger.info(
+            msg=f"Data directory {_data_directory} does not exist, creating ..."
+        )
+        try:
+            os.mkdir(path=_data_directory)
+        except OSError:
+            logger.info(
+                msg=f"Cannot create data directory {_data_directory}, aborting ..."
+            )
+            success = False
+    else:
+        if not os.path.isdir(_data_directory):
+            logger.info(msg=f"{_data_directory} is not a directory, aborting ...")
+            success = False
+    return success
 
 
 if __name__ == "__main__":

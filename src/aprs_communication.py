@@ -20,7 +20,6 @@
 import aprslib
 import logging
 import time
-import re
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s %(module)s -%(levelname)s- %(message)s"
