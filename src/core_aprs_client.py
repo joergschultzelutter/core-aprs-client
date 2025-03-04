@@ -44,6 +44,7 @@ from aprs_communication import send_ack, send_aprs_message_list
 import time
 from datetime import datetime
 import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
 
 logging.basicConfig(
     level=logging.INFO,
@@ -423,25 +424,75 @@ def run_listener():
             if AIS._connected:
                 logger.debug(msg="Established the connection to APRS-IS")
 
-                # Start the consumer thread
-                logger.info(msg="Starting callback consumer")
-                AIS.consumer(mycallback, blocking=True, immortal=True, raw=False)
-
+            aprs_scheduler = None
+            if aprsis_broadcast_position or aprsis_broadcast_bulletins:
+                # If we reach this position in the code, we have at least one
+                # task that needs to be scheduled (bulletins and/or position messages
                 #
-                # We have left the callback, let's clean up a few things before
-                # we try to re-establish our connection
-                logger.debug(msg="Have left the callback consumer")
-                #
-                # Verbindung schließen
-                logger.debug(msg="Closing APRS connection to APRS-IS")
-                AIS.close()
-                AIS = None
-            else:
-                logger.info(msg="Cannot re-establish connection to APRS-IS")
+                # Create the scheduler
+                aprs_scheduler = BackgroundScheduler()
 
-            # Enter sleep mode and then restart the loop
-            logger.info(msg=f"Sleeping {msg_packet_delay} secs")
-            time.sleep(msg_packet_delay)
+                # Install two schedulers tasks, if requested by the user
+                # The first task is responsible for sending out beacon messages
+                # to APRS; it will be triggered every 30 mins
+                #
+
+                # The 2nd task is responsible for sending out bulletin messages
+                # to APRS; it will be triggered every 4 hours
+                #
+
+                if aprsis_broadcast_position:
+                    # Send initial beacon after establishing the connection to APRS_IS
+                    logger.info(
+                        msg="Send initial beacon after establishing the connection to APRS_IS"
+                    )
+                    send_beacon_and_status_msg(AIS, aprsis_simulate_send)
+
+                    # Position beaconing; interval = 30 min
+                    aprs_scheduler.add_job(
+                        send_beacon_and_status_msg,
+                        "interval",
+                        id="aprsbeacon",
+                        minutes=30,
+                        args=[AIS, aprsis_simulate_send],
+                    )
+
+                if aprsis_broadcast_bulletins:
+                    # Install scheduler task 2 - MPAD standard bulletins (advertising the program instance)
+                    aprs_scheduler.add_job(
+                        send_bulletin_messages,
+                        "interval",
+                        id="aprsbulletin",
+                        hours=4,
+                        args=[
+                            AIS,
+                            mpad_config.aprs_bulletin_messages,
+                            aprsis_simulate_send,
+                        ],
+                    )
+
+            # start the scheduler
+            aprs_scheduler.start()
+
+            # Start the consumer thread
+            logger.info(msg="Starting callback consumer")
+            AIS.consumer(mycallback, blocking=True, immortal=True, raw=False)
+
+            #
+            # We have left the callback, let's clean up a few things before
+            # we try to re-establish our connection
+            logger.debug(msg="Have left the callback consumer")
+            #
+            # Verbindung schließen
+            logger.debug(msg="Closing APRS connection to APRS-IS")
+            AIS.close()
+            AIS = None
+        else:
+            logger.info(msg="Cannot re-establish connection to APRS-IS")
+
+        # Enter sleep mode and then restart the loop
+        logger.info(msg=f"Sleeping {msg_packet_delay} secs")
+        time.sleep(msg_packet_delay)
 
     except (KeyboardInterrupt, SystemExit):
         # Tell the user that we are about to terminate our work
@@ -453,6 +504,19 @@ def run_listener():
         #            sqs_remove_queue(queue=sqs_aprs_to_alexa_queue)
         #        if sqs_alexa_to_aprs_queue:
         #            sqs_remove_queue(queue=alexa_to_aprs_queue)
+
+        if aprs_scheduler:
+            logger.info(msg="Pausing aprs_scheduler")
+            aprs_scheduler.pause()
+            aprs_scheduler.remove_all_jobs()
+            logger.info(msg="shutting down aprs_scheduler")
+            if aprs_scheduler.state != apscheduler.schedulers.base.STATE_STOPPED:
+                try:
+                    aprs_scheduler.shutdown()
+                except:
+                    logger.info(
+                        msg="Exception during scheduler shutdown SystemExit loop"
+                    )
 
         # Close APRS-IS connection whereas still present
         if AIS:
