@@ -2,3 +2,4 @@ aprslib
 apprise
 expiringdict
 unidecode
+apscheduler
