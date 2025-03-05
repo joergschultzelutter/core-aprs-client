@@ -72,3 +72,6 @@ aprsis_broadcast_bulletins = false
 #
 # Apprise config file name
 apprise_config_file="apprise.yml"
+#
+# Force outgoing unicode messages
+force_outgoing_unicode_messages=false

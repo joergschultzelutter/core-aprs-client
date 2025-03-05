@@ -203,7 +203,7 @@ def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
     msg_cache_time_to_live = msg_packet_delay = False
     aprsis_server_filter = aprsis_broadcast_position = False
     aprsis_table = aprsis_symbol = apprise_config_file = False
-    aprsis_latitude = aprsis_longitude = False
+    aprsis_latitude = aprsis_longitude = force_outgoing_unicode_messages = False
     aprsis_altitude_ft = aprsis_broadcast_bulletins = False
 
     try:
@@ -240,6 +240,9 @@ def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
         apprise_config_file = config.get(
             "core_aprs_client_config", "apprise_config_file"
         )
+        force_outgoing_unicode_messages = config.get(
+            "core_aprs_client_config", "force_outgoing_unicode_messages"
+        )
 
         success = True
     except Exception as ex:
@@ -254,7 +257,7 @@ def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
         msg_cache_time_to_live = msg_packet_delay = False
         aprsis_server_filter = aprsis_broadcast_position = False
         aprsis_table = aprsis_symbol = apprise_config_file = False
-        aprsis_latitude = aprsis_longitude = False
+        aprsis_latitude = aprsis_longitude = force_outgoing_unicode_messages = False
         aprsis_altitude_ft = aprsis_broadcast_bulletins = False
 
     return (
@@ -277,6 +280,7 @@ def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
         aprsis_altitude_ft,
         aprsis_broadcast_bulletins,
         apprise_config_file,
+        force_outgoing_unicode_messages,
     )
 
 
@@ -536,6 +540,175 @@ def check_and_create_data_directory(
             logger.info(msg=f"{_data_directory} is not a directory, aborting ...")
             success = False
     return success
+
+
+def make_pretty_aprs_messages(
+    message_to_add: str,
+    destination_list: list = None,
+    max_len: int = 67,
+    separator_char: str = " ",
+    add_sep: bool = True,
+    force_outgoing_unicode_messages: bool = False,
+):
+    """
+    Pretty Printer for APRS messages. As APRS messages are likely to be split
+    up (due to the 67 chars message len limitation), this function prevents
+    'hard cuts'. Any information that is to be injected into message
+    destination list is going to be checked wrt its length. If
+    len(current content) + len(message_to_add) exceeds the max_len value,
+    the content will not be added to the current list string but to a new
+    string in the list.
+
+    Example:
+
+    current APRS message = 1111111111222222222233333333333444444444455555555556666666666
+
+    Add String "Hello World !!!!" (16 chars)
+
+    Add the string the 'conventional' way:
+
+    Message changes to
+    Line 1 = 1111111111222222222233333333333444444444455555555556666666666Hello W
+    Line 2 = orld !!!!
+
+    This function however returns:
+    Line 1 = 1111111111222222222233333333333444444444455555555556666666666
+    Line 2 = Hello World !!!!
+
+    In case the to-be-added text exceeds 67 characters due to whatever reason,
+    this function first tries to split up the content based on space characters
+    in the text and insert the resulting elements word by word, thus preventing
+    the program from ripping the content apart. However, if the content consists
+    of one or multiple strings which _do_ exceed the maximum text len, then there
+    is nothing that we can do. In this case, we will split up the text into 1..n
+    chunks of text and add it to the list element.
+
+    Known issues: if the separator_char is different from its default setting
+    (space), the second element that is inserted into the list may have an
+    additional separator char in the text
+
+    Parameters
+    ==========
+    message_to_add: 'str'
+        message string that is to be added to the list in a pretty way
+        If string is longer than 67 chars, we will truncate the information
+    destination_list: 'list'
+        List with string elements which will be enriched with the
+        'mesage_to_add' string. Default: empty list aka user wants new list
+    max_len: 'int':
+        Max length of the list's string len. 67 for APRS messages
+    separator_char: 'str'
+        Separator that is going to be used for dividing the single
+        elements that the user is going to add
+    add_sep: 'bool'
+        True = we will add the separator when more than one item
+               is in our string. This is the default
+        False = do not add the separator (e.g. if we add the
+                very first line of text, then we don't want a
+                comma straight after the location
+    force_outgoing_unicode_messages: 'bool'
+        False = all outgoing UTF-8 content will be down-converted
+                to ASCII content
+        True = all outgoing UTF-8 content will sent out 'as is'
+
+    Returns
+    =======
+    destination_list: 'list'
+        List array, containing 1..n human readable strings with
+        the "message_to_add' input data
+    """
+    # Dummy handler in case the list is completely empty
+    # or a reference to a list item has not been specified at all
+    # In this case, create an empty list
+    if not destination_list:
+        destination_list = []
+
+    # replace non-permitted APRS characters from the
+    # message text
+    # see APRS specification pg. 71
+    message_to_add = re.sub("[{}|~]+", "", message_to_add)
+
+    # Check if the user wants unicode messages. Default is ASCII
+    if (
+        not mpad_config.mpad_enforce_unicode_messages
+        and not force_outgoing_unicode_messages
+    ):
+        # Convert the message to plain ascii
+        # Unidecode does not take care of German special characters
+        # Therefore, we need to 'translate' them first
+        message_to_add = convert_text_to_plain_ascii(message_string=message_to_add)
+
+    # If new message is longer than max len then split it up with
+    # max chunks of max_len bytes and add it to the array.
+    # This should never happen but better safe than sorry.
+    # Keep in mind that we only transport plain text anyway.
+    if len(message_to_add) > max_len:
+        split_data = message_to_add.split()
+        for split in split_data:
+            # if string is short enough then add it by calling ourself
+            # with the smaller text chunk
+            if len(split) < max_len:
+                destination_list = make_pretty_aprs_messages(
+                    message_to_add=split,
+                    destination_list=destination_list,
+                    max_len=max_len,
+                    separator_char=separator_char,
+                    add_sep=add_sep,
+                    force_outgoing_unicode_messages=force_outgoing_unicode_messages,
+                )
+            else:
+                # string exceeds max len; split it up and add it as is
+                string_list = split_string_to_string_list(
+                    message_string=split, max_len=max_len
+                )
+                for msg in string_list:
+                    destination_list.append(msg)
+    else:  # try to insert
+        # Get very last element from list
+        if len(destination_list) > 0:
+            string_from_list = destination_list[-1]
+
+            # element + new string > max len? no: add to existing string, else create new element in list
+            if len(string_from_list) + len(message_to_add) + 1 <= max_len:
+                delimiter = ""
+                if len(string_from_list) > 0 and add_sep:
+                    delimiter = separator_char
+                string_from_list = string_from_list + delimiter + message_to_add
+                destination_list[-1] = string_from_list
+            else:
+                destination_list.append(message_to_add)
+        else:
+            destination_list.append(message_to_add)
+
+    return destination_list
+
+
+def split_string_to_string_list(message_string: str, max_len: int = 67):
+    """
+    Force-split the string into chunks of max_len size and return a list of
+    strings. This function is going to be called if the string that the user
+    wants to insert exceeds more than e.g. 67 characters. In this unlikely
+    case, we may not be able to add the string in a pretty format - but
+    we will split it up for the user and ensure that none of the data is lost
+
+    Parameters
+    ==========
+    message_string: 'str'
+        message string that is to be divided into 1..n strings of 'max_len"
+        text length
+    max_len: 'int':
+        Max length of the list's string len. Default = 67 for APRS messages
+
+    Returns
+    =======
+    split_strings: 'list'
+        List array, containing 1..n strings with a max len of 'max_len'
+    """
+    split_strings = [
+        message_string[index : index + max_len]
+        for index in range(0, len(message_string), max_len)
+    ]
+    return split_strings
 
 
 if __name__ == "__main__":

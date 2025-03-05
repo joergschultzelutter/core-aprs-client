@@ -37,6 +37,7 @@ from utils import (
     send_apprise_message,
     read_aprs_message_counter,
     write_aprs_message_counter,
+    make_pretty_aprs_messages,
 )
 import json
 from uuid import uuid1
@@ -51,27 +52,6 @@ logging.basicConfig(
     format="%(asctime)s - %(module)s -%(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
-
-# APRS Listener call sign - change this setting
-# this call sign will be used for logging on to APRS-IS
-# and is going to listen to APRS messages which will then
-# be forwarded to AWS / Alexa
-aprsis_callsign = "AMZN"
-
-# The bot uses the default APRS "TOCALL" identifier
-# change this whenever necessary
-aprsis_tocall = "APRS"
-
-# Amend parameters if necessary
-aprsis_passcode = aprslib.passcode(aprsis_callsign)
-aprsis_simulate_send = False
-aprsis_server_filter = f"g/{aprsis_callsign}"
-aprsis_server_name = "euro.aprs2.net"
-aprsis_server_port = 14580
-
-msg_cache_max_entries = 2160
-msg_cache_time_to_live = 60 * 60
-msg_packet_delay = 6.0
 
 
 def client_exception_handler():
@@ -186,12 +166,23 @@ def mycallback(raw_aprs_packet: dict):
     if from_callsign:
         from_callsign = from_callsign.upper()
 
-    # Check if we need to process this message
     if addresse_string:
-        if format_string == "message" and message_text_string:
-            if response_string not in ["ack", "rej"]:
-                logger.info("Starting processing loop - have entered callback")
-                # Alright, this is a message for us
+        if addresse_string in mpad_config.mpad_callsigns_to_parse:
+            # Lets examine what we've got:
+            # 1. Message format should always be 'message'.
+            #    This is even valid for ack/rej responses
+            # 2. Message text should contain content
+            # 3. response text should NOT be ack/rej
+            # Continue if both assumptions are correct
+            if (
+                format_string == "message"
+                and message_text_string
+                and response_string not in ["ack", "rej"]
+            ):
+                # This is a message that belongs to us
+
+                # logger.info(msg=dump_string_to_hex(message_text_string))
+
                 # Check if the message is present in our decaying message cache
                 # If the message can be located, then we can assume that we have
                 # processed (and potentially acknowledged) that message request
@@ -223,62 +214,78 @@ def mycallback(raw_aprs_packet: dict):
                             simulate_send=aprsis_simulate_send,
                             users_callsign=from_callsign,
                             source_msg_no=msgno_string,
-                            alias=aprsis_callsign,
-                            tocall=aprsis_tocall,
                         )
-
-                    # Create our outgoing SQS message item which needs to be a JSON object
-                    # Add some unique data to it (timestamp, uuid)
-                    ts = datetime.utcnow()
-                    ts_string = ts.strftime("%Y-%m-%d %H:%M:%Sz")
-                    msgid = str(uuid1())
-
-                    # Create the data object
-                    sqs_data = {
-                        "from_callsign": from_callsign,
-                        "received": ts_string,
-                        "uuid": msgid,
-                        "message_text": message_text_string,
-                    }
-
-                    # and convert it to a JSON string
-                    json_sqs_data = json.dumps(sqs_data)
-
-                    # our APRS output message
-                    output_message = []
-
-                    # Add the message to the SQS aprs-to-alexa queue
-                    logger.debug(msg=f"SQS send: message = '{pformat(json_sqs_data)}'")
-                    try:
-                        sqs_message = sqs_aprs_to_alexa_queue.sqs_send_message(
-                            MessageBody=json_sqs_data, MessageGroupId="Alexa-APRS-Bot"
-                        )
-                        output_message.append(
-                            "Success! Your message was forwarded to SQS"
-                        )
-                    except Exception as ex:
-                        logger.info(
-                            f"Cannot add your message to SQS queue. Error: {ex.args[0]}"
-                        )
-                        output_message.append("Error! Cannot add your message to SQS")
-
-                    # get the current value for the APRS message counter from S3
-                    # We share this with AWS Lambda - therefore, this object needs to
-                    # get retrieved every time we interact with APRS-IS and we cannot
-                    # keep it in memory
                     #
-                    # THIS CODE IS PRONE TO RACE CONDITIONS - SEE DOCUMENTATION (Reason: proof-of-concept approach)
-                    #
-                    aprs_message_counter = s3_get_aprs_msg_counter(
-                        bucket_name=s3_bucket_name,
-                        object_name=s3_object_name,
-                        region=aws_region,
+                    # This is where the magic happens: Try to figure out what the user
+                    # wants from us. If we were able to understand the user's message,
+                    # 'success' will be true. In any case, the 'response_parameters'
+                    # dictionary will give us a hint about what to do next (and even
+                    # contains the parser's error message if 'success' != True)
+                    # input parameters: the actual message, the user's call sign and
+                    # the aprs.fi API access key for location lookups
+                    success, response_parameters = parse_input_message(
+                        aprs_message=message_text_string,
+                        users_callsign=from_callsign,
+                        aprsdotfi_api_key=aprsdotfi_api_key,
                     )
+                    logger.info(msg=f"Input parser result: {success}")
+                    logger.info(msg=response_parameters)
+                    #
+                    # If the 'success' parameter is True, then we should know
+                    # by now what the user wants from us. Now, we'll leave it to
+                    # another module to generate the output data of what we want
+                    # to send to the user.
+                    # The result to this post-processor will be a general success
+                    # status code and a list item, containing the messages that are
+                    # ready to be sent to the user.
+                    #
+                    # parsing successful?
+                    if success:
+                        # enrich our response parameters with all API keys that we need for
+                        # the completion of the remaining tasks.
+                        response_parameters.update(
+                            {
+                                "aprsdotfi_api_key": aprsdotfi_api_key,
+                                "dapnet_login_callsign": dapnet_login_callsign,
+                                "dapnet_login_passcode": dapnet_login_passcode,
+                                "smtpimap_email_address": smtpimap_email_address,
+                                "smtpimap_email_password": smtpimap_email_password,
+                            }
+                        )
 
-                    # Send our message response(s) to APRS-IS
-                    # This WILL generate only one message but could (theoretically) consist of 2..n
-                    # outgoing messages to APRS-IS, so let's use the result value as future
-                    # message counter value
+                        # Generate the output message for the requested keyword
+                        # The 'success' status is ALWAYS positive even if the
+                        # message could not get processed - the inline'd error
+                        # message counts as positive message content
+                        success, output_message = generate_output_message(
+                            response_parameters=response_parameters,
+                        )
+                    # darn - we failed to hail the Tripods
+                    # this is the branch where the INPUT parser failed to understand
+                    # the message. As we only parse but never process data in that input
+                    # parser, we sinply don't know what to do with the user's message
+                    # and get back to him with a generic response.
+                    else:
+                        human_readable_message = response_parameters[
+                            "human_readable_message"
+                        ]
+                        # Dump the HRM to the user if we have one
+                        if human_readable_message:
+                            output_message = make_pretty_aprs_messages(
+                                message_to_add=f"{human_readable_message}",
+                                add_sep=False,
+                            )
+                        # If not, just dump the link to the instructions
+                        else:
+                            output_message = [
+                                "Sorry, did not understand your request. Have a look at my command",
+                                "syntax, see https://github.com/joergschultzelutter/mpad",
+                            ]
+                        logger.info(
+                            msg=f"Unable to process APRS packet {raw_aprs_packet}"
+                        )
+
+                    # Send our message(s) to APRS-IS
                     aprs_message_counter = send_aprs_message_list(
                         myaprsis=AIS,
                         simulate_send=aprsis_simulate_send,
@@ -288,19 +295,6 @@ def mycallback(raw_aprs_packet: dict):
                         aprs_message_counter=aprs_message_counter,
                         external_message_number=msgno_string,
                         new_ackrej_format=new_ackrej_format,
-                    )
-
-                    # Write the number of served packages to S3. Unlike my other APRS software (e.g. MPAD),
-                    # this code uses a message counter that is SHARED with AWS / Lambda which
-                    # means that we need to apply the update immediately
-                    #
-                    # THIS CODE IS PRONE TO RACE CONDITIONS - SEE DOCUMENTATION (Reason: proof-of-concept approach)
-                    #
-                    aprs_message_counter = s3_update_aprs_msg_counter(
-                        bucket_name=s3_bucket_name,
-                        object_name=s3_object_name,
-                        region=aws_region,
-                        aprs_msg_counter=aprs_message_counter,
                     )
 
                     # We've finished processing this message. Update the decaying
@@ -357,9 +351,14 @@ def run_listener():
         aprsis_altitude_ft,
         aprsis_broadcast_bulletins,
         apprise_config_file,
+        force_outgoing_unicode_messages,
     ) = get_program_config_from_file(config_filename=configfile)
     if not success:
         sys.exit(0)
+
+    # convert Tocall can Call Sign to uppercase (just to be on the safe side)
+    aprsis_callsign = aprsis_callsign.upper()
+    aprsis_tocall = aprsis_tocall.upper()
 
     # Install our custom exception handler, thus allowing us to signal the
     # user who hosts MPAD with a message whenever the program is prone to crash
