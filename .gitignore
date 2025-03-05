@@ -170,5 +170,5 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 .DS_Store
-core_aprs_client.yml
+core_aprs_client.cfg
 apprise.yml

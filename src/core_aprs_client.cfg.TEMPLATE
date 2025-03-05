@@ -1,6 +1,5 @@
-[core_aprs_client_config]
+[config]
 
-#
 # APRS Listener call sign
 # Default call sign is COAC
 # Amend both aprsis_callsign and aprsis_server_filter settings
@@ -9,20 +8,20 @@
 # This is the call sign on which the APRS client listens to
 # while being connected to APRS-IS. Read: you have to send
 # your messages to this call sign
-aprsis_callsign = "COAC"
+aprsis_callsign = COAC
 #
 # APRS-IS message filter. Amend if you
-aprsis_server_filter = f"g/COAC"
+aprsis_server_filter = g/COAC
 #
 # This is the APRS "tocall" identifier that is used for outgoing messages
 # You might want to request your very own TOCALL for your code
 # Details: https://github.com/aprsorg/aprs-deviceid
-aprsis_tocall = "APRS"
+aprsis_tocall = APRS
 
 # Standard APRS client parameters. Amend if necessary.
 #
 # APRS-IS server
-aprsis_server_name = "euro.aprs2.net"
+aprsis_server_name = euro.aprs2.net
 #
 # APRS-IS port number
 aprsis_server_port = 14580
@@ -51,8 +50,10 @@ aprsis_broadcast_position = false
 # Symbol for position broadcasting (only used for cases where
 # aprsis_broadcast_position = true
 # see http://www.aprs.org/symbols/symbolsX.txt
-aprsis_table = "/"  # APRS symbol table (/=primary \=secondary, or overlay)
-aprsis_symbol = "?"  # APRS symbol: Server
+# table: APRS symbol table (/=primary \=secondary, or overlay)
+# symbol: APRS symbol: Server
+aprsis_table = /
+aprsis_symbol = ?
 #
 # Latitude and longitude
 # Location of our process (Details: see aprs101.pdf see aprs101.pdf chapter 6 pg. 23)
@@ -61,8 +62,10 @@ aprsis_symbol = "?"  # APRS symbol: Server
 # Degrees: lat: 0-90, lon: 0-180
 # Minutes and Seconds: 00-60
 # Bearing: latitude N or S, longitude: E or W
-aprsis_latitude = "5151.84N"  # 8 chars fixed length, ddmm.ssN
-aprsis_longitude = "00935.48E"  # 9 chars fixed length, dddmm.ssE
+# latitude=8 chars fixed length, ddmm.ssN
+# longitude = 9 chars fixed length, dddmm.ssE
+aprsis_latitude = 5151.84N
+aprsis_longitude = 00935.48E
 #
 # Altitude in *FEET* (not meters) for APRS beacon. Details: see aprs101.pdf chapter 8
 aprsis_beacon_altitude_ft = 824
@@ -71,7 +74,7 @@ aprsis_beacon_altitude_ft = 824
 aprsis_broadcast_bulletins = false
 #
 # Apprise config file name
-apprise_config_file="apprise.yml"
+apprise_config_file = apprise.yml
 #
 # Force outgoing unicode messages
 force_outgoing_unicode_messages=false

@@ -171,5 +171,65 @@ def get_alphanumeric_counter_value(numeric_counter: int):
     return alphanumeric_counter
 
 
+def send_beacon_and_status_msg(myaprsis: aprslib.inet.IS, simulate_send: bool = True):
+    """
+    Send beacon message list to APRS_IS
+    If 'simulate_send'= True, we still prepare the message but only send it to our log file
+
+    Parameters
+    ==========
+    myaprsis: 'aprslib.inet.IS'
+        Our aprslib object that we will use for the communication part
+    simulate_send: 'bool'
+        If True: Prepare string but only send it to logger
+
+    Returns
+    =======
+    none
+    """
+    logger.info(msg="Reached beacon interval; sending beacons")
+    for bcn in mpad_config.aprs_beacon_messages:
+        stringtosend = f"{mpad_config.mpad_alias}>{mpad_config.mpad_aprs_tocall}:{bcn}"
+        if not simulate_send:
+            logger.info(msg=f"Sending beacon: {stringtosend}")
+            myaprsis.sendall(stringtosend)
+            time.sleep(mpad_config.packet_delay_other)
+        else:
+            logger.info(msg=f"Simulating beacons: {stringtosend}")
+
+
+def send_bulletin_messages(
+    myaprsis: aprslib.inet.IS, bulletin_dict: dict, simulate_send: bool = True
+):
+    """
+    Sends bulletin message list to APRS_IS
+    'Recipient' is 'BLNxxx' and is predefined in the bulletin's dict 'key'. The actual message
+    itself is stored in the dict's 'value'.
+    If 'simulate_send'= True, we still prepare the message but only send it to our log file
+
+    Parameters
+    ==========
+    myaprsis: 'aprslib.inet.IS'
+        Our aprslib object that we will use for the communication part
+    bulletin_dict: 'dict'
+        The bulletins that we are going to send upt to the user. Key = BLNxxx, Value = Bulletin Text
+    simulate_send: 'bool'
+        If True: Prepare string but only send it to logger
+
+    Returns
+    =======
+    none
+    """
+    logger.info(msg="reached bulletin interval; sending bulletins")
+    for recipient_id, bln in bulletin_dict.items():
+        stringtosend = f"{mpad_config.mpad_alias}>{mpad_config.mpad_aprs_tocall}::{recipient_id:9}:{bln}"
+        if not simulate_send:
+            logger.info(msg=f"Sending bulletin: {stringtosend}")
+            myaprsis.sendall(stringtosend)
+            time.sleep(mpad_config.packet_delay_other)
+        else:
+            logger.info(msg=f"simulating bulletins: {stringtosend}")
+
+
 if __name__ == "__main__":
     pass
