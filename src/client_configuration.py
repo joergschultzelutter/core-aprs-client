@@ -28,28 +28,86 @@ program_config = {}
 
 
 def load_config(config_file: str = "core_aprs_client.cfg"):
+    """
+    Loads the program configuration from the config file
+    Returs the program configuration as a dictionary
+    If the config file does not exist, the dictionary will be empty
+
+    Parameters
+    ==========
+    config_file: 'str'
+        Name of the configuration file
+
+    Returns
+    =======
+    none
+    """
+
     if check_if_file_exists(config_file):
-        config.read(config_file)
-        config_to_dict(config)
+        try:
+            config.read(config_file)
+            config_to_dict(config)
+        except:
+            program_config.clear()
     else:
         program_config.clear()
 
 
-def str_to_bool(value: str):
+def _str_to_bool(value: str):
+    """
+    Helper method to convert a string to a boolean
+
+    Parameters
+    ==========
+    value: 'str'
+       Our input value
+
+    Returns
+    =======
+    True/False, dependent on whether or not the input value is a boolean
+    """
     return value.lower() in ("true", "yes", "on", "1")
 
 
-def config_to_dict(config: configparser.ConfigParser):
+def config_to_dict(myconfig: configparser.ConfigParser):
+    """
+    Converts a ConfigParser object to a dictionary
+
+    Parameters
+    ==========
+    myconfig: 'configparser.ConfigParser'
+       ConfigParser input object
+
+    Returns
+    =======
+    program_config: 'dict'
+        Our program configuration dictionary
+    """
     program_config.clear()
-    for section in config.sections():
+    for section in myconfig.sections():
         program_config[section] = {
-            key: str_to_bool(value)
+            key: _str_to_bool(value)
             if value.lower() in ("true", "false", "yes", "no", "on", "off", "1", "0")
             else value
-            for key, value in config[section].items()
+            for key, value in myconfig[section].items()
         }
         return program_config
 
 
 def get_config():
+    """
+    Helper method: gets the program configuration dictionary
+
+    Parameters
+    ==========
+
+    Returns
+    =======
+    program_config: 'dict'
+        Our program configuration dictionary
+    """
     return program_config
+
+
+if __name__ == "__main__":
+    pass
