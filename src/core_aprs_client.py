@@ -296,7 +296,7 @@ def mycallback(raw_aprs_packet: dict):
                     # Send our message(s) to APRS-IS
                     aprs_message_counter = send_aprs_message_list(
                         myaprsis=AIS,
-                        simulate_send=aprsis_simulate_send,
+                        simulate_send=program_config["config"]["aprsis_simulate_send"],
                         message_text_array=output_message,
                         destination_call_sign=from_callsign,
                         send_with_msg_no=msg_no_supported,
@@ -375,11 +375,11 @@ def run_listener():
     # Create the decaying APRS message cache. Any APRS message that is present in
     # this cache will be considered as a duplicate / delayed and will not be processed
     logger.info(
-        msg=f"APRS message dupe cache set to {msg_cache_max_entries} max possible entries and a TTL of {int(msg_cache_time_to_live / 60)} mins"
+        msg=f"APRS message dupe cache set to {program_config["config"]["msg_cache_max_entries"]} max possible entries and a TTL of {int(program_config["config"]["msg_cache_time_to_live"] / 60)} mins"
     )
     aprs_message_cache = ExpiringDict(
-        max_len=msg_cache_max_entries,
-        max_age_seconds=msg_cache_time_to_live,
+        max_len=program_config["config"]["msg_cache_max_entries"],
+        max_age_seconds=program_config["config"]["msg_cache_time_to_live"],
     )
 
     # Enter the 'eternal' receive loop
@@ -387,20 +387,20 @@ def run_listener():
         while True:
             # Create the APRS-IS object and set user/pass/host/port
             AIS = aprslib.IS(
-                callsign=aprsis_callsign,
-                passwd=aprsis_passcode,
-                host=aprsis_server_name,
-                port=aprsis_server_port,
+                callsign=program_config["config"]["aprsis_callsign"],
+                passwd=program_config["config"]["aprsis_passcode"],
+                host=program_config["config"]["aprsis_server_name"],
+                port=program_config["config"]["aprsis_server_port"],
             )
 
             # Set the APRS-IS server filter
-            AIS.set_filter(aprsis_server_filter)
+            AIS.set_filter(program_config["config"]["aprsis_server_filter"])
 
             # Establish the connection to APRS-IS
             logger.info(
-                msg=f"Establishing connection to APRS-IS: server={aprsis_server_name},"
-                f"port={aprsis_server_port}, filter={aprsis_server_filter},"
-                f"APRS-IS User: {aprsis_callsign}, APRS-IS passcode: {aprsis_passcode}"
+                msg=f"Establishing connection to APRS-IS: server={program_config["config"]["aprsis_server_name"]},"
+                f"port={program_config["config"]["aprsis_server_port"]}, filter={program_config["config"]["aprsis_server_filter"]},"
+                f"APRS-IS User: {program_config["config"]["aprsis_callsign"]}, APRS-IS passcode: {program_config["config"]["aprsis_passcode"]}"
             )
             AIS.connect(blocking=True)
 
@@ -409,7 +409,7 @@ def run_listener():
                 logger.debug(msg="Established the connection to APRS-IS")
 
             aprs_scheduler = None
-            if aprsis_broadcast_position or aprsis_broadcast_bulletins:
+            if program_config["config"]["aprsis_broadcast_position"] or program_config["config"]["aprsis_broadcast_bulletins"]:
                 # If we reach this position in the code, we have at least one
                 # task that needs to be scheduled (bulletins and/or position messages
                 #
@@ -425,7 +425,7 @@ def run_listener():
                 # to APRS; it will be triggered every 4 hours
                 #
 
-                if aprsis_broadcast_position:
+                if program_config["config"]["aprsis_broadcast_position"]:
                     # Send initial beacon after establishing the connection to APRS_IS
                     logger.info(
                         msg="Send initial beacon after establishing the connection to APRS_IS"
@@ -441,7 +441,7 @@ def run_listener():
                         args=[AIS, aprsis_simulate_send],
                     )
 
-                if aprsis_broadcast_bulletins:
+                if program_config["config"]["aprsis_broadcast_bulletins"]:
                     # Install scheduler task 2 - MPAD standard bulletins (advertising the program instance)
                     aprs_scheduler.add_job(
                         send_bulletin_messages,
