@@ -21,10 +21,14 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 import configparser
-from utils import check_if_file_exists
+#from utils import check_if_file_exists
 
 config = configparser.ConfigParser()
 program_config = {}
+
+
+def check_if_file_exists(file_name):
+    return True
 
 
 def load_config(config_file: str = "core_aprs_client.cfg"):

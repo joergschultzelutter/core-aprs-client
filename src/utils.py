@@ -23,7 +23,6 @@ import os
 import logging
 from unidecode import unidecode
 import argparse
-import configparser
 import zipfile
 import sys
 import apprise
@@ -191,97 +190,6 @@ def get_command_line_params():
 
     configfile = args.core_aprs_client
     return configfile
-
-
-def get_program_config_from_file(config_filename: str = "core_aprs_client.yml"):
-    config = configparser.ConfigParser()
-
-    success = False
-
-    aprsis_callsign = aprsis_tocall = aprsis_server_name = aprsis_server_port = False
-    aprsis_simulate_send = aprsis_passcode = msg_cache_max_entries = False
-    msg_cache_time_to_live = msg_packet_delay = False
-    aprsis_server_filter = aprsis_broadcast_position = False
-    aprsis_table = aprsis_symbol = apprise_config_file = False
-    aprsis_latitude = aprsis_longitude = force_outgoing_unicode_messages = False
-    aprsis_altitude_ft = aprsis_broadcast_bulletins = False
-
-    try:
-        config.read(config_filename)
-        aprsis_callsign = config.get("core_aprs_client_config", "aprsis_callsign")
-        aprsis_tocall = config.get("core_aprs_client_config", "aprsis_tocall")
-        aprsis_server_name = config.get("core_aprs_client_config", "aprsis_server_name")
-        aprsis_server_port = config.get("core_aprs_client_config", "aprsis_server_port")
-        aprsis_simulate_send = config.get(
-            "core_aprs_client_config", "aprsis_simulate_send"
-        )
-        aprsis_passcode = config.get("core_aprs_client_config", "aprsis_passcode")
-        msg_cache_max_entries = config.get(
-            "core_aprs_client_config", "msg_cache_max_entries"
-        )
-        msg_cache_time_to_live = config.get(
-            "core_aprs_client_config", "msg_cache_time_to_live"
-        )
-        msg_packet_delay = config.get("core_aprs_client_config", "msg_packet_delay")
-        aprsis_server_filter = config.get(
-            "core_aprs_client_config", "aprsis_server_filter"
-        )
-        aprsis_broadcast_position = config.get(
-            "core_aprs_client_config", "aprsis_broadcast_position"
-        )
-        aprsis_table = config.get("core_aprs_client_config", "aprsis_table")
-        aprsis_symbol = config.get("core_aprs_client_config", "aprsis_symbol")
-        aprsis_latitude = config.get("core_aprs_client_config", "aprsis_latitude")
-        aprsis_longitude = config.get("core_aprs_client_config", "aprsis_longitude")
-        aprsis_altitude_ft = config.get("core_aprs_client_config", "aprsis_altitude_ft")
-        aprsis_broadcast_bulletins = config.get(
-            "core_aprs_client_config", "aprsis_broadcast_bulletins"
-        )
-        apprise_config_file = config.get(
-            "core_aprs_client_config", "apprise_config_file"
-        )
-        force_outgoing_unicode_messages = config.get(
-            "core_aprs_client_config", "force_outgoing_unicode_messages"
-        )
-
-        success = True
-    except Exception as ex:
-        logger.info(
-            msg="Error in configuration file; Check if your config format is correct."
-        )
-        success = False
-        aprsis_callsign = (
-            aprsis_tocall
-        ) = aprsis_server_name = aprsis_server_port = False
-        aprsis_simulate_send = aprsis_passcode = msg_cache_max_entries = False
-        msg_cache_time_to_live = msg_packet_delay = False
-        aprsis_server_filter = aprsis_broadcast_position = False
-        aprsis_table = aprsis_symbol = apprise_config_file = False
-        aprsis_latitude = aprsis_longitude = force_outgoing_unicode_messages = False
-        aprsis_altitude_ft = aprsis_broadcast_bulletins = False
-
-    return (
-        success,
-        aprsis_callsign,
-        aprsis_tocall,
-        aprsis_server_name,
-        aprsis_server_port,
-        aprsis_simulate_send,
-        aprsis_passcode,
-        msg_cache_max_entries,
-        msg_cache_time_to_live,
-        msg_packet_delay,
-        aprsis_server_filter,
-        aprsis_broadcast_position,
-        aprsis_table,
-        aprsis_symbol,
-        aprsis_latitude,
-        aprsis_longitude,
-        aprsis_altitude_ft,
-        aprsis_broadcast_bulletins,
-        apprise_config_file,
-        force_outgoing_unicode_messages,
-    )
 
 
 def read_aprs_message_counter(file_name: str = "core_aprs_client_message_counter.txt"):

@@ -30,7 +30,6 @@ from utils import (
     get_aprs_message_from_cache,
     get_command_line_params,
     signal_term_handler,
-    get_program_config_from_file,
     check_if_file_exists,
     check_and_create_data_directory,
     create_zip_file_from_log,
@@ -39,6 +38,8 @@ from utils import (
     write_aprs_message_counter,
     make_pretty_aprs_messages,
 )
+from client_configuration import load_config, program_config
+
 import json
 from uuid import uuid1
 from aprs_communication import send_ack, send_aprs_message_list
@@ -52,6 +53,13 @@ logging.basicConfig(
     format="%(asctime)s - %(module)s -%(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+# These are global variables which will be used
+# in case of an uncaught exception where we send
+# the host a final Apprise message along with the
+# program's stack trace
+exception_occurred = False
+ex_type = ex_value = ex_traceback = None
 
 
 def client_exception_handler():
@@ -331,34 +339,11 @@ def run_listener():
     if not configfile:
         sys.exit(0)
 
-    (
-        success,
-        aprsis_callsign,
-        aprsis_tocall,
-        aprsis_server_name,
-        aprsis_server_port,
-        aprsis_simulate_send,
-        aprsis_passcode,
-        msg_cache_max_entries,
-        msg_cache_time_to_live,
-        msg_packet_delay,
-        aprsis_server_filter,
-        aprsis_broadcast_position,
-        aprsis_table,
-        aprsis_symbol,
-        aprsis_latitude,
-        aprsis_longitude,
-        aprsis_altitude_ft,
-        aprsis_broadcast_bulletins,
-        apprise_config_file,
-        force_outgoing_unicode_messages,
-    ) = get_program_config_from_file(config_filename=configfile)
-    if not success:
+    # load the program config from our external config file
+    load_config(config_file=configfile)
+    if len(program_config) == 0:
+        logger.info(msg="Program config file is empty or contains an error; exiting")
         sys.exit(0)
-
-    # convert Tocall can Call Sign to uppercase (just to be on the safe side)
-    aprsis_callsign = aprsis_callsign.upper()
-    aprsis_tocall = aprsis_tocall.upper()
 
     # Install our custom exception handler, thus allowing us to signal the
     # user who hosts MPAD with a message whenever the program is prone to crash

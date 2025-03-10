@@ -20,6 +20,7 @@
 import aprslib
 import logging
 import time
+from client_configuration import program_config
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s %(module)s -%(levelname)s- %(message)s"
