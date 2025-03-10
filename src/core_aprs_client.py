@@ -82,7 +82,7 @@ def client_exception_handler():
     message_body = f"The MPAD process has crashed. Reason: {ex_value}"
 
     # Try to zip the log file if possible
-    success, log_file_name = create_zip_file_from_log(mpad_config.mpad_nohup_filename)
+    success, log_file_name = create_zip_file_from_log(program_config["config"]["nohup_filename"])
 
     # check if we can spot a 'nohup' file which already contains our status
     if log_file_name and check_if_file_exists(log_file_name):
@@ -93,7 +93,7 @@ def client_exception_handler():
     send_apprise_message(
         message_header="MPAD process has crashed",
         message_body=message_body,
-        apprise_config_file=apprise_config_file,
+        apprise_config_file=program_config["config"]["apprise_config_file"],
         message_attachment=log_file_name,
     )
 

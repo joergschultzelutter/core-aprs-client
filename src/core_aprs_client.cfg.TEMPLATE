@@ -78,3 +78,6 @@ apprise_config_file = apprise.yml
 #
 # Force outgoing unicode messages
 force_outgoing_unicode_messages=false
+#
+# file name of the "nohup" file
+nohup_filename="nohup.out"
