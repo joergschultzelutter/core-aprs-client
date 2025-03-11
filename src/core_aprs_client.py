@@ -39,10 +39,17 @@ from utils import (
     make_pretty_aprs_messages,
 )
 from client_configuration import load_config, program_config
+from input_parser import parse_input_message
+from output_generator import generate_output_message
 
 import json
 from uuid import uuid1
-from aprs_communication import send_ack, send_aprs_message_list
+from aprs_communication import (
+    send_ack,
+    send_aprs_message_list,
+    send_bulletin_messages,
+    send_beacon_and_status_msg,
+)
 import time
 from datetime import datetime
 import atexit
@@ -60,6 +67,19 @@ logger = logging.getLogger(__name__)
 # program's stack trace
 exception_occurred = False
 ex_type = ex_value = ex_traceback = None
+
+#
+# The program's bulletin message (optional)
+#
+# APRS_IS bulletin messages (will be sent every 4 hrs)
+# Note: these HAVE to have 67 characters (or less) per entry
+# The client will NOT check the content and send it out 'as is'
+aprs_bulletin_messages: dict = {
+    "BLN0": f"Core APRS Client",
+    "BLN1": f"See https://github.com/joergschultzelutter for the",
+    "BLN2": f"program source code. 73 de DF1JSL",
+}
+#
 
 
 def client_exception_handler():
@@ -82,7 +102,9 @@ def client_exception_handler():
     message_body = f"The MPAD process has crashed. Reason: {ex_value}"
 
     # Try to zip the log file if possible
-    success, log_file_name = create_zip_file_from_log(program_config["config"]["nohup_filename"])
+    success, log_file_name = create_zip_file_from_log(
+        program_config["config"]["nohup_filename"]
+    )
 
     # check if we can spot a 'nohup' file which already contains our status
     if log_file_name and check_if_file_exists(log_file_name):
@@ -219,7 +241,9 @@ def mycallback(raw_aprs_packet: dict):
                     if msg_no_supported and not new_ackrej_format:
                         send_ack(
                             myaprsis=AIS,
-                            simulate_send=aprsis_simulate_send,
+                            simulate_send=program_config["config"][
+                                "aprsis_simulate_send"
+                            ],
                             users_callsign=from_callsign,
                             source_msg_no=msgno_string,
                         )
@@ -234,7 +258,6 @@ def mycallback(raw_aprs_packet: dict):
                     success, response_parameters = parse_input_message(
                         aprs_message=message_text_string,
                         users_callsign=from_callsign,
-                        aprsdotfi_api_key=aprsdotfi_api_key,
                     )
                     logger.info(msg=f"Input parser result: {success}")
                     logger.info(msg=response_parameters)
@@ -249,18 +272,6 @@ def mycallback(raw_aprs_packet: dict):
                     #
                     # parsing successful?
                     if success:
-                        # enrich our response parameters with all API keys that we need for
-                        # the completion of the remaining tasks.
-                        response_parameters.update(
-                            {
-                                "aprsdotfi_api_key": aprsdotfi_api_key,
-                                "dapnet_login_callsign": dapnet_login_callsign,
-                                "dapnet_login_passcode": dapnet_login_passcode,
-                                "smtpimap_email_address": smtpimap_email_address,
-                                "smtpimap_email_password": smtpimap_email_password,
-                            }
-                        )
-
                         # Generate the output message for the requested keyword
                         # The 'success' status is ALWAYS positive even if the
                         # message could not get processed - the inline'd error
@@ -374,9 +385,9 @@ def run_listener():
 
     # Create the decaying APRS message cache. Any APRS message that is present in
     # this cache will be considered as a duplicate / delayed and will not be processed
-    logger.info(
-        msg=f"APRS message dupe cache set to {program_config["config"]["msg_cache_max_entries"]} max possible entries and a TTL of {int(program_config["config"]["msg_cache_time_to_live"] / 60)} mins"
-    )
+    # logger.info(
+    #    msg=f"APRS message dupe cache set to {program_config["config"]["msg_cache_max_entries"]} max possible entries and a TTL of {int(program_config["config"]["msg_cache_time_to_live"] / 60)} mins"
+    # )
     aprs_message_cache = ExpiringDict(
         max_len=program_config["config"]["msg_cache_max_entries"],
         max_age_seconds=program_config["config"]["msg_cache_time_to_live"],
@@ -397,11 +408,12 @@ def run_listener():
             AIS.set_filter(program_config["config"]["aprsis_server_filter"])
 
             # Establish the connection to APRS-IS
-            logger.info(
-                msg=f"Establishing connection to APRS-IS: server={program_config["config"]["aprsis_server_name"]},"
-                f"port={program_config["config"]["aprsis_server_port"]}, filter={program_config["config"]["aprsis_server_filter"]},"
-                f"APRS-IS User: {program_config["config"]["aprsis_callsign"]}, APRS-IS passcode: {program_config["config"]["aprsis_passcode"]}"
-            )
+            # logger.info(
+            #    msg=f"Establishing connection to APRS-IS: server={program_config["config"]["aprsis_server_name"]},"
+            #    f"port={program_config["config"]["aprsis_server_port"]}, filter={program_config["config"]["aprsis_server_filter"]},"
+            #    f"APRS-IS User: {program_config["config"]["aprsis_callsign"]}, APRS-IS passcode: {program_config["config"]["aprsis_passcode"]}"
+            # )
+            logger.info(msg="Establishing connection to APRS-IS")
             AIS.connect(blocking=True)
 
             # Are we connected?
@@ -409,7 +421,10 @@ def run_listener():
                 logger.debug(msg="Established the connection to APRS-IS")
 
             aprs_scheduler = None
-            if program_config["config"]["aprsis_broadcast_position"] or program_config["config"]["aprsis_broadcast_bulletins"]:
+            if (
+                program_config["config"]["aprsis_broadcast_position"]
+                or program_config["config"]["aprsis_broadcast_bulletins"]
+            ):
                 # If we reach this position in the code, we have at least one
                 # task that needs to be scheduled (bulletins and/or position messages
                 #
@@ -430,7 +445,54 @@ def run_listener():
                     logger.info(
                         msg="Send initial beacon after establishing the connection to APRS_IS"
                     )
-                    send_beacon_and_status_msg(AIS, aprsis_simulate_send)
+
+                    #
+                    # APRS_IS beacon messages (will be sent every 30 mins)
+                    # - APRS Position (first line) needs to have 63 characters or less
+                    # - APRS Status can have 67 chars (as usual)
+                    # Details: see aprs101.pdf chapter 8
+                    #
+                    # The client will NOT check the content and send it out 'as is'
+                    #
+                    # This message is a position report; format description can be found on pg. 23ff and pg. 94ff.
+                    # of aprs101.pdf. Message symbols: see http://www.aprs.org/symbols/symbolsX.txt and aprs101.pdf
+                    # on page 104ff.
+                    # Format is as follows: =Lat primary-symbol-table-identifier lon symbol-identifier test-message
+                    # Lat/lon from the configuration have to be valid or the message will not be accepted by aprs-is
+                    #
+                    # Example nessage: MPAD>APRS:=5150.34N/00819.60E?MPAD 0.01
+                    # results in
+                    # lat = 5150.34N
+                    # primary symbol identifier = /
+                    # lon = 00819.60E
+                    # symbol identifier = ?
+                    # plus some text.
+                    # The overall total symbol code /? refers to a server icon - see list of symbols
+                    #
+
+                    mpad_version = "6.66"
+
+                    bcn = (
+                        program_config["config"]["aprsis_latitude"]
+                        + program_config["config"]["aprsis_table"]
+                        + program_config["config"]["aprsis_longitude"]
+                        + program_config["config"]["aprsis_symbol"]
+                        + program_config["config"]["aprsis_callsign"]
+                        + " "
+                        + mpad_version
+                        + " /A="
+                        + program_config["config"][
+                            "aprsis_beacon_altitude_ft"
+                        ]  ## ggf. noch auf 6 Zeichen limitieren
+                    )
+                    aprs_beacon_messages: list = [bcn]
+                    #
+
+                    send_beacon_and_status_msg(
+                        myaprsis=AIS,
+                        aprs_beacon_messages=aprs_beacon_messages,
+                        simulate_send=program_config["config"]["aprsis_simulate_send"],
+                    )
 
                     # Position beaconing; interval = 30 min
                     aprs_scheduler.add_job(
@@ -438,7 +500,11 @@ def run_listener():
                         "interval",
                         id="aprsbeacon",
                         minutes=30,
-                        args=[AIS, aprsis_simulate_send],
+                        args=[
+                            AIS,
+                            aprs_beacon_messages,
+                            program_config["config"]["aprsis_simulate_send"],
+                        ],
                     )
 
                 if program_config["config"]["aprsis_broadcast_bulletins"]:
@@ -451,7 +517,7 @@ def run_listener():
                         args=[
                             AIS,
                             mpad_config.aprs_bulletin_messages,
-                            aprsis_simulate_send,
+                            program_config["config"]["aprsis_simulate_send"],
                         ],
                     )
 

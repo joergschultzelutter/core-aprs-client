@@ -172,7 +172,9 @@ def get_alphanumeric_counter_value(numeric_counter: int):
     return alphanumeric_counter
 
 
-def send_beacon_and_status_msg(myaprsis: aprslib.inet.IS, simulate_send: bool = True):
+def send_beacon_and_status_msg(
+    myaprsis: aprslib.inet.IS, aprs_beacon_messages: list, simulate_send: bool = True
+):
     """
     Send beacon message list to APRS_IS
     If 'simulate_send'= True, we still prepare the message but only send it to our log file
@@ -189,7 +191,7 @@ def send_beacon_and_status_msg(myaprsis: aprslib.inet.IS, simulate_send: bool = 
     none
     """
     logger.info(msg="Reached beacon interval; sending beacons")
-    for bcn in mpad_config.aprs_beacon_messages:
+    for bcn in aprs_beacon_messages:
         stringtosend = f"{mpad_config.mpad_alias}>{mpad_config.mpad_aprs_tocall}:{bcn}"
         if not simulate_send:
             logger.info(msg=f"Sending beacon: {stringtosend}")

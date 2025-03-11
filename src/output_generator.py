@@ -21,11 +21,13 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
+from utils import make_pretty_aprs_messages
 
-def parse_input_message(aprs_message: str, users_callsign: str):
-    response_parameters = {}
+
+def generate_output_message(response_parameters: dict):
     success = True
-    return success, response_parameters
+    output_message = []
+    return success, output_message
 
 
 if __name__ == "__main__":
