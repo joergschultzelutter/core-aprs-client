@@ -21,7 +21,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 import configparser
-#from utils import check_if_file_exists
+
+# from utils import check_if_file_exists
 
 config = configparser.ConfigParser()
 program_config = {}
@@ -57,9 +58,9 @@ def load_config(config_file: str = "core_aprs_client.cfg"):
         program_config.clear()
 
 
-def _str_to_bool(value: str):
+def _parse_value(value: str):
     """
-    Helper method to convert a string to a boolean
+    Helper method to convert a string to its native value format
 
     Parameters
     ==========
@@ -68,9 +69,18 @@ def _str_to_bool(value: str):
 
     Returns
     =======
-    True/False, dependent on whether or not the input value is a boolean
+    Converted data type
     """
-    return value.lower() in ("true", "yes", "on", "1")
+    if value.lower() in {"true", "yes", "on"}:
+        return True
+    elif value.lower() in {"false", "no", "off"}:
+        return False
+    try:
+        if "." in value:
+            return float(value)
+        return int(value)
+    except ValueError:
+        return value
 
 
 def config_to_dict(myconfig: configparser.ConfigParser):
@@ -90,12 +100,9 @@ def config_to_dict(myconfig: configparser.ConfigParser):
     program_config.clear()
     for section in myconfig.sections():
         program_config[section] = {
-            key: _str_to_bool(value)
-            if value.lower() in ("true", "false", "yes", "no", "on", "off", "1", "0")
-            else value
-            for key, value in myconfig[section].items()
+            key: _parse_value(value) for key, value in config.items(section)
         }
-        return program_config
+    return program_config
 
 
 def get_config():
