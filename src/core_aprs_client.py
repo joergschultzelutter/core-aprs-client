@@ -41,6 +41,7 @@ from utils import (
 from client_configuration import load_config, program_config
 from input_parser import parse_input_message
 from output_generator import generate_output_message
+from _version import __version__
 
 import json
 from uuid import uuid1
@@ -469,9 +470,6 @@ def run_listener():
                     # plus some text.
                     # The overall total symbol code /? refers to a server icon - see list of symbols
                     #
-
-                    mpad_version = "6.66"
-
                     # as all of our parameters are stored in a dictionary, we need to construct
 
                     _beacon = (
@@ -481,7 +479,7 @@ def run_listener():
                         + program_config["config"]["aprsis_symbol"]
                         + program_config["config"]["aprsis_callsign"]
                         + " "
-                        + mpad_version
+                        + __version__
                         + " /A="
                         + program_config["config"]["aprsis_beacon_altitude_ft"][:6]
                     )
@@ -508,7 +506,9 @@ def run_listener():
                     )
 
                 if program_config["config"]["aprsis_broadcast_bulletins"]:
-                    # Install scheduler task 2 - MPAD standard bulletins (advertising the program instance)
+                    # Install scheduler task 2 - send standard bulletins (advertising the program instance)
+                    # The bulletin messages consist of fixed content and are defined at the beginning of
+                    # this program code
                     aprs_scheduler.add_job(
                         send_bulletin_messages,
                         "interval",
@@ -516,7 +516,7 @@ def run_listener():
                         hours=4,
                         args=[
                             AIS,
-                            mpad_config.aprs_bulletin_messages,
+                            aprs_bulletin_messages,
                             program_config["config"]["aprsis_simulate_send"],
                         ],
                     )
@@ -559,7 +559,7 @@ def run_listener():
             logger.info(msg="Pausing aprs_scheduler")
             aprs_scheduler.pause()
             aprs_scheduler.remove_all_jobs()
-            logger.info(msg="shutting down aprs_scheduler")
+            logger.info(msg="Shutting down aprs_scheduler")
             if aprs_scheduler.state != apscheduler.schedulers.base.STATE_STOPPED:
                 try:
                     aprs_scheduler.shutdown()
