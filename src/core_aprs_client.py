@@ -472,7 +472,9 @@ def run_listener():
 
                     mpad_version = "6.66"
 
-                    bcn = (
+                    # as all of our parameters are stored in a dictionary, we need to construct
+
+                    _beacon = (
                         program_config["config"]["aprsis_latitude"]
                         + program_config["config"]["aprsis_table"]
                         + program_config["config"]["aprsis_longitude"]
@@ -481,11 +483,9 @@ def run_listener():
                         + " "
                         + mpad_version
                         + " /A="
-                        + program_config["config"][
-                            "aprsis_beacon_altitude_ft"
-                        ]  ## ggf. noch auf 6 Zeichen limitieren
+                        + program_config["config"]["aprsis_beacon_altitude_ft"][:6]
                     )
-                    aprs_beacon_messages: list = [bcn]
+                    aprs_beacon_messages: list = [_beacon]
                     #
 
                     send_beacon_and_status_msg(
@@ -541,8 +541,8 @@ def run_listener():
             logger.info(msg="Cannot re-establish connection to APRS-IS")
 
         # Enter sleep mode and then restart the loop
-        logger.info(msg=f"Sleeping {msg_packet_delay} secs")
-        time.sleep(msg_packet_delay)
+        logger.info(msg=f"Sleeping ...")
+        time.sleep(program_config["config"]["packet_delay_message"])
 
     except (KeyboardInterrupt, SystemExit):
         # Tell the user that we are about to terminate our work

@@ -40,7 +40,7 @@ def send_ack(
     """
     Send acknowledgment for received package to APRS_IS if
     a message number was present
-    If 'simulate_send'= True, we still prepare the message but only send it to our  log file
+    If 'simulate_send'= True, we still prepare the message but only send it to our log file
     Parameters
     ==========
     myaprsis: 'aprslib.inet.IS'
@@ -53,7 +53,7 @@ def send_ack(
     simulate_send: 'bool'
         If True: Prepare string but only send it to logger
     alias: 'str'
-        Our APRS alias (AMZN)
+        Our APRS alias (COAC)
     packet_delay: 'float'
         Delay after sending out our APRS acknowledgment request
     tocall: 'str'
@@ -84,7 +84,7 @@ def send_aprs_message_list(
     external_message_number: str,
     simulate_send: bool = True,
     new_ackrej_format: bool = False,
-    alias: str = "AMZN",
+    alias: str = "COAC",
     packet_delay: float = 10.0,
     tocall: str = "APRS",
 ):
@@ -122,7 +122,7 @@ def send_aprs_message_list(
         (from the original request) WILL be added to the
         outgoing message
     alias: 'str'
-        Our APRS alias (AMZN)
+        Our APRS alias (COAC)
     packet_delay: 'float'
         Delay after sending out our APRS acknowledgment request
     tocall: 'str'
@@ -183,6 +183,8 @@ def send_beacon_and_status_msg(
     ==========
     myaprsis: 'aprslib.inet.IS'
         Our aprslib object that we will use for the communication part
+    aprs_beacon_messages: list
+        List of pre-defined APRS beacon messages
     simulate_send: 'bool'
         If True: Prepare string but only send it to logger
 
@@ -196,7 +198,7 @@ def send_beacon_and_status_msg(
         if not simulate_send:
             logger.info(msg=f"Sending beacon: {stringtosend}")
             myaprsis.sendall(stringtosend)
-            time.sleep(mpad_config.packet_delay_other)
+            time.sleep(program_config["config"]["packet_delay_other"])
         else:
             logger.info(msg=f"Simulating beacons: {stringtosend}")
 
