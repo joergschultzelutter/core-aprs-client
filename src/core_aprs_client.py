@@ -17,10 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-import datetime
-
 import sys
-from pprint import pformat
 import signal
 import logging
 import aprslib
@@ -55,6 +52,9 @@ import time
 from datetime import datetime
 import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
+
+# init our (future) global variables
+apscheduler = AIS = aprs_message_cache = aprs_message_conter = None
 
 logging.basicConfig(
     level=logging.INFO,
@@ -173,6 +173,7 @@ def mycallback(raw_aprs_packet: dict):
     """
     global aprs_message_counter
     global aprs_message_cache
+    global AIS
 
     # Get our relevant fields from the APRS message
     addresse_string = raw_aprs_packet.get("addresse")
@@ -198,136 +199,132 @@ def mycallback(raw_aprs_packet: dict):
         from_callsign = from_callsign.upper()
 
     if addresse_string:
-        if addresse_string in mpad_config.mpad_callsigns_to_parse:
-            # Lets examine what we've got:
-            # 1. Message format should always be 'message'.
-            #    This is even valid for ack/rej responses
-            # 2. Message text should contain content
-            # 3. response text should NOT be ack/rej
-            # Continue if both assumptions are correct
-            if (
-                format_string == "message"
-                and message_text_string
-                and response_string not in ["ack", "rej"]
-            ):
-                # This is a message that belongs to us
+        # Lets examine what we've got:
+        # 1. Message format should always be 'message'.
+        #    This is even valid for ack/rej responses
+        # 2. Message text should contain content
+        # 3. response text should NOT be ack/rej
+        # Continue if both assumptions are correct
+        if (
+            format_string == "message"
+            and message_text_string
+            and response_string not in ["ack", "rej"]
+        ):
+            # This is a message that belongs to us
 
-                # logger.info(msg=dump_string_to_hex(message_text_string))
+            # logger.info(msg=dump_string_to_hex(message_text_string))
 
-                # Check if the message is present in our decaying message cache
-                # If the message can be located, then we can assume that we have
-                # processed (and potentially acknowledged) that message request
-                # within the last e.g. 5 minutes and that this is a delayed / dupe
-                # request, thus allowing us to ignore this request.
-                aprs_message_key = get_aprs_message_from_cache(
+            # Check if the message is present in our decaying message cache
+            # If the message can be located, then we can assume that we have
+            # processed (and potentially acknowledged) that message request
+            # within the last e.g. 5 minutes and that this is a delayed / dupe
+            # request, thus allowing us to ignore this request.
+            aprs_message_key = get_aprs_message_from_cache(
+                message_text=message_text_string,
+                message_no=msgno_string,
+                users_callsign=from_callsign,
+                aprs_cache=aprs_message_cache,
+            )
+            if aprs_message_key:
+                logger.info(
+                    msg="DUPLICATE APRS PACKET - this message is still in our decaying message cache"
+                )
+                logger.info(
+                    msg=f"Ignoring duplicate APRS packet raw_aprs_packet: {raw_aprs_packet}"
+                )
+            else:
+                logger.info(msg=f"Received raw_aprs_packet: {raw_aprs_packet}")
+
+                # Send an ack if we DID receive a message number
+                # and we DID NOT have received a request in the
+                # new ack/rej format
+                # see aprs101.pdf pg. 71ff.
+                if msg_no_supported and not new_ackrej_format:
+                    send_ack(
+                        myaprsis=AIS,
+                        simulate_send=program_config["config"]["aprsis_simulate_send"],
+                        alias=program_config["config"]["aprsis_callsign"],
+                        users_callsign=from_callsign,
+                        source_msg_no=msgno_string,
+                    )
+                #
+                # This is where the magic happens: Try to figure out what the user
+                # wants from us. If we were able to understand the user's message,
+                # 'success' will be true. In any case, the 'response_parameters'
+                # dictionary will give us a hint about what to do next (and even
+                # contains the parser's error message if 'success' != True)
+                # input parameters: the actual message, the user's call sign and
+                # the aprs.fi API access key for location lookups
+                success, response_parameters = parse_input_message(
+                    aprs_message=message_text_string,
+                    users_callsign=from_callsign,
+                )
+                logger.info(msg=f"Input parser result: {success}")
+                logger.info(msg=response_parameters)
+                #
+                # If the 'success' parameter is True, then we should know
+                # by now what the user wants from us. Now, we'll leave it to
+                # another module to generate the output data of what we want
+                # to send to the user.
+                # The result to this post-processor will be a general success
+                # status code and a list item, containing the messages that are
+                # ready to be sent to the user.
+                #
+                # parsing successful?
+                if success:
+                    # Generate the output message for the requested keyword
+                    # The 'success' status is ALWAYS positive even if the
+                    # message could not get processed - the inline'd error
+                    # message counts as positive message content
+                    success, output_message = generate_output_message(
+                        response_parameters=response_parameters,
+                    )
+                # darn - we failed to hail the Tripods
+                # this is the branch where the INPUT parser failed to understand
+                # the message. As we only parse but never process data in that input
+                # parser, we sinply don't know what to do with the user's message
+                # and get back to him with a generic response.
+                else:
+                    human_readable_message = response_parameters[
+                        "human_readable_message"
+                    ]
+                    # Dump the HRM to the user if we have one
+                    if human_readable_message:
+                        output_message = make_pretty_aprs_messages(
+                            message_to_add=f"{human_readable_message}",
+                            add_sep=False,
+                        )
+                    # If not, just dump the link to the instructions
+                    else:
+                        output_message = [
+                            "Sorry, did not understand your request. Have a look at my command",
+                            "syntax, see https://github.com/joergschultzelutter/mpad",
+                        ]
+                    logger.info(msg=f"Unable to process APRS packet {raw_aprs_packet}")
+
+                # Send our message(s) to APRS-IS
+                aprs_message_counter = send_aprs_message_list(
+                    myaprsis=AIS,
+                    simulate_send=program_config["config"]["aprsis_simulate_send"],
+                    message_text_array=output_message,
+                    destination_call_sign=from_callsign,
+                    send_with_msg_no=msg_no_supported,
+                    aprs_message_counter=aprs_message_counter,
+                    external_message_number=msgno_string,
+                    new_ackrej_format=new_ackrej_format,
+                )
+
+                # We've finished processing this message. Update the decaying
+                # cache with our message.
+                # Store the core message data in our decaying APRS message cache
+                # Dupe detection is applied regardless of the message's
+                # processing status
+                aprs_message_cache = add_aprs_message_to_cache(
                     message_text=message_text_string,
                     message_no=msgno_string,
                     users_callsign=from_callsign,
                     aprs_cache=aprs_message_cache,
                 )
-                if aprs_message_key:
-                    logger.info(
-                        msg="DUPLICATE APRS PACKET - this message is still in our decaying message cache"
-                    )
-                    logger.info(
-                        msg=f"Ignoring duplicate APRS packet raw_aprs_packet: {raw_aprs_packet}"
-                    )
-                else:
-                    logger.info(msg=f"Received raw_aprs_packet: {raw_aprs_packet}")
-
-                    # Send an ack if we DID receive a message number
-                    # and we DID NOT have received a request in the
-                    # new ack/rej format
-                    # see aprs101.pdf pg. 71ff.
-                    if msg_no_supported and not new_ackrej_format:
-                        send_ack(
-                            myaprsis=AIS,
-                            simulate_send=program_config["config"][
-                                "aprsis_simulate_send"
-                            ],
-                            users_callsign=from_callsign,
-                            source_msg_no=msgno_string,
-                        )
-                    #
-                    # This is where the magic happens: Try to figure out what the user
-                    # wants from us. If we were able to understand the user's message,
-                    # 'success' will be true. In any case, the 'response_parameters'
-                    # dictionary will give us a hint about what to do next (and even
-                    # contains the parser's error message if 'success' != True)
-                    # input parameters: the actual message, the user's call sign and
-                    # the aprs.fi API access key for location lookups
-                    success, response_parameters = parse_input_message(
-                        aprs_message=message_text_string,
-                        users_callsign=from_callsign,
-                    )
-                    logger.info(msg=f"Input parser result: {success}")
-                    logger.info(msg=response_parameters)
-                    #
-                    # If the 'success' parameter is True, then we should know
-                    # by now what the user wants from us. Now, we'll leave it to
-                    # another module to generate the output data of what we want
-                    # to send to the user.
-                    # The result to this post-processor will be a general success
-                    # status code and a list item, containing the messages that are
-                    # ready to be sent to the user.
-                    #
-                    # parsing successful?
-                    if success:
-                        # Generate the output message for the requested keyword
-                        # The 'success' status is ALWAYS positive even if the
-                        # message could not get processed - the inline'd error
-                        # message counts as positive message content
-                        success, output_message = generate_output_message(
-                            response_parameters=response_parameters,
-                        )
-                    # darn - we failed to hail the Tripods
-                    # this is the branch where the INPUT parser failed to understand
-                    # the message. As we only parse but never process data in that input
-                    # parser, we sinply don't know what to do with the user's message
-                    # and get back to him with a generic response.
-                    else:
-                        human_readable_message = response_parameters[
-                            "human_readable_message"
-                        ]
-                        # Dump the HRM to the user if we have one
-                        if human_readable_message:
-                            output_message = make_pretty_aprs_messages(
-                                message_to_add=f"{human_readable_message}",
-                                add_sep=False,
-                            )
-                        # If not, just dump the link to the instructions
-                        else:
-                            output_message = [
-                                "Sorry, did not understand your request. Have a look at my command",
-                                "syntax, see https://github.com/joergschultzelutter/mpad",
-                            ]
-                        logger.info(
-                            msg=f"Unable to process APRS packet {raw_aprs_packet}"
-                        )
-
-                    # Send our message(s) to APRS-IS
-                    aprs_message_counter = send_aprs_message_list(
-                        myaprsis=AIS,
-                        simulate_send=program_config["config"]["aprsis_simulate_send"],
-                        message_text_array=output_message,
-                        destination_call_sign=from_callsign,
-                        send_with_msg_no=msg_no_supported,
-                        aprs_message_counter=aprs_message_counter,
-                        external_message_number=msgno_string,
-                        new_ackrej_format=new_ackrej_format,
-                    )
-
-                    # We've finished processing this message. Update the decaying
-                    # cache with our message.
-                    # Store the core message data in our decaying APRS message cache
-                    # Dupe detection is applied regardless of the message's
-                    # processing status
-                    aprs_message_cache = add_aprs_message_to_cache(
-                        message_text=message_text_string,
-                        message_no=msgno_string,
-                        users_callsign=from_callsign,
-                        aprs_cache=aprs_message_cache,
-                    )
 
 
 def run_listener():
@@ -421,128 +418,133 @@ def run_listener():
             if AIS._connected:
                 logger.debug(msg="Established the connection to APRS-IS")
 
-            aprs_scheduler = None
-            if (
-                program_config["config"]["aprsis_broadcast_position"]
-                or program_config["config"]["aprsis_broadcast_bulletins"]
-            ):
-                # If we reach this position in the code, we have at least one
-                # task that needs to be scheduled (bulletins and/or position messages
+                aprs_scheduler = None
+                if (
+                    program_config["config"]["aprsis_broadcast_position"]
+                    or program_config["config"]["aprsis_broadcast_bulletins"]
+                ):
+                    # If we reach this position in the code, we have at least one
+                    # task that needs to be scheduled (bulletins and/or position messages
+                    #
+                    # Create the scheduler
+                    aprs_scheduler = BackgroundScheduler()
+
+                    # Install two schedulers tasks, if requested by the user
+                    # The first task is responsible for sending out beacon messages
+                    # to APRS; it will be triggered every 30 mins
+                    #
+
+                    # The 2nd task is responsible for sending out bulletin messages
+                    # to APRS; it will be triggered every 4 hours
+                    #
+
+                    if program_config["config"]["aprsis_broadcast_position"]:
+                        # Send initial beacon after establishing the connection to APRS_IS
+                        logger.info(
+                            msg="Send initial beacon after establishing the connection to APRS_IS"
+                        )
+
+                        #
+                        # APRS_IS beacon messages (will be sent every 30 mins)
+                        # - APRS Position (first line) needs to have 63 characters or less
+                        # - APRS Status can have 67 chars (as usual)
+                        # Details: see aprs101.pdf chapter 8
+                        #
+                        # The client will NOT check the content and send it out 'as is'
+                        #
+                        # This message is a position report; format description can be found on pg. 23ff and pg. 94ff.
+                        # of aprs101.pdf. Message symbols: see http://www.aprs.org/symbols/symbolsX.txt and aprs101.pdf
+                        # on page 104ff.
+                        # Format is as follows: =Lat primary-symbol-table-identifier lon symbol-identifier test-message
+                        # Lat/lon from the configuration have to be valid or the message will not be accepted by aprs-is
+                        #
+                        # Example nessage: MPAD>APRS:=5150.34N/00819.60E?MPAD 0.01
+                        # results in
+                        # lat = 5150.34N
+                        # primary symbol identifier = /
+                        # lon = 00819.60E
+                        # symbol identifier = ?
+                        # plus some text.
+                        # The overall total symbol code /? refers to a server icon - see list of symbols
+                        #
+                        # as all of our parameters are stored in a dictionary, we need to construct
+
+                        _beacon = (
+                            program_config["config"]["aprsis_latitude"]
+                            + program_config["config"]["aprsis_table"]
+                            + program_config["config"]["aprsis_longitude"]
+                            + program_config["config"]["aprsis_symbol"]
+                            + program_config["config"]["aprsis_callsign"]
+                            + " "
+                            + __version__
+                            + " /A="
+                            + str(
+                                program_config["config"]["aprsis_beacon_altitude_ft"]
+                            )[:6]
+                        )
+                        aprs_beacon_messages: list = [_beacon]
+                        #
+
+                        send_beacon_and_status_msg(
+                            myaprsis=AIS,
+                            aprs_beacon_messages=aprs_beacon_messages,
+                            simulate_send=program_config["config"][
+                                "aprsis_simulate_send"
+                            ],
+                        )
+
+                        # Position beaconing; interval = 30 min
+                        aprs_scheduler.add_job(
+                            send_beacon_and_status_msg,
+                            "interval",
+                            id="aprsbeacon",
+                            minutes=30,
+                            args=[
+                                AIS,
+                                aprs_beacon_messages,
+                                program_config["config"]["aprsis_simulate_send"],
+                            ],
+                        )
+
+                    if program_config["config"]["aprsis_broadcast_bulletins"]:
+                        # Install scheduler task 2 - send standard bulletins (advertising the program instance)
+                        # The bulletin messages consist of fixed content and are defined at the beginning of
+                        # this program code
+                        aprs_scheduler.add_job(
+                            send_bulletin_messages,
+                            "interval",
+                            id="aprsbulletin",
+                            hours=4,
+                            args=[
+                                AIS,
+                                aprs_bulletin_messages,
+                                program_config["config"]["aprsis_simulate_send"],
+                            ],
+                        )
+
+                # start the scheduler
+                aprs_scheduler.start()
+
+                # Start the consumer thread
+                logger.info(msg="Starting callback consumer")
+                AIS.consumer(mycallback, blocking=True, immortal=True, raw=False)
+
                 #
-                # Create the scheduler
-                aprs_scheduler = BackgroundScheduler()
-
-                # Install two schedulers tasks, if requested by the user
-                # The first task is responsible for sending out beacon messages
-                # to APRS; it will be triggered every 30 mins
+                # We have left the callback, let's clean up a few things before
+                # we try to re-establish our connection
+                logger.debug(msg="Have left the callback consumer")
                 #
+                # Verbindung schließen
+                logger.debug(msg="Closing APRS connection to APRS-IS")
+                AIS.close()
+                AIS = None
+            else:
+                logger.info(msg="Cannot re-establish connection to APRS-IS")
+            write_aprs_message_counter(aprs_message_counter=aprs_message_counter)
 
-                # The 2nd task is responsible for sending out bulletin messages
-                # to APRS; it will be triggered every 4 hours
-                #
-
-                if program_config["config"]["aprsis_broadcast_position"]:
-                    # Send initial beacon after establishing the connection to APRS_IS
-                    logger.info(
-                        msg="Send initial beacon after establishing the connection to APRS_IS"
-                    )
-
-                    #
-                    # APRS_IS beacon messages (will be sent every 30 mins)
-                    # - APRS Position (first line) needs to have 63 characters or less
-                    # - APRS Status can have 67 chars (as usual)
-                    # Details: see aprs101.pdf chapter 8
-                    #
-                    # The client will NOT check the content and send it out 'as is'
-                    #
-                    # This message is a position report; format description can be found on pg. 23ff and pg. 94ff.
-                    # of aprs101.pdf. Message symbols: see http://www.aprs.org/symbols/symbolsX.txt and aprs101.pdf
-                    # on page 104ff.
-                    # Format is as follows: =Lat primary-symbol-table-identifier lon symbol-identifier test-message
-                    # Lat/lon from the configuration have to be valid or the message will not be accepted by aprs-is
-                    #
-                    # Example nessage: MPAD>APRS:=5150.34N/00819.60E?MPAD 0.01
-                    # results in
-                    # lat = 5150.34N
-                    # primary symbol identifier = /
-                    # lon = 00819.60E
-                    # symbol identifier = ?
-                    # plus some text.
-                    # The overall total symbol code /? refers to a server icon - see list of symbols
-                    #
-                    # as all of our parameters are stored in a dictionary, we need to construct
-
-                    _beacon = (
-                        program_config["config"]["aprsis_latitude"]
-                        + program_config["config"]["aprsis_table"]
-                        + program_config["config"]["aprsis_longitude"]
-                        + program_config["config"]["aprsis_symbol"]
-                        + program_config["config"]["aprsis_callsign"]
-                        + " "
-                        + __version__
-                        + " /A="
-                        + str(program_config["config"]["aprsis_beacon_altitude_ft"])[:6]
-                    )
-                    aprs_beacon_messages: list = [_beacon]
-                    #
-
-                    send_beacon_and_status_msg(
-                        myaprsis=AIS,
-                        aprs_beacon_messages=aprs_beacon_messages,
-                        simulate_send=program_config["config"]["aprsis_simulate_send"],
-                    )
-
-                    # Position beaconing; interval = 30 min
-                    aprs_scheduler.add_job(
-                        send_beacon_and_status_msg,
-                        "interval",
-                        id="aprsbeacon",
-                        minutes=30,
-                        args=[
-                            AIS,
-                            aprs_beacon_messages,
-                            program_config["config"]["aprsis_simulate_send"],
-                        ],
-                    )
-
-                if program_config["config"]["aprsis_broadcast_bulletins"]:
-                    # Install scheduler task 2 - send standard bulletins (advertising the program instance)
-                    # The bulletin messages consist of fixed content and are defined at the beginning of
-                    # this program code
-                    aprs_scheduler.add_job(
-                        send_bulletin_messages,
-                        "interval",
-                        id="aprsbulletin",
-                        hours=4,
-                        args=[
-                            AIS,
-                            aprs_bulletin_messages,
-                            program_config["config"]["aprsis_simulate_send"],
-                        ],
-                    )
-
-            # start the scheduler
-            aprs_scheduler.start()
-
-            # Start the consumer thread
-            logger.info(msg="Starting callback consumer")
-            AIS.consumer(mycallback, blocking=True, immortal=True, raw=False)
-
-            #
-            # We have left the callback, let's clean up a few things before
-            # we try to re-establish our connection
-            logger.debug(msg="Have left the callback consumer")
-            #
-            # Verbindung schließen
-            logger.debug(msg="Closing APRS connection to APRS-IS")
-            AIS.close()
-            AIS = None
-        else:
-            logger.info(msg="Cannot re-establish connection to APRS-IS")
-
-        # Enter sleep mode and then restart the loop
-        logger.info(msg=f"Sleeping ...")
-        time.sleep(program_config["config"]["packet_delay_message"])
+            # Enter sleep mode and then restart the loop
+            logger.info(msg=f"Sleeping ...")
+            time.sleep(program_config["config"]["packet_delay_message"])
 
     except (KeyboardInterrupt, SystemExit):
         # Tell the user that we are about to terminate our work
@@ -550,10 +552,9 @@ def run_listener():
             msg="KeyboardInterrupt or SystemExit in progress; shutting down ..."
         )
 
-        #        if sqs_aprs_to_alexa_queue:
-        #            sqs_remove_queue(queue=sqs_aprs_to_alexa_queue)
-        #        if sqs_alexa_to_aprs_queue:
-        #            sqs_remove_queue(queue=alexa_to_aprs_queue)
+        # write most recent APRS message counter to disc
+        logger.info(msg="Writing APRS message counter to disc ...")
+        write_aprs_message_counter(aprs_message_counter=aprs_message_counter)
 
         if aprs_scheduler:
             logger.info(msg="Pausing aprs_scheduler")
