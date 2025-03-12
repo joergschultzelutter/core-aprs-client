@@ -481,7 +481,7 @@ def run_listener():
                         + " "
                         + __version__
                         + " /A="
-                        + program_config["config"]["aprsis_beacon_altitude_ft"][:6]
+                        + str(program_config["config"]["aprsis_beacon_altitude_ft"])[:6]
                     )
                     aprs_beacon_messages: list = [_beacon]
                     #
