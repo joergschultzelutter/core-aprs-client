@@ -23,8 +23,40 @@
 
 
 def parse_input_message(aprs_message: str, users_callsign: str):
-    response_parameters = {}
+    """
+    This is a stub for your custom APRS input parser.
+
+    Parameters
+    ==========
+    aprs_message: 'str'
+        The APRS message that the user has provided us with (1..67
+        bytes in length). Parse the content and figure out what
+        the user wants you to do.
+    users_callsign: 'str'
+        Ham radio callsign that sent the message to us.
+
+    Returns
+    =======
+    success: 'bool'
+        True if everything is fine, False otherwise.
+    response_parameters: 'dict'
+        Dictionary object where we store the data that is required
+        by the 'output_generator' module for generating the APRS message.
+        For this stub, that dictionary is empty.
+    """
+
+    # tell the calling process that everything is fine
     success = True
+
+    # our target dictionary
+    response_parameters = {}
+
+    # here you would add data to the dictionary (e.g. lat/lon, wx-related stuff),
+    # thus telling the output_generator processes later on what the user wants from us
+    #
+    #
+    #
+
     return success, response_parameters
 
 

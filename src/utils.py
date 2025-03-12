@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 from expiringdict import ExpiringDict
-from datetime import datetime
+import datetime
 import hashlib
 import os
 import logging
@@ -26,6 +26,8 @@ import argparse
 import zipfile
 import sys
 import apprise
+import re
+from client_configuration import program_config
 
 mpad_data_directory = "data_files"
 mpad_root_directory = os.path.abspath(os.getcwd())
@@ -77,7 +79,7 @@ def add_aprs_message_to_cache(
 
     # Add the Key to our expiring cache. The datetime stamp is not used; we
     # just need to give the dictionary entry a value
-    aprs_cache[key] = datetime.now()
+    aprs_cache[key] = datetime.datetime.now()
     return aprs_cache
 
 
@@ -252,8 +254,8 @@ def write_aprs_message_counter(
 
 def build_full_pathname(
     file_name: str,
-    root_path_name: str = mpad_config.mpad_root_directory,
-    relative_path_name: str = mpad_config.mpad_data_directory,
+    root_path_name: str = os.path.abspath(os.getcwd()),
+    relative_path_name: str = "data_files",
 ):
     """
     Build a full-grown path based on $CWD, an optional relative directory name and a file name.
@@ -298,8 +300,8 @@ def create_zip_file_from_log(log_file_name: str):
         return False, None
 
     # get a UTC time stamp as reference and create the file name
-    _utc = datetime.utcnow()
-    zip_file_name = datetime.strftime(
+    _utc = datetime.datetime.now(datetime.UTC)
+    zip_file_name = datetime.datetime.strftime(
         _utc, "core_aprs_client_crash_dump_%Y-%m-%d_%H-%M-%S%z.zip"
     )
 
@@ -349,6 +351,9 @@ def send_apprise_message(
         The message body that we want to send to the user
     apprise_config_file: 'str'
         Apprise Yaml configuration file
+    message_attachment: 'str'
+        The message attachment that we want to send to the user
+        'None' if we don't want to send an attachment
 
     Returns
     =======
@@ -412,8 +417,8 @@ def send_apprise_message(
 
 
 def check_and_create_data_directory(
-    root_path_name: str = mpad_config.mpad_root_directory,
-    relative_path_name: str = mpad_config.mpad_data_directory,
+    root_path_name: str = os.path.abspath(os.getcwd()),
+    relative_path_name: str = "data_files",
 ):
     """
     Check if the data directory is present and create it, if necessary
@@ -538,7 +543,7 @@ def make_pretty_aprs_messages(
 
     # Check if the user wants unicode messages. Default is ASCII
     if (
-        not mpad_config.mpad_enforce_unicode_messages
+        not program_config["config"]["aprsis_enforce_unicode_messages"]
         and not force_outgoing_unicode_messages
     ):
         # Convert the message to plain ascii
