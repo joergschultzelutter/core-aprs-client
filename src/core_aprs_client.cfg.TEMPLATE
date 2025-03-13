@@ -42,7 +42,10 @@ msg_cache_max_entries = 2160
 msg_cache_time_to_live = 3600
 #
 # delay between messages if more than one message is to be sent to APRS-IS
-msg_packet_delay = 6.0
+packet_delay_message = 6.0
+#
+# packet delay after sending an acknowledgment, bulletin or beacon
+packet_delay_other = 6.0
 #
 # Broadcast position true/false
 aprsis_broadcast_position = false
@@ -81,3 +84,8 @@ force_outgoing_unicode_messages=false
 #
 # file name of the "nohup" file
 nohup_filename="nohup.out"
+#
+# Enforce outgoing messages to be in unicode format
+# default = False (normally, you are never required
+# to change this setting
+aprsis_enforce_unicode_messages = false
