@@ -194,7 +194,9 @@ def send_beacon_and_status_msg(
     """
     logger.info(msg="Reached beacon interval; sending beacons")
     for bcn in aprs_beacon_messages:
-        stringtosend = f"{mpad_config.mpad_alias}>{mpad_config.mpad_aprs_tocall}:{bcn}"
+        #fmt: off
+        stringtosend = f"{program_config["config"]["aprsis_callsign"]}>{program_config["config"]["aprsis_tocall"]}:{bcn}"
+        #fmt: on
         if not simulate_send:
             logger.info(msg=f"Sending beacon: {stringtosend}")
             myaprsis.sendall(stringtosend)
@@ -227,11 +229,11 @@ def send_bulletin_messages(
     """
     logger.info(msg="reached bulletin interval; sending bulletins")
     for recipient_id, bln in bulletin_dict.items():
-        stringtosend = f"{mpad_config.mpad_alias}>{mpad_config.mpad_aprs_tocall}::{recipient_id:9}:{bln}"
+        stringtosend = f"{program_config["config"]["aprsis_callsign"]}>{program_config["config"]["aprsis_tocall"]}::{recipient_id:9}:{bln}"
         if not simulate_send:
             logger.info(msg=f"Sending bulletin: {stringtosend}")
             myaprsis.sendall(stringtosend)
-            time.sleep(mpad_config.packet_delay_other)
+            time.sleep(program_config["config"]["packet_delay_other"])
         else:
             logger.info(msg=f"simulating bulletins: {stringtosend}")
 

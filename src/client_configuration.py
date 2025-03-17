@@ -21,8 +21,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 import configparser
-
-from utils import check_if_file_exists
+from os import path
 
 config = configparser.ConfigParser()
 program_config = {}
@@ -44,7 +43,7 @@ def load_config(config_file: str = "core_aprs_client.cfg"):
     none
     """
 
-    if check_if_file_exists(config_file):
+    if path.isfile(config_file):
         try:
             config.read(config_file)
             config_to_dict(config)
