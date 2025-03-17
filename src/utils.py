@@ -184,7 +184,7 @@ def get_command_line_params():
         "--configfile",
         default="core_aprs_client.cfg",
         type=argparse.FileType("r"),
-        help="Program config file name",
+        help="Program config file name (default is 'core_aprs_client.cfg')",
     )
 
     args = parser.parse_args()
