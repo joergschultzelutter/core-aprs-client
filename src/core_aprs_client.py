@@ -329,9 +329,8 @@ def mycallback(raw_aprs_packet: dict):
 
 def run_listener():
     """
-    Main listener; either performs the initial AWS setup or
-    establishes a listener to APRS-IS and forwards content
-    to its SQS fifo queue
+    Main listener
+    Establishes a listener to APRS-IS and activates APRS callback
 
     Parameters
     ==========
@@ -410,13 +409,13 @@ def run_listener():
                 "Establishing connection to APRS-IS: server="
                 + program_config["config"]["aprsis_server_name"]
                 + ", port="
-                + program_config["config"]["aprsis_server_port"]
+                + str(program_config["config"]["aprsis_server_port"])
                 + ", filter="
                 + program_config["config"]["aprsis_server_filter"]
                 + ", APRS-IS User:"
                 + program_config["config"]["aprsis_callsign"]
                 + ", APRS-IS passcode:"
-                + program_config["config"]["aprsis_passcode"]
+                + str(program_config["config"]["aprsis_passcode"])
             )
             logger.info(msg=message)
             logger.info(msg="Establishing connection to APRS-IS")
@@ -530,9 +529,11 @@ def run_listener():
                             ],
                         )
 
-                # start the scheduler
-                aprs_scheduler.start()
+                    # Ultimately, start the scheduler
+                    aprs_scheduler.start()
 
+                #
+                # We are now ready to initiate the actual processing
                 # Start the consumer thread
                 logger.info(msg="Starting callback consumer")
                 AIS.consumer(mycallback, blocking=True, immortal=True, raw=False)
@@ -599,6 +600,7 @@ def run_listener():
 
         # Close APRS-IS connection whereas still present
         if AIS:
+            logger.info(msg="Closing connection to APRS-IS")
             AIS.close()
 
 
