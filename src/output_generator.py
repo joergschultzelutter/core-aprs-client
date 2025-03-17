@@ -21,6 +21,7 @@
 #
 
 from utils import make_pretty_aprs_messages
+from client_configuration import program_config
 
 
 def generate_output_message(response_parameters: dict):
@@ -58,14 +59,14 @@ def generate_output_message(response_parameters: dict):
     # generate our very first message; either pass an empty list item to the
     # function or omit the 'destination_list" parameter. In that case, the function
     # will create a list object for you
-    output_message = make_pretty_aprs_messages(message_to_add="Hello World!")
+    output_message = make_pretty_aprs_messages(message_to_add="Hello")
 
     # This is an example for adding an additional message part to the list item
     # Simply pass the list item as input parameter to our function, thus telling it
     # that you rather want to add additional content than having it create a new
     # list item for you
     output_message = make_pretty_aprs_messages(
-        message_to_add="How are you...", destination_list=output_message
+        message_to_add="World", destination_list=output_message
     )
 
     return success, output_message

@@ -21,6 +21,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
+from client_configuration import program_config
+
 
 def parse_input_message(aprs_message: str, users_callsign: str):
     """

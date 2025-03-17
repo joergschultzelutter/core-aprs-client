@@ -23,7 +23,7 @@ aprsis_callsign = COAC
 aprsis_server_filter = g/COAC
 #
 # This is the APRS "tocall" identifier that is used for outgoing messages
-# You NEED to request your very own TOCALL for your code
+# You NEED to request your very own TOCALL for your client code
 # Details: https://github.com/aprsorg/aprs-deviceid
 aprsis_tocall = APRS
 #
