@@ -190,6 +190,11 @@ def get_command_line_params():
     args = parser.parse_args()
 
     configfile = args.configfile.name
+
+    if not check_if_file_exists(file_name=configfile):
+        logger.info(msg="Config file does not exist; exiting")
+        sys.exit(0)
+
     return configfile
 
 

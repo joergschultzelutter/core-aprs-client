@@ -374,10 +374,6 @@ def run_listener():
     logger.info(msg="Reading APRS message counter...")
     aprs_message_counter = read_aprs_message_counter()
 
-    # Register the SIGTERM handler; this will allow a safe shutdown of the program
-    logger.info(msg="Registering SIGTERM handler for safe shutdown...")
-    signal.signal(signal.SIGTERM, signal_term_handler)
-
     # Initialize the aprs-is object
     AIS = None
 
@@ -390,6 +386,10 @@ def run_listener():
         max_len=program_config["config"]["msg_cache_max_entries"],
         max_age_seconds=program_config["config"]["msg_cache_time_to_live"],
     )
+
+    # Register the SIGTERM handler; this will allow a safe shutdown of the program
+    logger.info(msg="Registering SIGTERM handler for safe shutdown...")
+    signal.signal(signal.SIGTERM, signal_term_handler)
 
     # Enter the 'eternal' receive loop
     try:
@@ -406,11 +406,19 @@ def run_listener():
             AIS.set_filter(program_config["config"]["aprsis_server_filter"])
 
             # Establish the connection to APRS-IS
-            logger.info(
-                msg=f"Establishing connection to APRS-IS: server={program_config["config"]["aprsis_server_name"]}, "
-                f"port={program_config["config"]["aprsis_server_port"]}, filter={program_config["config"]["aprsis_server_filter"]}, "
-                f"APRS-IS User: {program_config["config"]["aprsis_callsign"]}, APRS-IS passcode: {program_config["config"]["aprsis_passcode"]}"
+            message = (
+                "Establishing connection to APRS-IS: server="
+                + program_config["config"]["aprsis_server_name"]
+                + ", port="
+                + program_config["config"]["aprsis_server_port"]
+                + ", filter="
+                + program_config["config"]["aprsis_server_filter"]
+                + ", APRS-IS User:"
+                + program_config["config"]["aprsis_callsign"]
+                + ", APRS-IS passcode:"
+                + program_config["config"]["aprsis_passcode"]
             )
+            logger.info(msg=message)
             logger.info(msg="Establishing connection to APRS-IS")
             AIS.connect(blocking=True)
 
@@ -530,11 +538,31 @@ def run_listener():
                 AIS.consumer(mycallback, blocking=True, immortal=True, raw=False)
 
                 #
-                # We have left the callback, let's clean up a few things before
-                # we try to re-establish our connection
-                logger.debug(msg="Have left the callback consumer")
+                # We have left the callback, let's clean up a few things
+                logger.info(msg="Have left the callback consumer")
                 #
-                # Verbindung schließen
+                # First, stop all schedulers. Then remove the associated jobs
+                # This will prevent the beacon/bulletin processes from sending out
+                # messages to APRS_IS
+                # Note that the scheduler might not be active - its existence depends
+                # on the user's configuration file settings.
+                if aprs_scheduler:
+                    # pause the scheduler and remove all jobs
+                    aprs_scheduler.pause()
+                    aprs_scheduler.remove_all_jobs()
+                    if (
+                        aprs_scheduler.state
+                        != apscheduler.schedulers.base.STATE_STOPPED
+                    ):
+                        try:
+                            aprs_scheduler.shutdown()
+                        except:
+                            logger.info(
+                                msg="Exception during scheduler shutdown eternal loop"
+                            )
+
+                #
+                # close connection
                 logger.debug(msg="Closing APRS connection to APRS-IS")
                 AIS.close()
                 AIS = None
