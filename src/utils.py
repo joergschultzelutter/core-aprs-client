@@ -182,15 +182,14 @@ def get_command_line_params():
 
     parser.add_argument(
         "--configfile",
-        default="core_aprs_client.yml",
+        default="core_aprs_client.cfg",
         type=argparse.FileType("r"),
         help="Program config file name",
     )
 
-    parser.set_defaults(run_aws_setup=False)
     args = parser.parse_args()
 
-    configfile = args.core_aprs_client
+    configfile = args.configfile.name
     return configfile
 
 

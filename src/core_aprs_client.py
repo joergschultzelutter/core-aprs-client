@@ -406,11 +406,11 @@ def run_listener():
             AIS.set_filter(program_config["config"]["aprsis_server_filter"])
 
             # Establish the connection to APRS-IS
-            # logger.info(
-            #    msg=f"Establishing connection to APRS-IS: server={program_config["config"]["aprsis_server_name"]},"
-            #    f"port={program_config["config"]["aprsis_server_port"]}, filter={program_config["config"]["aprsis_server_filter"]},"
-            #    f"APRS-IS User: {program_config["config"]["aprsis_callsign"]}, APRS-IS passcode: {program_config["config"]["aprsis_passcode"]}"
-            # )
+            logger.info(
+                msg=f"Establishing connection to APRS-IS: server={program_config["config"]["aprsis_server_name"]}, "
+                f"port={program_config["config"]["aprsis_server_port"]}, filter={program_config["config"]["aprsis_server_filter"]}, "
+                f"APRS-IS User: {program_config["config"]["aprsis_callsign"]}, APRS-IS passcode: {program_config["config"]["aprsis_passcode"]}"
+            )
             logger.info(msg="Establishing connection to APRS-IS")
             AIS.connect(blocking=True)
 
