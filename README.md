@@ -3,6 +3,10 @@ Core APRS client with dupe detection
 
 This is a modernized version of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS functions which can be used for building your very own APRS client / bot. It supports all of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS functions, such as connecting to APRS-IS, message dupe detection, ACK/REJ handling, and other functionality. You are then required to add a proper input parser and then generate message content that is to be sent to the user. Everything critical to APRS will be covered by the core-aprs-client.
 
+## Schematics
+![Schematics](img/schematics.svg)
+
+
 ## Configuration
 This repository comes with a configuration file template which can be used for amending your program instance. Rename the file called ``core_aprs_client.cfg.TEMPLATE`` to ``core_aprs_client.cfg`` (default config file name; you can choose a different one) and amend the settings:
 
