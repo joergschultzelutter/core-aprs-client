@@ -1,5 +1,8 @@
 # Client Config
 
+:::! "Warning"
+Mandatory configuration setting - you HAVE to change this
+:::
 
 ```
 [client_config]
@@ -15,11 +18,6 @@
 # while being connected to APRS-IS. Read: you have to send
 # your messages to this call sign
 aprsis_callsign = COAC
-#
-# APRS-IS message filter settings - see https://www.aprs-is.net/javAPRSFilter.aspx
-# Usually, you don't want to change the filter setting. Just ensure that both
-# aprsis_callsign and aprsis_server_filter relate to the same call sign!
-aprsis_server_filter = g/COAC
 #
 # This is the APRS "tocall" identifier that is used for outgoing messages
 # You NEED to request your very own TOCALL for your client code
