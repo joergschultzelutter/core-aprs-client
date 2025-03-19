@@ -1,8 +1,6 @@
 # Client Config
 
-:::! "Warning"
-Mandatory configuration setting - you HAVE to change this
-:::
+[!CAUTION] Mandatory configuration setting - you HAVE to change this
 
 ```
 [client_config]
