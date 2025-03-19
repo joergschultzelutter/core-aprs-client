@@ -2,11 +2,14 @@
 
 When it comes to the individual configuration, the```core-aprs-client``` solely relies on an external config file. The default file name is ```core-aprs-client.cfg``` and can be overwritten by specifying an individual file name program parameter during program start.
 
-```core-aprs-client.cfg``` is divided into multiple sections whose contents will be described in the following help pages. Unless specified otherwise, most of these sections are optional. If you are happy with the default settings, simply modify those parts of the config file which _do_ require modifications (e.g. call sign, passcode) - and you're good to go.
+```core-aprs-client.cfg``` is divided into multiple sections whose contents will be described in the following help pages. 
+
+> [NOTE]
+> Unless specified otherwise, most of these configuration sections are optional. If you are happy with the default settings, simply modify those parts of the config file which _do_ require modifications (e.g. call sign, passcode) - and you're good to go.
 
 ## Configuration file sections
 
-- [client_config](configuration/config_client.md) - Basic APRS call sign & filter configuration. :bangbang:This is the only configuration file section which HAS to be changed:bangbang: 
+- [client_config](configuration/config_client.md) - Basic APRS call sign & filter configuration. :bangbang:This is the only configuration file section which HAS to be changed prior to running the program:bangbang: 
 - [network_config](configuration/config_network.md) - APRS-IS networking settings, such as server, port, ....
 - [position_data](configuration/config_position.md) - Used in case you want to beacon your APRS bot's position & APRS symbol to APRS-IS
 - [bulletin_data](configuration/config_bulletin.md) - Used in case you want to send out fixed APRS bulletin messages to APRS-IS
