@@ -1,5 +1,8 @@
 # Network Config
 
+> [!CAUTION]
+> Requires individual configuration
+
 ```
 #
 # APRS-IS server, see https://www.aprs2.net/

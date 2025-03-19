@@ -1,7 +1,7 @@
 # Client Config
 
 > [!CAUTION]
-> Mandatory configuration setting - you HAVE to change the default settings
+> Requires individual configuration
 
 ```
 [client_config]

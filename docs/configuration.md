@@ -5,12 +5,12 @@ When it comes to the individual configuration, the```core-aprs-client``` solely 
 ```core-aprs-client.cfg``` is divided into multiple sections whose contents will be described in the following help pages. 
 
 > [!NOTE]
-> Unless specified otherwise, most of these configuration sections are optional. If you are happy with the default settings, simply modify those parts of the config file which _do_ require modifications (e.g. call sign, passcode) - and you're good to go.
+> With the exception of the first two configuration sections, all other configuration sections are optional and have been pre-configured. If you are happy with the default settings, simply modify those parts of the config file which _do_ require modifications (e.g. call sign, passcode) - and you're good to go.
 
 ## Configuration file sections
 
-- [client_config](configuration/config_client.md) - Basic APRS call sign & filter configuration. :bangbang:This is the only configuration file section which HAS to be changed prior to running the program:bangbang: 
-- [network_config](configuration/config_network.md) - APRS-IS networking settings, such as server, port, ....
+- [client_config](configuration/config_client.md) - Basic APRS call sign & filter configuration. :bangbang:Requires individual configuration settings:bangbang: 
+- [network_config](configuration/config_network.md) - APRS-IS networking settings, such as server, port, passcode,.... :bangbang:Requires individual configuration settings:bangbang:
 - [position_data](configuration/config_position.md) - Used in case you want to beacon your APRS bot's position & APRS symbol to APRS-IS
 - [bulletin_data](configuration/config_bulletin.md) - Used in case you want to send out fixed APRS bulletin messages to APRS-IS
 - [crash_handler](configuration/config_crash_handler.md) - Optional setting which enables the bot to send you a core dump file in case the program has crashed.
