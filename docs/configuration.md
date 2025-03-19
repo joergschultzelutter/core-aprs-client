@@ -4,7 +4,7 @@ When it comes to the individual configuration, the```core-aprs-client``` solely 
 
 ```core-aprs-client.cfg``` is divided into multiple sections whose contents will be described in the following help pages. 
 
-> [NOTE]
+> [!NOTE]
 > Unless specified otherwise, most of these configuration sections are optional. If you are happy with the default settings, simply modify those parts of the config file which _do_ require modifications (e.g. call sign, passcode) - and you're good to go.
 
 ## Configuration file sections
