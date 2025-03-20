@@ -9,12 +9,14 @@ When it comes to the individual configuration, the```core-aprs-client``` solely 
 
 ## Configuration file sections
 
-The following two configuration file sections require changes; here, you need to change the program's call sign, APRS-IS passcode, and other data.
+> [!WARNING]
+> The following two configuration file sections require changes; here, you need to change the program's call sign, APRS-IS passcode, and other data.
 
-- [client_config](configuration/config_client.md) - Basic APRS call sign & filter configuration. :bangbang:Requires individual configuration settings:bangbang: 
-- [network_config](configuration/config_network.md) - APRS-IS networking settings, such as server, port, passcode,.... :bangbang:Requires individual configuration settings:bangbang:
+- [client_config](configuration/config_client.md) - Basic APRS call sign & filter configuration.
+- [network_config](configuration/config_network.md) - APRS-IS networking settings, such as server, port, passcode,....
 
-The following configuration file sections are preconfigured and do not require any modification unless you want to activate specific bot functions.
+> [!TIP]
+> The following configuration file sections are preconfigured and do not require any modification unless you want to activate specific bot functions.
 
 - [position_data](configuration/config_position.md) - Used in case you want to beacon your APRS bot's position & APRS symbol to APRS-IS
 - [bulletin_data](configuration/config_bulletin.md) - Used in case you want to send out fixed APRS bulletin messages to APRS-IS
