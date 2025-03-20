@@ -3,7 +3,7 @@
 > [!TIP]
 > This section of the configuration file allows you to enable APRS bulletin broadcasting. APRS supports 10 bulletins (BLN0..9) which can be used for broadcasting static or dynamic texts to _all_ APRS users. Bulletin messages are received by nearby APRS-capable transceivers and [can be viewed on aprs.fi](https://aprs.fi/bulletin/).
 
-By default, the APRS bulletin data function is disabled (```aprsis_broadcast_bulletins = false```), meaning that ```core-aprs-client``` will not broadcast any APRS bulletins for you. If you change this setting to ```true```, then ```core-aprs-client``` will broadcast all _populated_ bulletin entries (```bln0``` to ```bln9```) at a fixed interval of 4 hours.
+By default, the APRS bulletin data function is disabled (```aprsis_broadcast_bulletins = false```), meaning that ```core-aprs-client``` will not broadcast any APRS bulletins for you. If you change this setting to ```true```, then ```core-aprs-client``` will broadcast all _populated_ bulletin entries (```bln0``` to ```bln9```) in the configuration file with a fixed broadcasting interval of 4 hours.
 
 > [!NOTE]
 > - Duplicate key entries (e.g. ```bln0``` occurs more than once) will be ignored.
