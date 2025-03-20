@@ -3,6 +3,11 @@
 > [!CAUTION]
 > Requires individual configuration
 
+You _*need*_ to modify the following values:
+
+- ```aprsis_callsign``` is the call sign that the bot listens to. Change the default value ```COAC``` to a call sign that is not in use.
+- ```aprsis_tocall``` is equivalent to the bot's technical identifier. Head over to Hessu's [APRS TOCALL repository](https://github.com/aprsorg/aprs-deviceid) and request a new TOCALL for your service. This setting's default value ```APRS``` in not to be used on a permanent basis.
+
 ```
 [client_config]
 
