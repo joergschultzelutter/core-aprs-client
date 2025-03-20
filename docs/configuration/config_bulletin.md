@@ -8,7 +8,7 @@ By default, the APRS bulletin data function is disabled (```aprsis_broadcast_bul
 > [!NOTE]
 > - Duplicate key entries (e.g. ```bln0``` occurs more than once) will be ignored.
 > - Messages longer than 67 characters will get truncated
-> - Ensure to stick with the ASCII-7 character set
+> - Ensure to stick to the ASCII-7 character set
 
 ```
 [bulletin_data]
