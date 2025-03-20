@@ -6,8 +6,6 @@
 - ```aprsis_enforce_unicode_messages``` (default: ```false```) When set to ```true```, the bot's egress data will allow UTF-8 messages. Additionally, ```core-aprs-client``` will not try to convert egress data to ASCII-7 content. Note that such messages may not be compatible with APRS transceivers. 
 - ```aprsis_simulate_send``` (default: ```false```) When set to ```true```, the bot will not send data to APRS-IS. Instead, it will just simulate egress data processing. Note that ingress messages sent to the bot are regularly digested.
 
-
-
 ```
 [testing]
 #

@@ -1,5 +1,8 @@
 # Message Delay
 
+> [!TIP]
+> Message delays
+
 ```
 [message_delay]
 #

@@ -1,5 +1,8 @@
 # Network Config
 
+> [!TIP]
+> This section configures basic content related to your personal ```core-aprs-client``` installation, such as your APRS-IS passcode and the APRSIS message filter. Other defaults might not require individual configuration.
+
 > [!CAUTION]
 > Requires individual configuration
 

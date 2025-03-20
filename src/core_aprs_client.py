@@ -243,7 +243,7 @@ def mycallback(raw_aprs_packet: dict):
                     send_ack(
                         myaprsis=AIS,
                         simulate_send=program_config["config"]["aprsis_simulate_send"],
-                        alias=program_config["config"]["aprsis_callsign"],
+                        alias=program_config["client_config"]["aprsis_callsign"],
                         users_callsign=from_callsign,
                         source_msg_no=msgno_string,
                     )
@@ -395,7 +395,7 @@ def run_listener():
         while True:
             # Create the APRS-IS object and set user/pass/host/port
             AIS = aprslib.IS(
-                callsign=program_config["config"]["aprsis_callsign"],
+                callsign=program_config["client_config"]["aprsis_callsign"],
                 passwd=program_config["config"]["aprsis_passcode"],
                 host=program_config["config"]["aprsis_server_name"],
                 port=program_config["config"]["aprsis_server_port"],
@@ -413,7 +413,7 @@ def run_listener():
                 + ", filter="
                 + program_config["config"]["aprsis_server_filter"]
                 + ", APRS-IS User:"
-                + program_config["config"]["aprsis_callsign"]
+                + program_config["client_config"]["aprsis_callsign"]
                 + ", APRS-IS passcode:"
                 + str(program_config["config"]["aprsis_passcode"])
             )
@@ -481,7 +481,7 @@ def run_listener():
                             + program_config["config"]["aprsis_table"]
                             + program_config["config"]["aprsis_longitude"]
                             + program_config["config"]["aprsis_symbol"]
-                            + program_config["config"]["aprsis_callsign"]
+                            + program_config["client_config"]["aprsis_callsign"]
                             + " "
                             + __version__
                             + " /A="

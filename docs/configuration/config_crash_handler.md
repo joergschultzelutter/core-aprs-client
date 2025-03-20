@@ -9,8 +9,7 @@
 > [!TIP]
 > if one (or both) of these settings point to an invalid file name, an empty value setting or use ```NOT_CONFIGURED``` as setting, then the crash handler gets deactivated.
 
-```bash
-[crash_handler]
+```
 #
 # Apprise config file name
 # Reference to an Apprise (https://github.com/caronc/apprise) configuration file

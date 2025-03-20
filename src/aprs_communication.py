@@ -195,10 +195,10 @@ def send_beacon_and_status_msg(
     logger.info(msg="Reached beacon interval; sending beacons")
     for bcn in aprs_beacon_messages:
         stringtosend = (
-            program_config["config"]["aprsis_callsign"]
+            program_config["client_config"]["aprsis_callsign"]
             + ">"
-            + program_config["config"]["aprsis_tocall"]
-            + ":{bcn}"
+            + program_config["client_config"]["aprsis_tocall"]
+            + ":"+bcn
         )
         if not simulate_send:
             logger.info(msg=f"Sending beacon: {stringtosend}")
@@ -233,9 +233,9 @@ def send_bulletin_messages(
     logger.info(msg="reached bulletin interval; sending bulletins")
     for recipient_id, bln in bulletin_dict.items():
         stringtosend = (
-            program_config["config"]["aprsis_callsign"]
+            program_config["client_config"]["aprsis_callsign"]
             + ">"
-            + program_config["config"]["aprsis_tocall"]
+            + program_config["client_config"]["aprsis_tocall"]
             + f"::{recipient_id:9}:{bln}"
         )
         if not simulate_send:

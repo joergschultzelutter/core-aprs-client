@@ -29,14 +29,17 @@ aprsis_broadcast_bulletins = false
 # - messages longer than 67 characters will get truncated
 # - Ensure to stick with the ASCII-7 character set
 #
-bln0 = Core APRS Client
-bln1 = See https://github.com/joergschultzelutter for
-bln2 = program source code. 73 de DF1JSL
-bln3 =
-bln4 =
-bln5 =
-bln6 =
-bln7 =
-bln8 =
-bln9 =
+aprsis_bln0 = Core APRS Client
+aprsis_bln1 = See https://github.com/joergschultzelutter for
+aprsis_bln2 = program source code. 73 de DF1JSL
+aprsis_bln3 =
+aprsis_bln4 =
+aprsis_bln5 =
+aprsis_bln6 =
+aprsis_bln7 =
+aprsis_bln8 =
+aprsis_bln9 =
+#
+# Broadcast interval for bulletins (default: 240 minutes = 4 hours)
+aprsis_bulletin_interval_minutes = 240
 ```

@@ -1,35 +1,24 @@
-[config]
-
-# This is the configuration file for the Core APRS Client
-# Refer to the program documentation at https://github.com/joergschultzelutter/core-aprs-client
+# Core APRS Client (COAC) configuration file
+# Refer to the program documentation at
+# https://github.com/joergschultzelutter/core-aprs-client/blob/master/docs/configuration.md
 # for additional information on what these settings do
 
+[client_config]
 #
-# BEGIN of APRS call sign configuration settings
-#
-# APRS Listener call sign
-# Default call sign is COAC (*CO*re *A*prs *C*lient)
-# Change BOTH aprsis_callsign and aprsis_server_filter settings
-# in case you want to use a different call sign
-#
+# APRS Listener call sign. Default call sign is COAC
 # This is the call sign on which the APRS client listens to
 # while being connected to APRS-IS. Read: you have to send
 # your messages to this call sign
+# Change BOTH aprsis_callsign and aprsis_server_filter settings
+# in case you want to use a different call sign
 aprsis_callsign = COAC
 #
-# APRS-IS message filter settings - see https://www.aprs-is.net/javAPRSFilter.aspx
-# Usually, you don't want to change the filter setting. Just ensure that both
-# aprsis_callsign and aprsis_server_filter relate to the same call sign!
-aprsis_server_filter = g/COAC
-#
-# This is the APRS "tocall" identifier that is used for outgoing messages
-# You NEED to request your very own TOCALL for your client code
+# This is the APRS "tocall" identifier which is used for outgoing messages
+# You NEED to request your very own TOCALL for your own client code
 # Details: https://github.com/aprsorg/aprs-deviceid
 aprsis_tocall = APRS
-#
-# END of call sign configuration settings
-#
-# Standard APRS client parameters. Amend if necessary.
+
+[network_config]
 #
 # APRS-IS server, see https://www.aprs2.net/
 aprsis_server_name = euro.aprs2.net
@@ -38,36 +27,25 @@ aprsis_server_name = euro.aprs2.net
 # Usually, you don't want to change this
 aprsis_server_port = 14580
 #
-# Simulates sending to APRS only, if set to true
-# (useful for initial testing purposes only)
-# Default: false
-aprsis_simulate_send = false
-#
 # APRS-IS passcode (numeric). Replace with your very own passcode
 # If you don't know what this is, then this program is not for you
-aprsis_passcode = 12345
+aprsis_passcode = 29166
+#
+# APRS-IS message filter settings - see https://www.aprs-is.net/javAPRSFilter.aspx
+# Ensure that both aprsis_callsign and aprsis_server_filter relate to the same call sign!
+aprsis_server_filter = g/COAC
 
-# Internal dupe message cache configuration
+[beacon_data]
 #
-# maximum number of messages
-msg_cache_max_entries = 2160
-#
-# max time span of dupe detection (3600 sec = 1 hour)
-msg_cache_time_to_live = 3600
-#
-# delay between messages if more than one message is to be sent to APRS-IS
-packet_delay_message = 6.0
-#
-# packet delay after sending an acknowledgment, bulletin or beacon
-packet_delay_other = 6.0
-#
-# Broadcast position true/false
-# if set to 'true', the client will beacon its existence plus lat/lon settings
+# Broadcast position beacon true/false
+# When set to 'true', the client will beacon its existence plus lat/lon settings
 # every 4 hrs
-aprsis_broadcast_position = false
+# When set to 'false', all other parameters in this section are going to be ignored
+#
+aprsis_broadcast_beacon = false
 #
 # Symbol for position broadcasting
-# (only used for cases where aprsis_broadcast_position = true)
+# (only used for cases where aprsis_broadcast_beacon = true)
 # see http://www.aprs.org/symbols/symbolsX.txt
 # table: APRS symbol table (/=primary \=secondary, or overlay)
 # symbol: APRS symbol: Server
@@ -75,7 +53,7 @@ aprsis_table = /
 aprsis_symbol = ?
 #
 # Latitude and longitude
-# (only used for cases where aprsis_broadcast_position = true)
+# (only used for cases where aprsis_broadcast_beacon = true)
 # Location of our process (Details: see aprs101.pdf see aprs101.pdf chapter 6 pg. 23)
 # Ensure to honor the format settings as described in the specification, otherwise
 # your package might get rejected and/or not surface on aprs.fi
@@ -88,15 +66,46 @@ aprsis_latitude = 5151.84N
 aprsis_longitude = 00935.48E
 #
 # Altitude in *FEET* (not meters) for APRS beacon. Details: see aprs101.pdf chapter 8
-# (only used for cases where aprsis_broadcast_position = true)
+# (only used for cases where aprsis_broadcast_beacon = true)
 aprsis_beacon_altitude_ft = 824
 #
 #
-# Broadcast APRS bulletins (BLN0..9) true/false
-# if set to 'true', the client will beacon a FIXED set of APRS bulletin messages
-# every 4 hrs. The messages are defined in the 'core_aprs_client.py' file
+# Broadcast interval for beacons (default: 30 minutes)
+aprsis_beacon_interval_minutes = 30
+
+[bulletin_data]
 #
+# Broadcast APRS bulletins (BLN0..9) true/false
+# When set to 'true', the client will beacon a FIXED set of APRS bulletin messages
+# every 4 hrs.
+# When set to 'false', all other parameters in this section are going to be ignored
 aprsis_broadcast_bulletins = false
+#
+# APRS Bulletin messages BLN0..BLN9
+# If you don't want to configure a bulletin message, then leave the value empty or
+# remove the line in question
+#
+# Notes:
+# - Duplicate keys will be ignored
+# - any key that is NOT a bulletin will be ignored
+# - messages longer than 67 characters will get truncated
+# - Ensure to stick with the ASCII-7 character set
+#
+aprsis_bln0 = Core APRS Client
+aprsis_bln1 = See https://github.com/joergschultzelutter for
+aprsis_bln2 = program source code. 73 de DF1JSL
+aprsis_bln3 =
+aprsis_bln4 =
+aprsis_bln5 =
+aprsis_bln6 =
+aprsis_bln7 =
+aprsis_bln8 =
+aprsis_bln9 =
+#
+# Broadcast interval for bulletins (default: 240 minutes = 4 hours)
+aprsis_bulletin_interval_minutes = 240
+
+[crash_handler]
 #
 # Apprise config file name
 # Reference to an Apprise (https://github.com/caronc/apprise) configuration file
@@ -111,9 +120,39 @@ apprise_config_file = apprise.yml
 # If the apprise config is enabled AND you have specified a correct file name
 # for this setting, the client will try to message you a potential call stack file
 # in case the program crashes
-nohup_filename="nohup.out"
+nohup_filename = nohup.out
+
+[dupe_detection]
+#
+# Internal dupe message cache configuration
+#
+# maximum number of messages
+msg_cache_max_entries = 2160
+#
+# max time span of dupe detection (3600 sec = 1 hour)
+msg_cache_time_to_live = 3600
+
+[message_delay]
+#
+# delay between messages if more than one message is to be sent to APRS-IS
+packet_delay_message = 6.0
+#
+# packet delay after sending an acknowledgment, bulletin or beacon
+packet_delay_other = 6.0
+
+[testing]
 #
 # Force outgoing unicode messages (default: false)
 # When set to 'true', outgoing content will allow UTF-8 encoding
 # Enabling this setting is only recommended for APRS-IS-to-APRS-IS testing
 aprsis_enforce_unicode_messages = false
+#
+# Simulates sending to APRS only, if set to true
+# (useful for initial testing purposes only)
+# Default: false
+aprsis_simulate_send = false
+
+[custom_config]
+#
+# This section is deliberately kept empty and can be used for storing your
+# individual APRS bot's configuration settings
