@@ -1,6 +1,6 @@
 # Crash Handler
 
-```config
+```javascript
 [crash_handler]
 #
 # Apprise config file name
