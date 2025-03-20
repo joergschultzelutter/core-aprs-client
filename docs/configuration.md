@@ -18,7 +18,7 @@ When it comes to the individual configuration, the```core-aprs-client``` solely 
 > [!TIP]
 > The following configuration file sections are preconfigured and do not require any modification unless you want to activate specific bot functions.
 
-- [position_data](configuration/config_beacon) - Used in case you want to beacon your APRS bot's position & APRS symbol to APRS-IS
+- [position_data](configuration/config_beacon.md) - Used in case you want to beacon your APRS bot's position & APRS symbol to APRS-IS
 - [bulletin_data](configuration/config_bulletin.md) - Used in case you want to send out fixed APRS bulletin messages to APRS-IS
 - [crash_handler](configuration/config_crash_handler.md) - Optional setting which enables the bot to send you a core dump file in case the program has crashed.
 - [dupe_detection](configuration/config_dupe_detection.md) - Default settings for how many incoming APRS messages are stored. The time-to-live setting can also be defined here.
