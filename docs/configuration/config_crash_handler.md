@@ -1,7 +1,7 @@
 # Crash Handler
 
-```
-crash_handler]
+```config
+[crash_handler]
 #
 # Apprise config file name
 # Reference to an Apprise (https://github.com/caronc/apprise) configuration file
