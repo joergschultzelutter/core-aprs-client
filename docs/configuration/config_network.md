@@ -4,7 +4,7 @@
 > This section configures basic content related to your personal ```core-aprs-client``` installation, such as your APRS-IS passcode and the APRSIS message filter. Other defaults might not require individual configuration.
 
 > [!CAUTION]
-> Requires individual configuration
+> This configuration file section requires individual configuration. You HAVE to make these changes in order to install ```core-aprs-client``` properly.
 
 ```
 #
