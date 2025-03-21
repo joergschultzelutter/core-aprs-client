@@ -4,7 +4,7 @@
 > This section configures basic content related to your personal ```core-aprs-client``` installation, such as your very own call sign and your TOCALL identifier.
 
 > [!CAUTION]
-> Requires individual configuration
+> This configuration file section requires individual configuration. You HAVE to make these changes in order to install ```core-aprs-client``` properly.
 
 You _*need*_ to modify the following values:
 
