@@ -9,7 +9,7 @@ APRS Beaconing enables your ```core-aprs-client``` instance to appear on [aprs.f
 - ```aprsis_table``` and ```aprsis_symbol``` - the COMBINATION of these two fields defines the icon type that is going to be displayed on [aprs.fi](http://www.aprs.fi). Details: see [official documentation on aprs.org](http://www.aprs.org/symbols/symbolsX.txt). You can also find graphical displays of all the available APRS icons on the Internet (search for "APRS Symbols")
 - ```aprsis_latitude``` and ```aprsis_longitude``` define your bot's latitude and longitude location parameters. Details: [aprs101.pdf](https://www.aprs.org/doc/APRS101.PDF) chapter 6 page 23
 - ```aprsis_beacon_altitude_ft``` defines your bot's altitude setting. Details: [aprs101.pdf](https://www.aprs.org/doc/APRS101.PDF) chapter 8. Note that the value needs to be specified in ```feet``` and not in ```meters```.
-- ```aprsis_beacon_interval_minutes``` defines your bot's beaconing interval. Default is ```30``` (minutes). Changing this setting to a lower value is not recommended.
+- ```aprsis_beacon_interval_minutes``` defines your bot's beaconing interval. Default is ```30``` (minutes). Changing this setting to a smaller value is not recommended.
 
 ```
 [beacon_data]
