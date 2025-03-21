@@ -13,6 +13,7 @@
 - ```aprsis_server_filter``` - APRS-IS's [server filter settings](https://www.aprs-is.net/javAPRSFilter.aspx). Default setting installs a call sign filter (```g/```) for our default call sign ```COAC```, thus only activating ```core-aprs-client``` whenever something is directly sent to its associated call sign.
 
 ```
+[network_config]
 #
 # APRS-IS server, see https://www.aprs2.net/
 aprsis_server_name = euro.aprs2.net
