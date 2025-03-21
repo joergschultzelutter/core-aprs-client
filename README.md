@@ -5,11 +5,14 @@ Core APRS client with dupe detection
 
 This is where you will step in. Just add your bot-specific code to the client and you're done. Everything else related to APRS messaging will be covered by ```core-aprs-client```.
 
+## Core features
+- Core APRS-IS functionality, covering both 'old' and [new](http://www.aprs.org/aprs11/replyacks.txt) ACK/REJ processing
+- Configurable dupe message handler
+- APRS Beaconing and Bulletins (optional)
+- Program crash handler, allowing you to get notified in case the client crashes (optional)
+
 ## Schematics
 ![Schematics](img/schematics.svg)
-
-
-
 
 ## Running the client
 
