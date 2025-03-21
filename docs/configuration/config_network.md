@@ -4,7 +4,8 @@
 > This section configures basic content related to your personal ```core-aprs-client``` installation, such as your APRS-IS passcode and the APRSIS message filter. Other defaults might not require individual configuration.
 
 > [!CAUTION]
-> This configuration file section requires individual configuration. For a minimum configuration, at least the settings for ```aprsis_passcode``` and ```aprsis_server_filter``` need to be configured. 
+> This configuration file section requires individual configuration.
+> For a minimum valid configuration, at least the settings for ```aprsis_passcode``` and ```aprsis_server_filter``` need to get configured. 
 
 - ```aprsis_server_name``` - the name of the APRS-IS server. Select a server from [the APRS2 Tier Network](https://www.aprs2.net/) that is close to your location.
 - ```aprsis_server_port``` - our server port. Details: [see APRS-IS documentation](https://www.aprs-is.net/connecting.aspx). Normally, you don't want to change this setting.
