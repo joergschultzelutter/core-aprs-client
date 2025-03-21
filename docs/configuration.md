@@ -7,16 +7,12 @@ When it comes to the individual configuration, the```core-aprs-client``` solely 
 > [!NOTE]
 > With the exception of the first two configuration sections, all other configuration sections are optional and have been pre-configured. If you are happy with the default settings, simply modify those parts of the config file which _do_ require modifications (e.g. call sign, passcode) - and you're good to go.
 
-## Configuration file sections
-
-> [!WARNING]
-> The following two configuration file sections require changes; here, you need to change the program's call sign, APRS-IS passcode, and other data.
+## Mandatory configuration file sections
 
 - [client_config](configuration/config_client.md) - Basic APRS call sign & filter configuration.
 - [network_config](configuration/config_network.md) - APRS-IS networking settings, such as server, port, passcode,....
 
-> [!TIP]
-> The following configuration file sections are preconfigured and do not require any modification unless you want to activate specific bot functions.
+## Optional configuration file sections
 
 - [beacon_data](configuration/config_beacon.md) - Used in case you want to beacon your APRS bot's position & APRS symbol to APRS-IS
 - [bulletin_data](configuration/config_bulletin.md) - Used in case you want to send out fixed APRS bulletin messages to APRS-IS
