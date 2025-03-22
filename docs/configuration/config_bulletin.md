@@ -10,7 +10,11 @@ By default, the APRS bulletin data function is disabled (```aprsis_broadcast_bul
 > - Messages longer than 67 characters will get truncated
 > - Ensure to stick to the ASCII-7 character set
 
+- ```aprsis_broadcast_bulletins``` - Enable or disable bulletins. Default value: ```false``` (bulletin broadcasting is disabled)
+- ```aprsis_bln0``` to ```aprsis_bln9``` - the bulletins that you may want to see transmitted. Longer messages will get truncated after 67 bytes (which is the maximum message limit for APRS messages). Ensure to use ASCII-7 encoding.
+- ```aprsis_bulletin_interval_minutes``` - the interval in minutes that ```core-aprs-client``` will use for bradcasting. Default value: 240 minutes (4 hours). 
 ```
+
 [bulletin_data]
 #
 # Broadcast APRS bulletins (BLN0..9) true/false
