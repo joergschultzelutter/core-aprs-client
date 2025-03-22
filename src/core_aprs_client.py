@@ -104,7 +104,7 @@ def client_exception_handler():
 
     # Try to zip the log file if possible
     success, log_file_name = create_zip_file_from_log(
-        program_config["config"]["nohup_filename"]
+        program_config["crash_handler"]["nohup_filename"]
     )
 
     # check if we can spot a 'nohup' file which already contains our status
@@ -116,7 +116,7 @@ def client_exception_handler():
     send_apprise_message(
         message_header="MPAD process has crashed",
         message_body=message_body,
-        apprise_config_file=program_config["config"]["apprise_config_file"],
+        apprise_config_file=program_config["crash_handler"]["apprise_config_file"],
         message_attachment=log_file_name,
     )
 
@@ -242,7 +242,7 @@ def mycallback(raw_aprs_packet: dict):
                 if msg_no_supported and not new_ackrej_format:
                     send_ack(
                         myaprsis=AIS,
-                        simulate_send=program_config["config"]["aprsis_simulate_send"],
+                        simulate_send=program_config["testing"]["aprsis_simulate_send"],
                         alias=program_config["client_config"]["aprsis_callsign"],
                         users_callsign=from_callsign,
                         source_msg_no=msgno_string,
@@ -297,15 +297,15 @@ def mycallback(raw_aprs_packet: dict):
                     # If not, just dump the link to the instructions
                     else:
                         output_message = [
-                            "Sorry, did not understand your request. Have a look at my command",
-                            "syntax, see https://github.com/joergschultzelutter/mpad",
+                            "Sorry, did not understand your request. Have a look at my documentation",
+                            "see https://github.com/joergschultzelutter/core-aprs-client",
                         ]
                     logger.info(msg=f"Unable to process APRS packet {raw_aprs_packet}")
 
                 # Send our message(s) to APRS-IS
                 aprs_message_counter = send_aprs_message_list(
                     myaprsis=AIS,
-                    simulate_send=program_config["config"]["aprsis_simulate_send"],
+                    simulate_send=program_config["testing"]["aprsis_simulate_send"],
                     message_text_array=output_message,
                     destination_call_sign=from_callsign,
                     send_with_msg_no=msg_no_supported,
@@ -378,12 +378,18 @@ def run_listener():
 
     # Create the decaying APRS message cache. Any APRS message that is present in
     # this cache will be considered as a duplicate / delayed and will not be processed
-    # logger.info(
-    #    msg=f"APRS message dupe cache set to {program_config["config"]["msg_cache_max_entries"]} max possible entries and a TTL of {int(program_config["config"]["msg_cache_time_to_live"] / 60)} mins"
-    # )
+    message = (
+        "APRS message dupe cache set to "
+        + program_config["dupe_detection"]["msg_cache_max_entries"]
+        + " max possible entries and a TTL of "
+        + (program_config["dupe_detection"]["msg_cache_time_to_live"] / 60)
+        + " mins"
+    )
+
+    logger.info(msg=message)
     aprs_message_cache = ExpiringDict(
-        max_len=program_config["config"]["msg_cache_max_entries"],
-        max_age_seconds=program_config["config"]["msg_cache_time_to_live"],
+        max_len=program_config["dupe_detection"]["msg_cache_max_entries"],
+        max_age_seconds=program_config["dupe_detection"]["msg_cache_time_to_live"],
     )
 
     # Register the SIGTERM handler; this will allow a safe shutdown of the program
@@ -396,26 +402,26 @@ def run_listener():
             # Create the APRS-IS object and set user/pass/host/port
             AIS = aprslib.IS(
                 callsign=program_config["client_config"]["aprsis_callsign"],
-                passwd=program_config["config"]["aprsis_passcode"],
-                host=program_config["config"]["aprsis_server_name"],
-                port=program_config["config"]["aprsis_server_port"],
+                passwd=program_config["network_config"]["aprsis_passcode"],
+                host=program_config["network_config"]["aprsis_server_name"],
+                port=program_config["network_config"]["aprsis_server_port"],
             )
 
             # Set the APRS-IS server filter
-            AIS.set_filter(program_config["config"]["aprsis_server_filter"])
+            AIS.set_filter(program_config["network_config"]["aprsis_server_filter"])
 
             # Establish the connection to APRS-IS
             message = (
                 "Establishing connection to APRS-IS: server="
-                + program_config["config"]["aprsis_server_name"]
+                + program_config["network_config"]["aprsis_server_name"]
                 + ", port="
-                + str(program_config["config"]["aprsis_server_port"])
+                + str(program_config["network_config"]["aprsis_server_port"])
                 + ", filter="
-                + program_config["config"]["aprsis_server_filter"]
+                + program_config["network_config"]["aprsis_server_filter"]
                 + ", APRS-IS User:"
-                + program_config["client_config"]["aprsis_callsign"]
+                + program_config["network_client_config"]["aprsis_callsign"]
                 + ", APRS-IS passcode:"
-                + str(program_config["config"]["aprsis_passcode"])
+                + str(program_config["network_config"]["aprsis_passcode"])
             )
             logger.info(msg=message)
             logger.info(msg="Establishing connection to APRS-IS")
@@ -427,8 +433,8 @@ def run_listener():
 
                 aprs_scheduler = None
                 if (
-                    program_config["config"]["aprsis_broadcast_position"]
-                    or program_config["config"]["aprsis_broadcast_bulletins"]
+                    program_config["beacon_data"]["aprsis_broadcast_beacon"]
+                    or program_config["bulletin_data"]["aprsis_broadcast_bulletins"]
                 ):
                     # If we reach this position in the code, we have at least one
                     # task that needs to be scheduled (bulletins and/or position messages
@@ -445,7 +451,7 @@ def run_listener():
                     # to APRS; it will be triggered every 4 hours
                     #
 
-                    if program_config["config"]["aprsis_broadcast_position"]:
+                    if program_config["beacon_data"]["aprsis_broadcast_beacon"]:
                         # Send initial beacon after establishing the connection to APRS_IS
                         logger.info(
                             msg="Send initial beacon after establishing the connection to APRS_IS"
@@ -465,7 +471,7 @@ def run_listener():
                         # Format is as follows: =Lat primary-symbol-table-identifier lon symbol-identifier test-message
                         # Lat/lon from the configuration have to be valid or the message will not be accepted by aprs-is
                         #
-                        # Example nessage: MPAD>APRS:=5150.34N/00819.60E?MPAD 0.01
+                        # Example nessage: MPAD>APRS:=5150.34N/00819.60E?COAC 0.01
                         # results in
                         # lat = 5150.34N
                         # primary symbol identifier = /
@@ -477,16 +483,18 @@ def run_listener():
                         # as all of our parameters are stored in a dictionary, we need to construct
 
                         _beacon = (
-                            program_config["config"]["aprsis_latitude"]
-                            + program_config["config"]["aprsis_table"]
-                            + program_config["config"]["aprsis_longitude"]
-                            + program_config["config"]["aprsis_symbol"]
+                            program_config["beacon_data"]["aprsis_latitude"]
+                            + program_config["beacon_data"]["aprsis_table"]
+                            + program_config["beacon_data"]["aprsis_longitude"]
+                            + program_config["beacon_data"]["aprsis_symbol"]
                             + program_config["client_config"]["aprsis_callsign"]
                             + " "
                             + __version__
                             + " /A="
                             + str(
-                                program_config["config"]["aprsis_beacon_altitude_ft"]
+                                program_config["beacon_data"][
+                                    "aprsis_beacon_altitude_ft"
+                                ]
                             )[:6]
                         )
                         aprs_beacon_messages: list = [_beacon]
@@ -495,25 +503,27 @@ def run_listener():
                         send_beacon_and_status_msg(
                             myaprsis=AIS,
                             aprs_beacon_messages=aprs_beacon_messages,
-                            simulate_send=program_config["config"][
+                            simulate_send=program_config["testing"][
                                 "aprsis_simulate_send"
                             ],
                         )
 
-                        # Position beaconing; interval = 30 min
+                        # Add position beaconing to scheduler
                         aprs_scheduler.add_job(
                             send_beacon_and_status_msg,
                             "interval",
                             id="aprsbeacon",
-                            minutes=30,
+                            minutes=program_config["beacon_data"][
+                                "aprsis_beacon_interval_minutes"
+                            ],
                             args=[
                                 AIS,
                                 aprs_beacon_messages,
-                                program_config["config"]["aprsis_simulate_send"],
+                                program_config["testing"]["aprsis_simulate_send"],
                             ],
                         )
 
-                    if program_config["config"]["aprsis_broadcast_bulletins"]:
+                    if program_config["bulletin_data"]["aprsis_broadcast_bulletins"]:
                         # Install scheduler task 2 - send standard bulletins (advertising the program instance)
                         # The bulletin messages consist of fixed content and are defined at the beginning of
                         # this program code
@@ -521,11 +531,13 @@ def run_listener():
                             send_bulletin_messages,
                             "interval",
                             id="aprsbulletin",
-                            hours=4,
+                            minutes=program_config["bulletin_data"][
+                                "aprsis_bulletin_interval_minutes"
+                            ],
                             args=[
                                 AIS,
                                 aprs_bulletin_messages,
-                                program_config["config"]["aprsis_simulate_send"],
+                                program_config["testing"]["aprsis_simulate_send"],
                             ],
                         )
 
@@ -573,7 +585,7 @@ def run_listener():
 
             # Enter sleep mode and then restart the loop
             logger.info(msg=f"Sleeping ...")
-            time.sleep(program_config["config"]["packet_delay_message"])
+            time.sleep(program_config["message_delay"]["packet_delay_message"])
 
     except (KeyboardInterrupt, SystemExit):
         # Tell the user that we are about to terminate our work

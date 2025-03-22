@@ -547,7 +547,7 @@ def make_pretty_aprs_messages(
 
     # Check if the user wants unicode messages. Default is ASCII
     if (
-        not program_config["config"]["aprsis_enforce_unicode_messages"]
+        not program_config["testing"]["aprsis_enforce_unicode_messages"]
         and not force_outgoing_unicode_messages
     ):
         # Convert the message to plain ascii

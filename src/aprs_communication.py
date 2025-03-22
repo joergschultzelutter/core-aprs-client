@@ -198,12 +198,13 @@ def send_beacon_and_status_msg(
             program_config["client_config"]["aprsis_callsign"]
             + ">"
             + program_config["client_config"]["aprsis_tocall"]
-            + ":"+bcn
+            + ":"
+            + bcn
         )
         if not simulate_send:
             logger.info(msg=f"Sending beacon: {stringtosend}")
             myaprsis.sendall(stringtosend)
-            time.sleep(program_config["config"]["packet_delay_other"])
+            time.sleep(program_config["message_delay"]["packet_delay_other"])
         else:
             logger.info(msg=f"Simulating beacons: {stringtosend}")
 
@@ -241,7 +242,7 @@ def send_bulletin_messages(
         if not simulate_send:
             logger.info(msg=f"Sending bulletin: {stringtosend}")
             myaprsis.sendall(stringtosend)
-            time.sleep(program_config["config"]["packet_delay_other"])
+            time.sleep(program_config["message_delay"]["packet_delay_other"])
         else:
             logger.info(msg=f"simulating bulletins: {stringtosend}")
 
