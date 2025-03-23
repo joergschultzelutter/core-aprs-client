@@ -71,16 +71,9 @@ ex_type = ex_value = ex_traceback = None
 
 #
 # The program's bulletin message (optional)
+# This dictionary receives its data from the program's configuration file
 #
-# APRS_IS bulletin messages (will be sent every 4 hrs)
-# Note: these HAVE to have 67 characters (or less) per entry
-# The client will NOT check the content and send it out 'as is'
-aprs_bulletin_messages: dict = {
-    "BLN0": f"Core APRS Client",
-    "BLN1": f"See https://github.com/joergschultzelutter for the",
-    "BLN2": f"program source code. 73 de DF1JSL",
-}
-#
+aprs_bulletin_messages: dict = {}
 
 
 def client_exception_handler():
