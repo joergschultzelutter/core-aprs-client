@@ -1,4 +1,4 @@
-# Beacon Data
+# Beacon Configuration
 
 > [!TIP]
 > This section of the configuration file allows you to enable APRS beaconing (default: no beaconing). If you enable beaconing, configure parameters such as latitude/longitude, altitude, .. to your needs.
@@ -12,7 +12,7 @@ APRS Beaconing enables your ```core-aprs-client``` instance to appear on [aprs.f
 - ```aprsis_beacon_interval_minutes``` defines your bot's beaconing interval. Default is ```30``` (minutes). Changing this setting to a smaller value is not recommended.
 
 ```
-[beacon_data]
+[beacon]
 #
 # Broadcast position beacon true/false
 # When set to 'true', the client will beacon its existence plus lat/lon settings

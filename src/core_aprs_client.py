@@ -433,8 +433,8 @@ def run_listener():
 
                 aprs_scheduler = None
                 if (
-                    program_config["beacon_data"]["aprsis_broadcast_beacon"]
-                    or program_config["bulletin_data"]["aprsis_broadcast_bulletins"]
+                    program_config["beacon_config"]["aprsis_broadcast_beacon"]
+                    or program_config["bulletin_config"]["aprsis_broadcast_bulletins"]
                 ):
                     # If we reach this position in the code, we have at least one
                     # task that needs to be scheduled (bulletins and/or position messages
@@ -451,7 +451,7 @@ def run_listener():
                     # to APRS; it will be triggered every 4 hours
                     #
 
-                    if program_config["beacon_data"]["aprsis_broadcast_beacon"]:
+                    if program_config["beacon_config"]["aprsis_broadcast_beacon"]:
                         # Send initial beacon after establishing the connection to APRS_IS
                         logger.info(
                             msg="Send initial beacon after establishing the connection to APRS_IS"
@@ -483,16 +483,16 @@ def run_listener():
                         # as all of our parameters are stored in a dictionary, we need to construct
 
                         _beacon = (
-                            program_config["beacon_data"]["aprsis_latitude"]
-                            + program_config["beacon_data"]["aprsis_table"]
-                            + program_config["beacon_data"]["aprsis_longitude"]
-                            + program_config["beacon_data"]["aprsis_symbol"]
+                            program_config["beacon_config"]["aprsis_latitude"]
+                            + program_config["beacon_config"]["aprsis_table"]
+                            + program_config["beacon_config"]["aprsis_longitude"]
+                            + program_config["beacon_config"]["aprsis_symbol"]
                             + program_config["client_config"]["aprsis_callsign"]
                             + " "
                             + __version__
                             + " /A="
                             + str(
-                                program_config["beacon_data"][
+                                program_config["beacon_config"][
                                     "aprsis_beacon_altitude_ft"
                                 ]
                             )[:6]
@@ -513,7 +513,7 @@ def run_listener():
                             send_beacon_and_status_msg,
                             "interval",
                             id="aprsbeacon",
-                            minutes=program_config["beacon_data"][
+                            minutes=program_config["beacon_config"][
                                 "aprsis_beacon_interval_minutes"
                             ],
                             args=[
@@ -523,7 +523,7 @@ def run_listener():
                             ],
                         )
 
-                    if program_config["bulletin_data"]["aprsis_broadcast_bulletins"]:
+                    if program_config["bulletin_config"]["aprsis_broadcast_bulletins"]:
                         # Install scheduler task 2 - send standard bulletins (advertising the program instance)
                         # The bulletin messages consist of fixed content and are defined at the beginning of
                         # this program code
@@ -531,7 +531,7 @@ def run_listener():
                             send_bulletin_messages,
                             "interval",
                             id="aprsbulletin",
-                            minutes=program_config["bulletin_data"][
+                            minutes=program_config["bulletin_config"][
                                 "aprsis_bulletin_interval_minutes"
                             ],
                             args=[

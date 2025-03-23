@@ -35,7 +35,7 @@ aprsis_passcode = 29166
 # Ensure that both aprsis_callsign and aprsis_server_filter relate to the same call sign!
 aprsis_server_filter = g/COAC
 
-[beacon_data]
+[beacon_config]
 #
 # Broadcast position beacon true/false
 # When set to 'true', the client will beacon its existence plus lat/lon settings
@@ -73,7 +73,7 @@ aprsis_beacon_altitude_ft = 824
 # Broadcast interval for beacons (default: 30 minutes)
 aprsis_beacon_interval_minutes = 30
 
-[bulletin_data]
+[bulletin_config]
 #
 # Broadcast APRS bulletins (BLN0..9) true/false
 # When set to 'true', the client will beacon a FIXED set of APRS bulletin messages
@@ -81,29 +81,35 @@ aprsis_beacon_interval_minutes = 30
 # When set to 'false', all other parameters in this section are going to be ignored
 aprsis_broadcast_bulletins = false
 #
+# Broadcast interval for bulletins (default: 240 minutes = 4 hours)
+aprsis_bulletin_interval_minutes = 240
+
+
+[bulletin_messages]
+#
 # APRS Bulletin messages BLN0..BLN9
 # If you don't want to configure a bulletin message, then leave the value empty or
 # remove the line in question
 #
 # Notes:
-# - Duplicate keys will be ignored
-# - any key that is NOT a bulletin will be ignored
-# - messages longer than 67 characters will get truncated
-# - Ensure to stick with the ASCII-7 character set
+# - The variable name used in this section will be used for broadcasting, meaning that if you create a variable ```blnhello```, the ```core-aprs-client``` will broadcast a bulletin ```BLNHELLO``` along with its associated message to the APRS users.
+# - The variable name always gets converted to uppercase characters; there is no need for you to use uppercase values in the configuration file.
+# - All bulletin messages' variable names MUST start with the ```BLN``` prefix.
+# - Following that fixed prefix, a combination of 6 more digits or ASCII-7 characters are permissable (0..9, A..Z)
+# - Duplicate key entries (e.g. ```bln0``` occurs more than once) will be ignored.
+# - Message content longer than 67 characters will get truncated
+# - Bullets use ASCII-7 character set only
+# - Entries with no message content will be ignored and not broadcasted to APRS-IS
 #
-aprsis_bln0 = Core APRS Client
-aprsis_bln1 = See https://github.com/joergschultzelutter for
-aprsis_bln2 = program source code. 73 de DF1JSL
-aprsis_bln3 =
-aprsis_bln4 =
-aprsis_bln5 =
-aprsis_bln6 =
-aprsis_bln7 =
-aprsis_bln8 =
-aprsis_bln9 =
-#
-# Broadcast interval for bulletins (default: 240 minutes = 4 hours)
-aprsis_bulletin_interval_minutes = 240
+bln0 = Core APRS Client
+bln1 = See https://github.com/joergschultzelutter for
+bln2 = program source code. 73 de DF1JSL
+bln4 =
+bln5 =
+bln6 =
+bln7 =
+bln8 =
+bln9 =
 
 [crash_handler]
 #
