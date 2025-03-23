@@ -34,6 +34,7 @@ from utils import (
     read_aprs_message_counter,
     write_aprs_message_counter,
     make_pretty_aprs_messages,
+    parse_bulletin_data,
 )
 from client_configuration import load_config, program_config
 from input_parser import parse_input_message
@@ -517,6 +518,9 @@ def run_listener():
                         )
 
                     if program_config["bulletin_config"]["aprsis_broadcast_bulletins"]:
+                        # prepare the bulletin data
+                        parse_bulletin_data(core_config=program_config)
+
                         # Install scheduler task 2 - send standard bulletins (advertising the program instance)
                         # The bulletin messages consist of fixed content and are defined at the beginning of
                         # this program code

@@ -628,5 +628,51 @@ def split_string_to_string_list(message_string: str, max_len: int = 67):
     return split_strings
 
 
+def parse_bulletin_data(core_config: dict):
+    """
+    This function parses the bulletin messages from the configuration file,
+    checks them for validity and then adds them to the global 'aprs_bulletin_messages'
+    dictionary.
+
+    Parameters
+    ==========
+    core_config: 'dict'
+        The bulletin messages from the configuration file in their raw state
+
+    Returns
+    =======
+    """
+
+    # Get the key and value from our configuration file's bulletin messages section
+    for key, value in core_config["bulletin_messages"].items():
+        # Message populated and less than max APRS message length?
+        if 0 < len(value) < 68:
+            # Check if the identifier follows these APRS requirements:
+            # 1) must start with fixed "BLN" string
+            # 2) needs to be followed by 1..6 ASCII-7 characters and/or digits
+            match = re.match(
+                pattern=r"^bln[a-z0-9]{1,6}$", string=key, flags=re.IGNORECASE
+            )
+            if match:
+                # We found a match. As a precaution, let's check if the user has
+                # used characters in the actual message which are special to APRS
+                match = re.findall(r"[{}|~]+", value)
+                if match:
+                    logger.info(
+                        msg=f"APRS bulletin message '{key}': removing special APRS characters from 'value' setting; check your configuration file"
+                    )
+                    # Let's get rid of those control characters from the message
+                    value = re.sub(r"[{}|~]+", "", value)
+                # Convert the bulletin identifier to upperkey
+                key = key.upper()
+                # and add it to our dictionary
+                if key not in aprs_bulletin_messages:
+                    aprs_bulletin_messages[key] = [value]
+        else:
+            logger.debug(
+                f"Ignoring bulletin setting for '{key}'; value is either empty or too long. Check your configuration"
+            )
+
+
 if __name__ == "__main__":
     pass
