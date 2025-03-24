@@ -75,7 +75,7 @@ aprsis_beacon_interval_minutes = 30
 
 [bulletin_config]
 #
-# Broadcast APRS bulletins (BLN0..9) true/false
+# Broadcast APRS bulletins (e.g. BLN0..9) true/false
 # When set to 'true', the client will beacon a FIXED set of APRS bulletin messages
 # every 4 hrs.
 # When set to 'false', all other parameters in this section are going to be ignored
@@ -96,7 +96,7 @@ aprsis_bulletin_interval_minutes = 240
 # - The variable name always gets converted to uppercase characters; there is no need for you to use uppercase values in the configuration file.
 # - All bulletin messages' variable names MUST start with the ```BLN``` prefix.
 # - Following that fixed prefix, a combination of 6 more digits or ASCII-7 characters are permissable (0..9, A..Z)
-# - Duplicate key entries (e.g. ```bln0``` occurs more than once) will be ignored.
+# - Duplicate key entries (e.g. ```bln0``` occurs more than once) will cause a program error.
 # - Message content longer than 67 characters will get truncated
 # - Bullets use ASCII-7 character set only
 # - Entries with no message content will be ignored and not broadcasted to APRS-IS

@@ -646,7 +646,7 @@ def parse_bulletin_data(core_config: dict):
     # Get the key and value from our configuration file's bulletin messages section
     for key, value in core_config["bulletin_messages"].items():
         # Message populated and less than max APRS message length?
-        if 0 < len(value) < 68:
+        if 0 < len(value) <= 67:
             # Check if the identifier follows these APRS requirements:
             # 1) must start with fixed "BLN" string
             # 2) needs to be followed by 1..6 ASCII-7 characters and/or digits
@@ -665,8 +665,10 @@ def parse_bulletin_data(core_config: dict):
                     value = re.sub(r"[{}|~]+", "", value)
                 # Convert the bulletin identifier to upperkey
                 key = key.upper()
-                # and add it to our dictionary
-                if key not in aprs_bulletin_messages:
+                # and add it to our dictionary in case it does not exist
+                # and its lenght (after potential character replacements)
+                # is still greater than zero
+                if key not in aprs_bulletin_messages and len(value) > 0:
                     aprs_bulletin_messages[key] = [value]
         else:
             logger.debug(

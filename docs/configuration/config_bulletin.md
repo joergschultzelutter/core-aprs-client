@@ -14,7 +14,7 @@ By default, the APRS bulletin data function is disabled (```aprsis_broadcast_bul
 
 [bulletin_config]
 #
-# Broadcast APRS bulletins (BLN0..9) true/false
+# Broadcast APRS bulletins (e.g. BLN0..9) true/false
 # When set to 'true', the client will beacon a FIXED set of APRS bulletin messages
 # every 4 hrs.
 # When set to 'false', all other parameters in this section are going to be ignored
