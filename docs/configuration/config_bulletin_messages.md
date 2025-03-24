@@ -9,7 +9,7 @@ By default, ```core-aprs-client``` comes with a predefined set of 10 bulletin me
 > - The variable name used in this section will be used for broadcasting, meaning that if you create a variable ```blnhello```, the ```core-aprs-client``` will broadcast a bulletin ```BLNHELLO``` along with its associated message to the APRS users.
 > - The variable name always gets converted to uppercase characters; there is no need for you to use uppercase values in the configuration file.
 > - All bulletin messages' variable names MUST start with the ```BLN``` prefix. 
-> - Following that fixed prefix, a combination of 6 more digits or ASCII-7 characters are permissable (0..9, A..Z)
+> - Following that fixed prefix, a combination of 6 more digits or ASCII-7 characters are permissable (0..9, a..z)
 > - Duplicate key entries (e.g. ```bln0``` occurs more than once) will be ignored.
 > - Message content longer than 67 characters will get truncated
 > - Bullets use ASCII-7 character set only
