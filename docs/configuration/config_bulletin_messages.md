@@ -11,7 +11,7 @@ By default, ```core-aprs-client``` comes with a predefined set of 10 bulletin me
 > - All bulletin messages' variable names MUST start with the ```BLN``` prefix. 
 > - Following that fixed prefix, a combination of 6 more digits or ASCII-7 characters are permissable (0..9, a..z)
 > - Duplicate key entries (e.g. ```bln0``` occurs more than once) will be ignored.
-> - Message content longer than 67 characters will get truncated
+> - Message content longer than 67 characters will be ignored.
 > - Bullets use ASCII-7 character set only
 > - Entries with no message content will be ignored and not broadcasted to APRS-IS
 ```
