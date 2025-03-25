@@ -51,7 +51,9 @@ def parse_input_message(aprs_message: str, users_callsign: str):
     success = True
 
     # our target dictionary
-    response_parameters = {}
+    response_parameters = {
+        "from_callsign": users_callsign,
+    }
 
     # here you would add data to the dictionary (e.g. lat/lon, wx-related stuff),
     # thus telling the output_generator processes later on what the user wants from us
