@@ -676,5 +676,80 @@ def parse_bulletin_data(core_config: dict):
             )
 
 
+def client_exception_handler():
+    """
+    This function will be called in case of a regular program exit OR
+    an uncaught exception. If an exception has occurred, we will try to
+    send out an Apprise message along with the stack trace to the user
+
+    Parameters
+    ==========
+
+    Returns
+    =======
+    """
+
+    if not exception_occurred:
+        return
+
+    # Send a message before we hit the bucket
+    message_body = f"The MPAD process has crashed. Reason: {ex_value}"
+
+    # Try to zip the log file if possible
+    success, log_file_name = create_zip_file_from_log(
+        program_config["crash_handler"]["nohup_filename"]
+    )
+
+    # check if we can spot a 'nohup' file which already contains our status
+    if log_file_name and check_if_file_exists(log_file_name):
+        message_body = message_body + " (log file attached)"
+
+    # send_apprise_message will check again if the file exists or not
+    # Therefore, we can skip any further detection steps here
+    send_apprise_message(
+        message_header="MPAD process has crashed",
+        message_body=message_body,
+        apprise_config_file=program_config["crash_handler"]["apprise_config_file"],
+        message_attachment=log_file_name,
+    )
+
+
+def handle_exception(exc_type, exc_value, exc_traceback):
+    """
+    Custom exception handler which is installed by the
+    main process. We only do a few things:
+    - remember that there has been an uncaught exception
+    - save the exception type / value / tracebace
+
+    Parameters
+    ==========
+    exc_type:
+        exception type object
+    exc_value:
+        exception value object
+    exc_traceback:
+        exception traceback object
+
+    Returns
+    =======
+    """
+
+    global exception_occurred
+    global ex_type
+    global ex_value
+    global ex_traceback
+
+    # set some global values so that we know why the program has crashed
+    exception_occurred = True
+    ex_type = exc_type
+    ex_value = exc_value
+    ex_traceback = exc_traceback
+
+    logger.info(f"Core process has received uncaught exception: {exc_value}")
+
+    # and continue with the regular flow of things
+    sys.__excepthook__(exc_type, exc_value, exc_traceback)
+
+
 if __name__ == "__main__":
     pass
