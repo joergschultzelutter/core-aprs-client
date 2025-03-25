@@ -347,6 +347,12 @@ def run_listener():
         logger.info(msg="Program config file is empty or contains an error; exiting")
         sys.exit(0)
 
+    if program_config["client_config"]["aprsis_tocall"] == "APRS":
+        logger.error(msg="'aprsis_tocall' is still set to default config; change config file ASAP")
+
+    if program_config["client_config"]["aprsis_callsign"] == "COAC":
+        logger.error(msg="'aprsis_callsign' is still sket to default config; change config file ASAP").
+    
     # Install our custom exception handler, thus allowing us to signal the
     # user who hosts MPAD with a message whenever the program is prone to crash
     # OR has ended. In any case, we will then send the file to the host
