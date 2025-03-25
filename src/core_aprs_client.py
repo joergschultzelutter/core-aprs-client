@@ -220,14 +220,14 @@ def mycallback(raw_aprs_packet: dict):
                 aprs_cache=aprs_message_cache,
             )
             if aprs_message_key:
-                logger.info(
+                logger.debug(
                     msg="DUPLICATE APRS PACKET - this message is still in our decaying message cache"
                 )
-                logger.info(
+                logger.debug(
                     msg=f"Ignoring duplicate APRS packet raw_aprs_packet: {raw_aprs_packet}"
                 )
             else:
-                logger.info(msg=f"Received raw_aprs_packet: {raw_aprs_packet}")
+                logger.debug(msg=f"Received raw_aprs_packet: {raw_aprs_packet}")
 
                 # Send an ack if we DID receive a message number
                 # and we DID NOT have received a request in the
