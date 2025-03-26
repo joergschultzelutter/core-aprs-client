@@ -750,6 +750,16 @@ def handle_exception(exc_type, exc_value, exc_traceback):
     # and continue with the regular flow of things
     sys.__excepthook__(exc_type, exc_value, exc_traceback)
 
+def check _for_default_config():
+        if program_config["client_config"]["aprsis_tocall"] == "APRS":
+        logger.error(
+            msg="'aprsis_tocall' is still set to default config; change config file ASAP"
+        )
+
+    if program_config["client_config"]["aprsis_callsign"] == "COAC":
+        logger.error(
+            msg="'aprsis_callsign' is still set to default config; change config file ASAP"
+        )
 
 if __name__ == "__main__":
     pass
