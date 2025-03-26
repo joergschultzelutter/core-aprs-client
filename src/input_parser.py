@@ -55,6 +55,9 @@ def parse_input_message(aprs_message: str, users_callsign: str):
         "from_callsign": users_callsign,
     }
 
+    # Example for a very simple command line parser
+    # xxx
+
     # here you would add data to the dictionary (e.g. lat/lon, wx-related stuff),
     # thus telling the output_generator processes later on what the user wants from us
     #
