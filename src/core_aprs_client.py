@@ -37,6 +37,7 @@ from utils import (
     parse_bulletin_data,
     client_exception_handler,
     handle_exception,
+    check_for_default_config,
 )
 from client_configuration import load_config, program_config
 from input_parser import parse_input_message
@@ -105,15 +106,9 @@ def run_listener():
         logger.info(msg="Program config file is empty or contains an error; exiting")
         sys.exit(0)
 
-    if program_config["client_config"]["aprsis_tocall"] == "APRS":
-        logger.error(
-            msg="'aprsis_tocall' is still set to default config; change config file ASAP"
-        )
-
-    if program_config["client_config"]["aprsis_callsign"] == "COAC":
-        logger.error(
-            msg="'aprsis_callsign' is still set to default config; change config file ASAP"
-        )
+    # And check if the user still runs with the default config
+    # Currently, we do not abort the code but only issue an error to the user
+    check_for_default_config()
 
     # Install our custom exception handler, thus allowing us to signal the
     # user who hosts MPAD with a message whenever the program is prone to crash
