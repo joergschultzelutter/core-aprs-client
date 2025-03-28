@@ -377,18 +377,20 @@ def mycallback(raw_aprs_packet: dict):
                         response_parameters=response_parameters,
                     )
                 # darn - we failed to hail the Tripods
-                # this is the branch where the INPUT parser failed to understand
-                # the message. As we only parse but never process data in that input
+                # this is the branch where the input parser failed to understand
+                # the message. A possible reason: you sent a keyword which requires
+                # an additional parameter but failed to send that one, too.
+                # As we only parse but never process data in that input
                 # parser, we sinply don't know what to do with the user's message
                 # and get back to him with a generic response.
                 else:
-                    command_specific_error_message = response_parameters[
-                        "command_specific_error_message"
+                    input_parser_error_message = response_parameters[
+                        "input_parser_error_message"
                     ]
                     # Dump the HRM to the user if we have one
-                    if command_specific_error_message:
+                    if input_parser_error_message:
                         output_message = make_pretty_aprs_messages(
-                            message_to_add=f"{command_specific_error_message}",
+                            message_to_add=f"{input_parser_error_message}",
                             add_sep=False,
                         )
                     # If not, just dump the link to the instructions
