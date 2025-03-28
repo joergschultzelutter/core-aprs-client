@@ -44,31 +44,76 @@ def generate_output_message(response_parameters: dict):
         List object, containing 0..n APRS output messages
         of up to 67 characters in length.
     """
-    # Our stub code is always successful, so let's set the return
+
+    # This output generator stub is capable of processing two 
+    # commands: 
+    # Command #1 - "greetings" keyword
+    #              Builds a string "Greetings " + callsign, then returns that
+    #              string back to the APRS user
+    #              Internal command code = "greetme"
+    # Command #2 - "hello" keyword
+    #              Sends a "Hello World" string to the user
+    #              Internal command code = "sayhello"
+    #
+    # Every other keyword will result in an error message
+    
+    
+    # First, let's assume that we are in a 'failed state' mode
     # value accordingly
-    success = True
+    success = False
 
-    # Not let's assume that your code has processed the user's request and
-    # that you need to generate the output message.
-    # 'make_pretty_aprs_messages' will do that job for you. Simply pass
-    # your string to the function and you will receive a list object, containing
-    # 1..n future APRS messages. For adding additional content to that message,
-    # simply pass that list item along as 'destination list' parameter for all
-    # following calls
+    # Code for Command 1 ("greetme")
+    if response_parameters["what"] == "greetme":
+        # Not let's assume that your code has processed the user's request and
+        # that you need to generate the output message.
+        # 'make_pretty_aprs_messages' will do that job for you. Simply pass
+        # your string to the function and you will receive a list object, containing
+        # 1..n future APRS messages. For adding additional content to that message,
+        # simply pass that list item along as 'destination list' parameter for all
+        # following calls
 
-    # generate our very first message; either pass an empty list item to the
-    # function or omit the 'destination_list" parameter. In that case, the function
-    # will create a list object for you
-    output_message = make_pretty_aprs_messages(message_to_add="Hello")
+        # generate our very first message; either pass an empty list item to the
+        # function or omit the 'destination_list" parameter. In that case, the function
+        # will create a list object for you
+        output_message = make_pretty_aprs_messages(message_to_add="Hello")
 
-    # This is an example for adding an additional message part to the list item
-    # Simply pass the list item as input parameter to our function, thus telling it
-    # that you rather want to add additional content than having it create a new
-    # list item for you
-    output_message = make_pretty_aprs_messages(
-        message_to_add="World", destination_list=output_message
-    )
+        # This is an example for adding an additional message part to the list item
+        # Simply pass the list item as input parameter to our function, thus telling it
+        # that you rather want to add additional content than having it create a new
+        # list item for you
+        output_message = make_pretty_aprs_messages(
+            message_to_add=response_parameters["from_callsign"], destination_list=output_message
+        )
+        
+        # Finally, indicate to the main process that we were successful
+        success = True
 
+    # Code for Command 2 ("sayhello")
+    if response_parameters["what"] == "sayhello":
+        # Not let's assume that your code has processed the user's request and
+        # that you need to generate the output message.
+        # 'make_pretty_aprs_messages' will do that job for you. Simply pass
+        # your string to the function and you will receive a list object, containing
+        # 1..n future APRS messages. For adding additional content to that message,
+        # simply pass that list item along as 'destination list' parameter for all
+        # following calls
+
+        # generate our very first message; either pass an empty list item to the
+        # function or omit the 'destination_list" parameter. In that case, the function
+        # will create a list object for you
+        output_message = make_pretty_aprs_messages(message_to_add="Hello")
+
+        # This is an example for adding an additional message part to the list item
+        # Simply pass the list item as input parameter to our function, thus telling it
+        # that you rather want to add additional content than having it create a new
+        # list item for you
+        output_message = make_pretty_aprs_messages(
+            message_to_add="World", destination_list=output_message
+        )
+        
+        # Finally, indicate to the main process that we were successful
+        success = True
+    
     return success, output_message
 
 
