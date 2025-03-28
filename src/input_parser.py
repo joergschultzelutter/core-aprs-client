@@ -70,6 +70,16 @@ def parse_input_message(aprs_message: str, users_callsign: str):
     # user expects from us. Per default, that variable is empty
     what = ""
 
+    # The following variable is used in conjunction with error messages. Assuming
+    # that your code was instructed to e.g. pull a WX report for Berlin/Germany and
+    # failed to do so because of an invalid API key, you can then populate this variable
+    # in case of command-specific errors. When populated, the text in this variable will
+    # returned to the user. When NOT populated, the bot's default error message is 
+    # returned to the user.
+    # You can easily build your own error handling mechanisms in case this function
+    # does not work for you
+    command_specific_error_message = ""
+    
     # Convert our APRS message string to lowercase
     aprs_message = aprs_message.lower()
     
@@ -84,6 +94,7 @@ def parse_input_message(aprs_message: str, users_callsign: str):
     # our target dictionary
     response_parameters = {
         "from_callsign": users_callsign,
+        "command_specific_error_message": command_specific_error_message,
         "what": what,
     }
 
