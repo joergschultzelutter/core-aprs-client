@@ -47,22 +47,45 @@ def parse_input_message(aprs_message: str, users_callsign: str):
         For this stub, that dictionary is empty.
     """
 
-    # tell the calling process that everything is fine
-    success = True
+    # Let's build a very simple command line parser. Our parser will support
+    # two commands:
+    # Command #1 - "greetings" keyword
+    #              Builds a string "Greetings " + callsign, then returns that
+    #              string back to the APRS user
+    #              Internal command code = "greetme"
+    # Command #2 - "hello" keyword
+    #              Sends a "Hello World" string to the user
+    #              Internal command code = "sayhello"
+    #
+    # Due to simplicity reasons, the demo parser uses very crude code. For a 
+    # production release, you rather might want to use e.g. regular expressions
+    # for keyword parsing
+        
+    # Initially assume that the user has sent us no valid keyword
+    # This will trigger the output parser's error handler, thus allowing it
+    # to send usage instructions to the user
+    success = False
 
+    # now define a variable which later on tells the output processor what the
+    # user expects from us. Per default, that variable is empty
+    what = ""
+
+    # Convert our APRS message string to lowercase
+    aprs_message = aprs_message.lower()
+    
+    # START of crude input data parser
+    if "greetings" in aprs_message:
+        what = "greetme"
+        success = True
+    if "hello" in aprs_message:
+        what = "sayhello"
+        success = True
+    
     # our target dictionary
     response_parameters = {
         "from_callsign": users_callsign,
+        "what": what,
     }
-
-    # Example for a very simple command line parser
-    # xxx
-
-    # here you would add data to the dictionary (e.g. lat/lon, wx-related stuff),
-    # thus telling the output_generator processes later on what the user wants from us
-    #
-    #
-    #
 
     return success, response_parameters
 
