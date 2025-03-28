@@ -382,13 +382,13 @@ def mycallback(raw_aprs_packet: dict):
                 # parser, we sinply don't know what to do with the user's message
                 # and get back to him with a generic response.
                 else:
-                    human_readable_message = response_parameters[
-                        "human_readable_message"
+                    command_specific_error_message = response_parameters[
+                        "command_specific_error_message"
                     ]
                     # Dump the HRM to the user if we have one
-                    if human_readable_message:
+                    if command_specific_error_message:
                         output_message = make_pretty_aprs_messages(
-                            message_to_add=f"{human_readable_message}",
+                            message_to_add=f"{command_specific_error_message}",
                             add_sep=False,
                         )
                     # If not, just dump the link to the instructions
