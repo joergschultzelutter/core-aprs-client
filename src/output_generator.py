@@ -45,8 +45,8 @@ def generate_output_message(response_parameters: dict):
         of up to 67 characters in length.
     """
 
-    # This output generator stub is capable of processing two 
-    # commands: 
+    # This output generator stub is capable of processing two
+    # commands:
     # Command #1 - "greetings" keyword
     #              Builds a string "Greetings " + callsign, then returns that
     #              string back to the APRS user
@@ -56,8 +56,7 @@ def generate_output_message(response_parameters: dict):
     #              Internal command code = "sayhello"
     #
     # Every other keyword will result in an error message
-    
-    
+
     # First, let's assume that we are in a 'failed state' mode
     # value accordingly
     success = False
@@ -82,9 +81,10 @@ def generate_output_message(response_parameters: dict):
         # that you rather want to add additional content than having it create a new
         # list item for you
         output_message = make_pretty_aprs_messages(
-            message_to_add=response_parameters["from_callsign"], destination_list=output_message
+            message_to_add=response_parameters["from_callsign"],
+            destination_list=output_message,
         )
-        
+
         # Finally, indicate to the main process that we were successful
         success = True
 
@@ -110,10 +110,10 @@ def generate_output_message(response_parameters: dict):
         output_message = make_pretty_aprs_messages(
             message_to_add="World", destination_list=output_message
         )
-        
+
         # Finally, indicate to the main process that we were successful
         success = True
-    
+
     return success, output_message
 
 

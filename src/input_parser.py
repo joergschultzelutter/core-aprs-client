@@ -57,10 +57,10 @@ def parse_input_message(aprs_message: str, users_callsign: str):
     #              Sends a "Hello World" string to the user
     #              Internal command code = "sayhello"
     #
-    # Due to simplicity reasons, the demo parser uses very crude code. For a 
+    # Due to simplicity reasons, the demo parser uses very crude code. For a
     # production release, you rather might want to use e.g. regular expressions
     # for keyword parsing
-        
+
     # Initially assume that the user has sent us no valid keyword
     # This will trigger the output parser's error handler, thus allowing it
     # to send usage instructions to the user
@@ -79,10 +79,10 @@ def parse_input_message(aprs_message: str, users_callsign: str):
     # You can easily build your own error handling mechanisms in case this function
     # does not work for you
     input_parser_error_message = ""
-    
+
     # Convert our APRS message string to lowercase
     aprs_message = aprs_message.lower()
-    
+
     # START of crude input data parser
     if "greetings" in aprs_message:
         what = "greetme"
@@ -90,7 +90,7 @@ def parse_input_message(aprs_message: str, users_callsign: str):
     if "hello" in aprs_message:
         what = "sayhello"
         success = True
-    
+
     # our target dictionary
     response_parameters = {
         "from_callsign": users_callsign,
