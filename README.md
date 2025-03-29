@@ -11,18 +11,11 @@ This is where you will step in. Add your bot-specific code to the client and you
 - APRS Beaconing and Bulletins (optional)
 - Program crash handler, allowing you to get notified in case the client crashes (optional)
 
-## Schematics
-![Schematics](img/schematics.svg)
+## Configuring the client
+The steps for starting the client are described [here](docs/configuration.md).
 
 ## Running the client
+The steps for starting the client are described [here](docs/client_start.md).
 
-Every configuration setting is stored in the program's config file - see previous chapter. Therefore, the only command line option that can be specified is the name of the configuration file.
-
-```
-usage: core_aprs_client.py [-h] [--configfile CONFIGFILE]
-
-options:
-  -h, --help                show this help message and exit
-  --configfile CONFIGFILE   Program config file name (default is 'core_aprs_client.cfg')
-```
- Run the program via ``nohup python core_aprs_client.py >nohup.out &``
+## Client schematics
+If you want to learn about the bot's basic structure, then have a look at [this diagram](docs/schematics.md).
