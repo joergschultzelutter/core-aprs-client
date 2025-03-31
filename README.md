@@ -17,5 +17,8 @@ The steps for starting the client are described [here](docs/configuration.md).
 ## Running the client
 The steps for starting the client are described [here](docs/client_start.md).
 
+## Extending the client
+The steps for adding your own extensions to the client are described [here](docs/extensions.md).
+
 ## Client schematics
 If you want to learn about the bot's basic structure, then have a look at [this diagram](docs/schematics.md).
