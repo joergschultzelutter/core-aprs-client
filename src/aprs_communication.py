@@ -394,6 +394,8 @@ def mycallback(raw_aprs_packet: dict):
                             add_sep=False,
                         )
                     # If not, just dump the link to the instructions
+                    # This is the default branch which dumps generic information
+                    # to the client whenever there is no generic error text from the input parser
                     else:
                         output_message = [
                             "Sorry, did not understand your request. Have a look at my documentation",
