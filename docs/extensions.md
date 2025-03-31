@@ -12,11 +12,11 @@ Any other command that is sent to ```core-aprs-client``` will generate the bot's
 
 ## Extending the input processor
 
-### Inputs
+### Input processor: Inputs
 - ```from_callsign``` - the call sign that has sent the incoming APRS message to us (type: ```str```)
 - ```aprs_message``` - the actual APRS message,  up to 67 bytes in length (type: ```str```)
 
-### Outputs
+### Input processor: Outputs
 - ```success``` - ```True```in case of no errors, otherwise ```False```(type: ```boolean```)
 - ```response_parameters``` - dictionary object, containing core information that is used later on for generating your output message. Details: see below
 
