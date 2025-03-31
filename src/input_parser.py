@@ -90,6 +90,9 @@ def parse_input_message(aprs_message: str, users_callsign: str):
     if "hello" in aprs_message:
         what = "sayhello"
         success = True
+    if "error" in aprs_message:
+        input_parser_error_message = "Triggered input processor error"
+        success = False
 
     # our target dictionary
     response_parameters = {
