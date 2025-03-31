@@ -354,7 +354,7 @@ def mycallback(raw_aprs_packet: dict):
                 # the aprs.fi API access key for location lookups
                 success, response_parameters = parse_input_message(
                     aprs_message=message_text_string,
-                    users_callsign=from_callsign,
+                    from_callsign=from_callsign,
                 )
                 logger.info(msg=f"Input parser result: {success}")
                 logger.info(msg=response_parameters)
