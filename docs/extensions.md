@@ -1,4 +1,4 @@
-# Extend core-aprs-client and add your own processing code
+# Extend ```core-aprs-client``` and add your own processing code
 
 ![Workflow Input-Output Processing](../img/Workflow\ Input-Output\ Processing.drawio.svg)
 
