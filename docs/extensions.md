@@ -1,6 +1,6 @@
 # Extend ```core-aprs-client``` and add your own processing code
 
-![Workflow Input-Output Processing](../img/Workflow\ Input-Output\ Processing.drawio.svg)
+![Workflow Input-Output Processing](../img/workflow_input_output_processing.svg)
 
 By default, ```core-aprs-client```'s default installation comes with three keywords that you can send to its associated APRS call sign:
 
