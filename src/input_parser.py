@@ -24,7 +24,7 @@
 from client_configuration import program_config
 
 
-def parse_input_message(aprs_message: str, users_callsign: str):
+def parse_input_message(aprs_message: str, from_callsign: str):
     """
     This is a stub for your custom APRS input parser.
 
@@ -34,7 +34,7 @@ def parse_input_message(aprs_message: str, users_callsign: str):
         The APRS message that the user has provided us with (1..67
         bytes in length). Parse the content and figure out what
         the user wants you to do.
-    users_callsign: 'str'
+    from_callsign: 'str'
         Ham radio callsign that sent the message to us.
 
     Returns
@@ -96,7 +96,7 @@ def parse_input_message(aprs_message: str, users_callsign: str):
 
     # our target dictionary
     response_parameters = {
-        "from_callsign": users_callsign,
+        "from_callsign": from_callsign,
         "input_parser_error_message": input_parser_error_message,
         "what": what,
     }
