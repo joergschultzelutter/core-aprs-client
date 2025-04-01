@@ -257,7 +257,7 @@ def send_bulletin_messages(
 # APRSlib callback
 # Extract the fields from the APRS message, start the parsing process,
 # execute the command and send the command output back to the user
-def mycallback(raw_aprs_packet: dict):
+def aprs_callback(raw_aprs_packet: dict):
     """
     aprslib callback; this is the core process that takes care of everything
     Parameters

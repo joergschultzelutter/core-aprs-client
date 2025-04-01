@@ -42,6 +42,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# These are global variables which will be used
+# in case of an uncaught exception where we send
+# the host a final Apprise message along with the
+# program's stack trace
+exception_occurred = False
+ex_type = ex_value = ex_traceback = None
+
 
 def add_aprs_message_to_cache(
     message_text: str, message_no: str, users_callsign: str, aprs_cache: ExpiringDict

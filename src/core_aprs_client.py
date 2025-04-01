@@ -51,6 +51,7 @@ from aprs_communication import (
     send_aprs_message_list,
     send_bulletin_messages,
     send_beacon_and_status_msg,
+    aprs_callback,
 )
 import time
 from datetime import datetime
@@ -65,13 +66,6 @@ logging.basicConfig(
     format="%(asctime)s - %(module)s -%(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
-
-# These are global variables which will be used
-# in case of an uncaught exception where we send
-# the host a final Apprise message along with the
-# program's stack trace
-exception_occurred = False
-ex_type = ex_value = ex_traceback = None
 
 #
 # The program's bulletin message (optional)
@@ -137,9 +131,9 @@ def run_listener():
     # this cache will be considered as a duplicate / delayed and will not be processed
     message = (
         "APRS message dupe cache set to "
-        + program_config["dupe_detection"]["msg_cache_max_entries"]
+        + str(program_config["dupe_detection"]["msg_cache_max_entries"])
         + " max possible entries and a TTL of "
-        + (program_config["dupe_detection"]["msg_cache_time_to_live"] / 60)
+        + str(program_config["dupe_detection"]["msg_cache_time_to_live"] / 60)
         + " mins"
     )
 
@@ -159,7 +153,7 @@ def run_listener():
             # Create the APRS-IS object and set user/pass/host/port
             AIS = aprslib.IS(
                 callsign=program_config["client_config"]["aprsis_callsign"],
-                passwd=program_config["network_config"]["aprsis_passcode"],
+                passwd=str(program_config["network_config"]["aprsis_passcode"]),
                 host=program_config["network_config"]["aprsis_server_name"],
                 port=program_config["network_config"]["aprsis_server_port"],
             )
@@ -176,7 +170,7 @@ def run_listener():
                 + ", filter="
                 + program_config["network_config"]["aprsis_server_filter"]
                 + ", APRS-IS User:"
-                + program_config["network_client_config"]["aprsis_callsign"]
+                + program_config["client_config"]["aprsis_callsign"]
                 + ", APRS-IS passcode:"
                 + str(program_config["network_config"]["aprsis_passcode"])
             )
@@ -308,7 +302,7 @@ def run_listener():
                 # We are now ready to initiate the actual processing
                 # Start the consumer thread
                 logger.info(msg="Starting callback consumer")
-                AIS.consumer(mycallback, blocking=True, immortal=True, raw=False)
+                AIS.consumer(aprs_callback, blocking=True, immortal=True, raw=False)
 
                 #
                 # We have left the callback, let's clean up a few things
