@@ -22,3 +22,7 @@ The steps for adding your own extensions to the client are described [here](docs
 
 ## Client schematics
 If you want to learn about the bot's basic structure, then have a look at [this diagram](docs/schematics.md).
+
+## Known issues
+- Single-threaded software. Due to APRS-IS's technical nature, this should not be an issue, though.
+- If you are not a licensed ham radio operator, then this program is not for you. Additionally, you should at least know the APRS basics before you use this code.
