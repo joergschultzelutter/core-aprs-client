@@ -397,11 +397,13 @@ def mycallback(raw_aprs_packet: dict):
                     # This is the default branch which dumps generic information
                     # to the client whenever there is no generic error text from the input parser
                     else:
-                        output_message = [
-                            "Sorry, did not understand your request. Have a look at my documentation",
-                            "see https://github.com/joergschultzelutter/core-aprs-client",
-                        ]
-                    logger.info(msg=f"Unable to process APRS packet {raw_aprs_packet}")
+                        output_message = make_pretty_aprs_messages(
+                            message_to_add="Sorry, did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client",
+                            add_sep=False,
+                        )
+                        logger.info(
+                            msg=f"Unable to process APRS packet {raw_aprs_packet}"
+                        )
 
                 # Send our message(s) to APRS-IS
                 aprs_message_counter = send_aprs_message_list(
