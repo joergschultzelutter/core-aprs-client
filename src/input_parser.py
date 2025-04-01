@@ -68,7 +68,7 @@ def parse_input_message(aprs_message: str, from_callsign: str):
 
     # now define a variable which later on tells the output processor what the
     # user expects from us. Per default, that variable is empty
-    what = ""
+    command_code = ""
 
     # The following variable is used in conjunction with errors during parsing.
     # Assuming that e.g. your keyword is used for pulling a wx report for a certain
@@ -85,10 +85,10 @@ def parse_input_message(aprs_message: str, from_callsign: str):
 
     # START of crude input data parser
     if "greetings" in aprs_message:
-        what = "greetme"
+        command_code = "greetme"
         success = True
     if "hello" in aprs_message:
-        what = "sayhello"
+        command_code = "sayhello"
         success = True
     if "error" in aprs_message:
         input_parser_error_message = "Triggered input processor error"
@@ -98,7 +98,7 @@ def parse_input_message(aprs_message: str, from_callsign: str):
     response_parameters = {
         "from_callsign": from_callsign,
         "input_parser_error_message": input_parser_error_message,
-        "what": what,
+        "command_code": command_code,
     }
 
     return success, response_parameters
