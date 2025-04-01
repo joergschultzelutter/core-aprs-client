@@ -34,6 +34,6 @@ The default ```response_parameters``` object comes with three fields:
 
 ### Output generator: Outputs
 - ```success``` - ```True```in case of no errors, otherwise ```False```(type: ```boolean```)
-- ```output_message``` - ```List``` object, containing 0..n ```str``` objects of 1..67 bytes in length.
+- ```output_message``` - ```List``` object, containing 0..n ```str``` objects of 1..67 bytes in length. This is the content that will be sent to the APRS user.
 
 Any errors which may arise as part of the ```output-generator``` process should be part of the ```output_message``` field. You can still check for the ```success``` field's value, though.
