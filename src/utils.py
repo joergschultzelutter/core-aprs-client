@@ -650,6 +650,9 @@ def parse_bulletin_data(core_config: dict):
     =======
     """
 
+    # our target directory
+    aprs_bulletin_messages: dict = {}
+
     # Get the key and value from our configuration file's bulletin messages section
     for key, value in core_config["bulletin_messages"].items():
         # Message populated and less than max APRS message length?
@@ -676,11 +679,12 @@ def parse_bulletin_data(core_config: dict):
                 # and its lenght (after potential character replacements)
                 # is still greater than zero
                 if key not in aprs_bulletin_messages and len(value) > 0:
-                    aprs_bulletin_messages[key] = [value]
+                    aprs_bulletin_messages[key] = value
         else:
             logger.debug(
                 f"Ignoring bulletin setting for '{key}'; value is either empty or too long. Check your configuration"
             )
+    return aprs_bulletin_messages
 
 
 def client_exception_handler():

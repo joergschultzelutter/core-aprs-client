@@ -57,6 +57,7 @@ import time
 from datetime import datetime
 import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers import base as apbase
 
 # init our (future) global variables
 apscheduler = AIS = aprs_message_cache = aprs_message_conter = None
@@ -66,12 +67,6 @@ logging.basicConfig(
     format="%(asctime)s - %(module)s -%(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
-
-#
-# The program's bulletin message (optional)
-# This dictionary receives its data from the program's configuration file
-#
-aprs_bulletin_messages: dict = {}
 
 
 def run_listener():
@@ -276,7 +271,9 @@ def run_listener():
 
                     if program_config["bulletin_config"]["aprsis_broadcast_bulletins"]:
                         # prepare the bulletin data
-                        parse_bulletin_data(core_config=program_config)
+                        aprs_bulletin_messages = parse_bulletin_data(
+                            core_config=program_config
+                        )
 
                         # Install scheduler task 2 - send standard bulletins (advertising the program instance)
                         # The bulletin messages consist of fixed content and are defined at the beginning of
@@ -356,7 +353,7 @@ def run_listener():
             aprs_scheduler.pause()
             aprs_scheduler.remove_all_jobs()
             logger.info(msg="Shutting down aprs_scheduler")
-            if aprs_scheduler.state != apscheduler.schedulers.base.STATE_STOPPED:
+            if aprs_scheduler.state != apbase.STATE_STOPPED:
                 try:
                     aprs_scheduler.shutdown()
                 except:
