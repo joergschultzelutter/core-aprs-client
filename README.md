@@ -8,8 +8,9 @@ This is where you can step in. Just add your bot-specific code to the client and
 ## Core features
 - Core APRS-IS functionality, covering both 'old' and '[new](http://www.aprs.org/aprs11/replyacks.txt)' ACK/REJ processing
 - Configurable dupe message handler
-- APRS Beaconing and Bulletins (optional)
-- Program crash handler, allowing you to get notified in case the client crashes (optional)
+- Optional:
+    - Support for APRS beaconing and bulletins
+    - Program crash handler, allowing you to get notified in case the client crashes
 
 ## Configuring the client
 The steps for starting the client are described [here](docs/configuration.md).
