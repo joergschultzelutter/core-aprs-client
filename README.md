@@ -1,9 +1,9 @@
 # core-aprs-client
-Core APRS client with dupe detection
+Core APRS client with dupe detection and other stuff.
 
-```core-aprs-client``` is a modernized version of [mpad](https://github.com/joergschultzelutter/mpad)'s APRS functions which can be used for building your very own APRS client / bot. It supports all of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS messaging functions, such as connecting to APRS-IS, message dupe detection, ACK/REJ handling, and other functionality. Hoewever, ```core-aprs-client``` lacks bot-specific functions such as WX reporting etc. 
+```core-aprs-client``` is a modernized version of [mpad](https://github.com/joergschultzelutter/mpad)'s APRS functions which can be used for building your very own APRS client / bot. It supports all of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS messaging functions, such as connecting to APRS-IS, message dupe detection, ACK/REJ handling, and other functionality. Hoewever, ```core-aprs-client``` deliberately lacks functions such as WX reporting etc. 
 
-This is where you will step in. Add your bot-specific code to the client and you're done. Everything else related to APRS messaging and communication with APRS-IS will be covered by ```core-aprs-client```.
+This is where you can step in. Just add your bot-specific code to the client and you're literally done. Everything related to APRS messaging and communication with APRS-IS will be covered by ```core-aprs-client```.
 
 ## Core features
 - Core APRS-IS functionality, covering both 'old' and '[new](http://www.aprs.org/aprs11/replyacks.txt)' ACK/REJ processing
@@ -24,5 +24,7 @@ The steps for adding your own extensions to the client are described [here](docs
 If you want to learn about the bot's basic structure, then have a look at [this diagram](docs/schematics.md).
 
 ## Known issues
-- Single-threaded software. Due to APRS-IS's technical nature, this should not be an issue, though.
+- This software is single-threaded. Due to APRS-IS's technical nature of resubmitting non-ack'ed messages, this should not be an issue, though.
 - If you are not a licensed ham radio operator, then this program is not for you. Additionally, you should at least know the APRS basics before you use this code.
+- You HAVE to assign your personal call sign to the bot.
+- You HAVE to request your personal APRS TOCALL for using this bot.
