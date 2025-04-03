@@ -17,6 +17,11 @@ aprsis_callsign = COAC
 # You NEED to request your very own TOCALL for your own client code
 # Details: https://github.com/aprsorg/aprs-deviceid
 aprsis_tocall = APRS
+#
+# This variable is used by the Apprise communication subroutines
+# Its contents are freely configurable and will be used in case
+# of program crashes (e.g. Telegram messages to the bot's host)
+aprs_client_name = Core APRS Client
 
 [network_config]
 #

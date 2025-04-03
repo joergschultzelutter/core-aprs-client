@@ -1,2 +1,2 @@
-# mypackage/_version.py
+# Program version
 __version__ = "0.1"

@@ -694,8 +694,10 @@ def client_exception_handler():
     if not exception_occurred:
         return
 
+    client_name = program_config["client_config"]["aprs_client_name"]
+
     # Send a message before we hit the bucket
-    message_body = f"The APRS bot process has crashed. Reason: {ex_value}"
+    message_body = f"'{client_name}' process has crashed. Reason: {ex_value}"
 
     # Try to zip the log file if possible
     success, log_file_name = create_zip_file_from_log(
@@ -709,7 +711,7 @@ def client_exception_handler():
     # send_apprise_message will check again if the file exists or not
     # Therefore, we can skip any further detection steps here
     send_apprise_message(
-        message_header="APRS bot process has crashed",
+        message_header=f"'{client_name}' process has crashed",
         message_body=message_body,
         apprise_config_file=program_config["crash_handler"]["apprise_config_file"],
         message_attachment=log_file_name,

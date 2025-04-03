@@ -200,14 +200,14 @@ def send_beacon_and_status_msg(
     none
     """
     logger.info(msg="Reached beacon interval; sending beacons")
+
+    # Generate some local variables because the 'black' beautifier seems
+    # to choke on multi-dimensional dictionaries
+    _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
+    _aprsis_tocall = program_config["client_config"]["aprsis_tocall"]
+
     for bcn in aprs_beacon_messages:
-        stringtosend = (
-            program_config["client_config"]["aprsis_callsign"]
-            + ">"
-            + program_config["client_config"]["aprsis_tocall"]
-            + ":"
-            + bcn
-        )
+        stringtosend = f"{_aprsis_callsign}>{_aprsis_tocall}:{bcn}"
         if not simulate_send:
             logger.info(msg=f"Sending beacon: {stringtosend}")
             myaprsis.sendall(stringtosend)
@@ -239,13 +239,14 @@ def send_bulletin_messages(
     none
     """
     logger.info(msg="reached bulletin interval; sending bulletins")
+
+    # Generate some local variables because the 'black' beautifier seems
+    # to choke on multi-dimensional dictionaries
+    _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
+    _aprsis_tocall = program_config["client_config"]["aprsis_tocall"]
+
     for recipient_id, bln in bulletin_dict.items():
-        stringtosend = (
-            program_config["client_config"]["aprsis_callsign"]
-            + ">"
-            + program_config["client_config"]["aprsis_tocall"]
-            + f"::{recipient_id:9}:{bln}"
-        )
+        stringtosend = f"{_aprsis_callsign}>{_aprsis_tocall}::{recipient_id:9}:{bln}"
         if not simulate_send:
             logger.info(msg=f"Sending bulletin: {stringtosend}")
             myaprsis.sendall(stringtosend)

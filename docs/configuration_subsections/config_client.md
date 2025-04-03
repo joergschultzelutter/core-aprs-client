@@ -10,6 +10,7 @@ You _*need*_ to modify the following values:
 
 - ```aprsis_callsign``` is the call sign that the bot listens to. Change the default value ```COAC``` to a call sign that is not in use.
 - ```aprsis_tocall``` is equivalent to the bot's technical identifier. Head over to Hessu's [APRS TOCALL repository](https://github.com/aprsorg/aprs-deviceid) and request a new TOCALL for your service, then change this setting accordingy. This setting's default value ```APRS``` in not to be used on a permanent basis.
+- ```aprs_client_name``` is used whenever the (optional) Apprise handler has to inform you of a program crash. See [the 'Crash Handler'](config_crash_handler.md) section for details. You should change this value to your own installation's program name - but there is no harm in keeping the default setting. 
 
 ```
 [client_config]
@@ -26,4 +27,9 @@ aprsis_callsign = COAC
 # You NEED to request your very own TOCALL for your own client code
 # Details: https://github.com/aprsorg/aprs-deviceid
 aprsis_tocall = APRS
+#
+# This variable is used by the Apprise communication subroutines
+# Its contents are freely configurable and will be used in case
+# of program crashes (e.g. Telegram messages to the bot's host)
+aprs_client_name = Core APRS Client
 ```
