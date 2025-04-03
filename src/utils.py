@@ -29,13 +29,6 @@ import apprise
 import re
 from client_configuration import program_config
 
-mpad_data_directory = "data_files"
-mpad_root_directory = os.path.abspath(os.getcwd())
-
-# this is the name of the  directory where we store
-# our data files
-data_directory = "data_files"
-
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(module)s -%(levelname)s - %(message)s",
@@ -205,7 +198,7 @@ def get_command_line_params():
     return configfile
 
 
-def read_aprs_message_counter(file_name: str = "core_aprs_client_message_counter.txt"):
+def read_aprs_message_counter(file_name: str):
     """
     Reads the latest message counter from a file
 
@@ -237,9 +230,7 @@ def read_aprs_message_counter(file_name: str = "core_aprs_client_message_counter
     return served_packages
 
 
-def write_aprs_message_counter(
-    aprs_message_counter: int, file_name: str = "core_aprs_client_message_counter.txt"
-):
+def write_aprs_message_counter(aprs_message_counter: int, file_name: str):
     """
     Writes the latest message counter to a file
 
@@ -351,7 +342,7 @@ def send_apprise_message(
 ):
     """
     Generates Apprise messages and triggers transmission to the user
-    We will only use this for post-mortem dumps in case MPAD is on the
+    We will use this e.g. for post-mortem dumps in case the client is on the
     verge of crashing
 
     Parameters
@@ -428,8 +419,8 @@ def send_apprise_message(
 
 
 def check_and_create_data_directory(
-    root_path_name: str = os.path.abspath(os.getcwd()),
-    relative_path_name: str = "data_files",
+    root_path_name: str,
+    relative_path_name: str,
 ):
     """
     Check if the data directory is present and create it, if necessary
@@ -704,7 +695,7 @@ def client_exception_handler():
         return
 
     # Send a message before we hit the bucket
-    message_body = f"The MPAD process has crashed. Reason: {ex_value}"
+    message_body = f"The APRS bot process has crashed. Reason: {ex_value}"
 
     # Try to zip the log file if possible
     success, log_file_name = create_zip_file_from_log(
@@ -718,7 +709,7 @@ def client_exception_handler():
     # send_apprise_message will check again if the file exists or not
     # Therefore, we can skip any further detection steps here
     send_apprise_message(
-        message_header="MPAD process has crashed",
+        message_header="APRS bot process has crashed",
         message_body=message_body,
         apprise_config_file=program_config["crash_handler"]["apprise_config_file"],
         message_attachment=log_file_name,

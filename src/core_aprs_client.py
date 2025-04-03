@@ -100,24 +100,29 @@ def run_listener():
     check_for_default_config()
 
     # Install our custom exception handler, thus allowing us to signal the
-    # user who hosts MPAD with a message whenever the program is prone to crash
+    # user who hosts this bot with a message whenever the program is prone to crash
     # OR has ended. In any case, we will then send the file to the host
     #
     # if you are not interested in a post-mortem call stack, remove the following
     # two lines
-    logger.info(msg=f"Activating MPAD exception handler")
+    logger.info(msg=f"Activating bot exception handler")
     atexit.register(client_exception_handler)
     sys.excepthook = handle_exception
 
     # Check whether the data directory exists
-    success = check_and_create_data_directory()
+    success = check_and_create_data_directory(
+        root_path_name=os.path.abspath(os.getcwd()),
+        relative_path_name=program_config["data_storage"]["aprs_data_directory"],
+    )
     if not success:
         exit(0)
 
     #
     # Read the message counter (function will create the S3 object if it does not exist in the bucket)
     logger.info(msg="Reading APRS message counter...")
-    aprs_message_counter = read_aprs_message_counter()
+    aprs_message_counter = read_aprs_message_counter(
+        file_name=program_config["data_storage"]["aprs_message_counter_file_name"]
+    )
 
     # Initialize the aprs-is object
     AIS = None
@@ -217,7 +222,7 @@ def run_listener():
                         # Format is as follows: =Lat primary-symbol-table-identifier lon symbol-identifier test-message
                         # Lat/lon from the configuration have to be valid or the message will not be accepted by aprs-is
                         #
-                        # Example nessage: MPAD>APRS:=5150.34N/00819.60E?COAC 0.01
+                        # Example nessage: COAC>APRS:=5150.34N/00819.60E?COAC 0.01
                         # results in
                         # lat = 5150.34N
                         # primary symbol identifier = /
@@ -332,7 +337,12 @@ def run_listener():
                 AIS = None
             else:
                 logger.info(msg="Cannot re-establish connection to APRS-IS")
-            write_aprs_message_counter(aprs_message_counter=aprs_message_counter)
+            write_aprs_message_counter(
+                aprs_message_counter=aprs_message_counter,
+                file_name=program_config["data_storage"][
+                    "aprs_message_counter_file_name"
+                ],
+            )
 
             # Enter sleep mode and then restart the loop
             logger.info(msg=f"Sleeping ...")
@@ -346,7 +356,10 @@ def run_listener():
 
         # write most recent APRS message counter to disc
         logger.info(msg="Writing APRS message counter to disc ...")
-        write_aprs_message_counter(aprs_message_counter=aprs_message_counter)
+        write_aprs_message_counter(
+            aprs_message_counter=aprs_message_counter,
+            file_name=program_config["data_storage"]["aprs_message_counter_file_name"],
+        )
 
         if aprs_scheduler:
             logger.info(msg="Pausing aprs_scheduler")
