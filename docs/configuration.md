@@ -14,6 +14,9 @@ When it comes to the individual configuration, the```core-aprs-client``` solely 
 
 ## Optional configuration file sections
 
+> [!Tip]
+> These configuration file sections have been preconfigured. You can use the file's default settings unless you want to use a very specific configuration for your program's purposes.
+
 - [beacon_config](configuration_subsections/config_beacon.md) - Used in case you want to beacon your APRS bot's position & APRS symbol to APRS-IS
 - [bulletin_config](configuration_subsections/config_bulletin.md) and [bulletin_messages](configuration_subsections/config_bulletin_messages.md) - Used in case you want to send out fixed APRS bulletin messages to APRS-IS
 - [crash_handler](configuration_subsections/config_crash_handler.md) - Optional setting which enables the bot to send you a core dump file in case the program has crashed.
