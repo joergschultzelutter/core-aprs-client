@@ -20,6 +20,7 @@ When it comes to the individual configuration, the```core-aprs-client``` solely 
 - [dupe_detection](configuration_subsections/config_dupe_detection.md) - Default settings for how many incoming APRS messages are stored. The time-to-live setting can also be defined here.
 - [message_delay](configuration_subsections/config_message_delay.md) - Can be used for configuring the delays between outgoing multiple APRS-IS messages
 - [testing](configuration_subsections/config_testing.md) - Configuration settings for software and integration testing
+- [data_storage](configuration_subsections/config_data_storage.md) - Configuration settings for the storage of data files, e.g. the data file which contains the APRS message counter
 - [custom_config](configuration_subsections/config_custom.md) - Empty. You can store your very own configuration settings in this section; ```core-aprs-client``` will then make these available to you
 
 
