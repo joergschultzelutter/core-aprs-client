@@ -2,6 +2,9 @@
 
 ![Workflow Input-Output Processing](../img/workflow_input_output_processing.svg)
 
+- ```input_parser.py``` digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us.
+- ```output_generator.py``` takes the data from ```input_parser.py``` and builds the outgoing message which is later to be sent to APRS-IS.
+
 By default, ```core-aprs-client```'s default installation comes with three keywords that you can send to its associated APRS call sign:
 
 - ```greetings``` - Generate output string ```Greetings <callsign>```, meaning that your output message will be ```Greetings DF1JSL-1``` if DF1JSL-1 has sent the command to ```core-aprs-client```
@@ -10,7 +13,7 @@ By default, ```core-aprs-client```'s default installation comes with three keywo
 
 Any other command that is sent to ```core-aprs-client``` will generate the bot's _generic_ error message.
 
-For demonstration purposes, both ```input_parser.py``` and ```output_generator.py``` use a very simplified processing algorithm. For your future code, you might want to implement proper parsing (e.g. by using regular expressions) and error handling.
+For demonstration purposes, both ```input_parser.py``` and ```output_generator.py``` use a _very_ simplified processing algorithm. For your future code, you might want to implement proper parsing (e.g. by using regular expressions) and error handling.
 
 ## Extending the input parser ```input_parser.py``
 
