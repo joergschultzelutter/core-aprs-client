@@ -199,7 +199,7 @@ def aprs_callback(raw_aprs_packet: dict):
                     input_parser_error_message = response_parameters[
                         "input_parser_error_message"
                     ]
-                    # Dump the HRM to the user if we have one
+                    # Dump the human readable message to the user if we have one
                     if input_parser_error_message:
                         output_message = make_pretty_aprs_messages(
                             message_to_add=f"{input_parser_error_message}",
@@ -258,7 +258,6 @@ def run_listener():
 
     # Get the command line params
     configfile = get_command_line_params()
-
     if not configfile:
         sys.exit(0)
 
@@ -344,15 +343,14 @@ def run_listener():
             # Establish the connection to APRS-IS
             # create a couple of local variables as the 'black' prettifier seems to
             # choke on multi-dimensional dictionaries
+            # fmt:off
             _aprsis_server_name = program_config["network_config"]["aprsis_server_name"]
-            _aprsis_server_port = str(
-                program_config["network_config"]["aprsis_server_port"]
-            )
-            _aprsis_server_filter = program_config["network_config"][
-                "aprsis_server_filter"
-            ]
+            _aprsis_server_port = str(program_config["network_config"]["aprsis_server_port"])
+            _aprsis_server_filter = program_config["network_config"]["aprsis_server_filter"]
             _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
             _aprsis_passcode = str(program_config["network_config"]["aprsis_passcode"])
+            # fmt: on
+
             logger.info(
                 msg=f"Establishing connection to APRS-IS: server={_aprsis_server_name}, port={_aprsis_server_port}, filter={_aprsis_server_filter}, APRS-IS passcode={_aprsis_passcode}, APRS-IS User = {_aprsis_callsign}"
             )
@@ -415,22 +413,15 @@ def run_listener():
 
                         # create a couple of local variables as the 'black' prettifier seems to
                         # choke on multi-dimensional dictionaries
-                        _aprsis_latitude = program_config["beacon_config"][
-                            "aprsis_latitude"
-                        ]
-                        _aprsis_longitude = program_config["beacon_config"][
-                            "aprsis_longitude"
-                        ]
+
+                        # fmt:off
+                        _aprsis_latitude = program_config["beacon_config"]["aprsis_latitude"]
+                        _aprsis_longitude = program_config["beacon_config"]["aprsis_longitude"]
                         _aprsis_table = program_config["beacon_config"]["aprsis_table"]
-                        _aprsis_symbol = program_config["beacon_config"][
-                            "aprsis_symbol"
-                        ]
-                        _aprsis_callsign = program_config["client_config"][
-                            "aprsis_callsign"
-                        ]
-                        _aprsis_beacon_altitude_ft = str(
-                            program_config["beacon_config"]["aprsis_beacon_altitude_ft"]
-                        )[:6]
+                        _aprsis_symbol = program_config["beacon_config"]["aprsis_symbol"]
+                        _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
+                        _aprsis_beacon_altitude_ft = str(program_config["beacon_config"]["aprsis_beacon_altitude_ft"])[:6]
+                        # fmt:on
 
                         # generate our beacon string
                         _beacon = f"{_aprsis_latitude}{_aprsis_table}{_aprsis_longitude}{_aprsis_symbol}{_aprsis_callsign} {__version__} /A={_aprsis_beacon_altitude_ft}"
