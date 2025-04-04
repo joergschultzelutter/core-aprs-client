@@ -2,8 +2,9 @@
 
 ![Workflow Input-Output Processing](../img/workflow_input_output_processing.svg)
 
-- ```input_parser.py``` digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us.
-- ```output_generator.py``` takes the data from ```input_parser.py``` and builds the outgoing message which is later to be sent to APRS-IS.
+> [!TIP]
+> - ```input_parser.py``` digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us.
+> - ```output_generator.py``` takes the data from ```input_parser.py``` and builds the outgoing message which is later to be sent to APRS-IS.
 
 By default, ```core-aprs-client```'s default installation comes with three keywords that you can send to its associated APRS call sign:
 
