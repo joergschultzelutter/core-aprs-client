@@ -13,12 +13,12 @@ This is where you step in. Add your bot-specific code to the client's framework.
     - Program crash handler, allowing you to get notified in case the client crashes
 
 ## Configuring the client
-The steps for starting the client are described [here](docs/configuration.md).
+The steps for modifying the client's config file are described [here](docs/configuration.md).
 
 ## Running the client
 The steps for starting the client are described [here](docs/client_start.md).
 
-## Extending the client
+## Extending the client with your own code
 The steps for adding your own extensions to the client are described [here](docs/extensions.md).
 
 ## Client schematics
@@ -27,6 +27,6 @@ If you want to learn about the bot's basic structure, then have a look at [this 
 ## Known issues and caveats
 - This software is single-threaded. Due to APRS-IS's technical nature of resubmitting non-ack'ed messages, this limitation should not be an issue, though. Future versions of this software might support queued processing of incoming requests.
 - This software is intended to be used by licensed ham radio operators. If you are not a licensed ham radio operator, then this program is not (yet) for you. Why not take a look at sites such as [Hamstudy](https://hamstudy.org/) and [50 Ohm](https://50ohm.de/) - and get licensed?
-- You should at least know the APRS basics before you use this software. Acquaint yourself with [the APRS documentation](https://github.com/glidernet/ogn-aprs-protocol/blob/master/APRS101.PDF) and learn about [how APRS works](https://how.aprs.works/) in general. Additionally, have a look at the [APRS Foundation](https://www.aprsfoundation.org/)'s web site.
+- You should at least know the APRS basics before you use this software. Acquaint yourself with [the official APRS documentation](https://github.com/glidernet/ogn-aprs-protocol/blob/master/APRS101.PDF) and learn about [how APRS works](https://how.aprs.works/) in general. Additionally, have a look at the [APRS Foundation](https://www.aprsfoundation.org/)'s web site.
 - You HAVE to assign your personal call sign to the bot.
 - You HAVE to [request your personal APRS TOCALL](https://github.com/aprsorg/aprs-deviceid) for using this bot.
