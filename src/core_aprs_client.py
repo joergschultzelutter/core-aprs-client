@@ -342,20 +342,20 @@ def run_listener():
             AIS.set_filter(program_config["network_config"]["aprsis_server_filter"])
 
             # Establish the connection to APRS-IS
-            message = (
-                "Establishing connection to APRS-IS: server="
-                + program_config["network_config"]["aprsis_server_name"]
-                + ", port="
-                + str(program_config["network_config"]["aprsis_server_port"])
-                + ", filter="
-                + program_config["network_config"]["aprsis_server_filter"]
-                + ", APRS-IS User:"
-                + program_config["client_config"]["aprsis_callsign"]
-                + ", APRS-IS passcode:"
-                + str(program_config["network_config"]["aprsis_passcode"])
+            # create a couple of local variables as the 'black' prettifier seems to
+            # choke on multi-dimensional dictionaries
+            _aprsis_server_name = program_config["network_config"]["aprsis_server_name"]
+            _aprsis_server_port = str(
+                program_config["network_config"]["aprsis_server_port"]
             )
-            logger.info(msg=message)
-            logger.info(msg="Establishing connection to APRS-IS")
+            _aprsis_server_filter = program_config["network_config"][
+                "aprsis_server_filter"
+            ]
+            _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
+            _aprsis_passcode = str(program_config["network_config"]["aprsis_passcode"])
+            logger.info(
+                msg=f"Establishing connection to APRS-IS: server={_aprsis_server_name}, port={_aprsis_server_port}, filter={_aprsis_server_filter}, APRS-IS passcode={_aprsis_passcode}, APRS-IS User = {_aprsis_callsign}"
+            )
             AIS.connect(blocking=True)
 
             # Are we connected?
@@ -413,24 +413,32 @@ def run_listener():
                         #
                         # as all of our parameters are stored in a dictionary, we need to construct
 
-                        _beacon = (
-                            program_config["beacon_config"]["aprsis_latitude"]
-                            + program_config["beacon_config"]["aprsis_table"]
-                            + program_config["beacon_config"]["aprsis_longitude"]
-                            + program_config["beacon_config"]["aprsis_symbol"]
-                            + program_config["client_config"]["aprsis_callsign"]
-                            + " "
-                            + __version__
-                            + " /A="
-                            + str(
-                                program_config["beacon_config"][
-                                    "aprsis_beacon_altitude_ft"
-                                ]
-                            )[:6]
-                        )
-                        aprs_beacon_messages: list = [_beacon]
-                        #
+                        # create a couple of local variables as the 'black' prettifier seems to
+                        # choke on multi-dimensional dictionaries
+                        _aprsis_latitude = program_config["beacon_config"][
+                            "aprsis_latitude"
+                        ]
+                        _aprsis_longitude = program_config["beacon_config"][
+                            "aprsis_longitude"
+                        ]
+                        _aprsis_table = program_config["beacon_config"]["aprsis_table"]
+                        _aprsis_symbol = program_config["beacon_config"][
+                            "aprsis_symbol"
+                        ]
+                        _aprsis_callsign = program_config["client_config"][
+                            "aprsis_callsign"
+                        ]
+                        _aprsis_beacon_altitude_ft = str(
+                            program_config["beacon_config"]["aprsis_beacon_altitude_ft"]
+                        )[:6]
 
+                        # generate our beacon string
+                        _beacon = f"{_aprsis_latitude}{_aprsis_table}{_aprsis_longitude}{_aprsis_symbol}{_aprsis_callsign} {__version__} /A={_aprsis_beacon_altitude_ft}"
+
+                        # and store it in a list item
+                        aprs_beacon_messages: list = [_beacon]
+
+                        # Ultimately, send the beacon
                         send_beacon_and_status_msg(
                             myaprsis=AIS,
                             aprs_beacon_messages=aprs_beacon_messages,
