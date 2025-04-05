@@ -533,8 +533,8 @@ def run_listener():
             msg="KeyboardInterrupt or SystemExit in progress; shutting down ..."
         )
 
-        # write most recent APRS message counter to disc
-        logger.info(msg="Writing APRS message counter to disc ...")
+        # write most recent APRS message counter to disk
+        logger.info(msg="Writing APRS message counter to disk ...")
         write_aprs_message_counter(
             aprs_message_counter=aprs_message_counter,
             file_name=program_config["data_storage"]["aprs_message_counter_file_name"],
