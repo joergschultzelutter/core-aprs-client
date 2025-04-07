@@ -31,8 +31,6 @@ from utils import (
     check_and_create_data_directory,
     create_zip_file_from_log,
     send_apprise_message,
-    read_aprs_message_counter,
-    write_aprs_message_counter,
     make_pretty_aprs_messages,
     parse_bulletin_data,
     client_exception_handler,
@@ -43,6 +41,12 @@ from client_configuration import load_config, program_config
 from input_parser import parse_input_message
 from output_generator import generate_output_message
 from _version import __version__
+
+from client_message_counter import (
+    read_aprs_message_counter,
+    write_aprs_message_counter,
+    aprs_message_counter,
+)
 
 import json
 from uuid import uuid1
@@ -517,7 +521,6 @@ def run_listener():
             else:
                 logger.info(msg="Cannot re-establish connection to APRS-IS")
             write_aprs_message_counter(
-                aprs_message_counter=aprs_message_counter,
                 file_name=program_config["data_storage"][
                     "aprs_message_counter_file_name"
                 ],
@@ -536,7 +539,6 @@ def run_listener():
         # write most recent APRS message counter to disk
         logger.info(msg="Writing APRS message counter to disk ...")
         write_aprs_message_counter(
-            aprs_message_counter=aprs_message_counter,
             file_name=program_config["data_storage"]["aprs_message_counter_file_name"],
         )
 
