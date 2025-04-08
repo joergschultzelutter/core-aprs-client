@@ -21,9 +21,44 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 import logging
+import aprslib
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(module)s -%(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+#
+# The variable which holds our future AIS object
+AIS = None
+
+def ais_open(callsign: str,passwd: str, host: str, port: int, filter: str):
+    AIS = aprslib.IS(callsign=callsign,passwd=passwd,host=host,port=port)
+    if AIS:
+        AIS.set_filter(filter)
+
+def ais_start_consumer(aprs_callback: object):
+    if AIS:
+        AIS.consumer(aprs_callback, blocking=True, immortal=True, raw=False)
+
+def ais_connect():
+    if AIS:
+        AIS.connect(blocking=True)
+
+def ais_is_connected():
+    return AIS._connected
+
+def ais_close:
+    # Close APRS-IS connection whereas still present
+    if AIS:
+        logger.info(msg="Closing connection to APRS-IS")
+        AIS.close()
+        AIS = None
+
+def ais_send(ais_data: str)
+    if AIS:
+        AIS.sendall(ais_data)
+
+if __name__ == "__main__":
+    pass
