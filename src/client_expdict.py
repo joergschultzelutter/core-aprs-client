@@ -21,9 +21,29 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 import logging
+from expiringdict import ExpiringDict
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(module)s -%(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+#
+# This is our (future) global variable for the expiring dictionary
+#
+aprs_message_cache = None
+
+# Helper method for creating our APRS message cache
+def CreateExpiringDict(max_len: int,
+                       max_age_seconds: int):
+    
+    # create the expiring dictionary
+    aprs_message_cache = ExpiringDict(
+        max_len=max_len],
+        max_age_seconds=max_age_seconds,
+    )
+
+
+if __name__ == "__main__":
+    pass
