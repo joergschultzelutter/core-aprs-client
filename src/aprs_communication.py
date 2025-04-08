@@ -41,7 +41,7 @@ def send_ack(
     source_msg_no: str,
     alias: str,
     tocall: str,
-    packet_delay: float = 2.0,
+    packet_delay: float,
     simulate_send: bool = True,
 ):
     """

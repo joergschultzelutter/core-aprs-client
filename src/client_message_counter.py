@@ -81,6 +81,7 @@ def write_aprs_message_counter(file_name: str):
     =======
     Nothing
     """
+    global aprs_message_counter
     absolute_path_filename = build_full_pathname(file_name=file_name)
     try:
         with open(f"{absolute_path_filename}", "w") as f:

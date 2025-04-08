@@ -140,16 +140,22 @@ nohup_filename = nohup.out
 # maximum number of messages
 msg_cache_max_entries = 2160
 #
-# max time span of dupe detection (3600 sec = 1 hour)
+# max time span of dupe detection in seconds (3600 sec = 1 hour)
 msg_cache_time_to_live = 3600
 
 [message_delay]
 #
 # delay between messages if more than one message is to be sent to APRS-IS
+# Unit of measure: seconds
 packet_delay_message = 6.0
 #
-# packet delay after sending an acknowledgment, bulletin or beacon
+# packet delay after sending a bulletin or beacon
+# Unit of measure: seconds
 packet_delay_other = 6.0
+#
+# packet delay after sending an ackknowledgment
+# Unit of measure: seconds
+packet_delay_ack = 2.0
 
 [testing]
 #

@@ -159,6 +159,9 @@ def aprs_callback(raw_aprs_packet: dict):
                         tocall=program_config["client_config"]["aprsis_tocall"],
                         users_callsign=from_callsign,
                         source_msg_no=msgno_string,
+                        packet_delay=program_config["message_delay"][
+                            "packet_delay_ack"
+                        ],
                     )
                 #
                 # This is where the magic happens: Try to figure out what the user
