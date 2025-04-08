@@ -53,11 +53,15 @@ def create_expiring_dict(max_len: int, max_age_seconds: int):
 
     global aprs_message_cache
 
-    # create the expiring dictionary
+    # Create the decaying APRS message cache. Any APRS message that is present in
+    # this cache will be considered as a duplicate / delayed and will not be processed
+    logger.info(msg=f"APRS message dupe cache set to {str(max_len)}  max possible entries and a TTL of {str(max_age_seconds / 60)} mins")
     aprs_message_cache = ExpiringDict(
         max_len=max_len,
         max_age_seconds=max_age_seconds,
     )
+    return aprs_message_cache
+
 
 
 if __name__ == "__main__":

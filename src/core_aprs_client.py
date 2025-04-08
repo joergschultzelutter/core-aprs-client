@@ -48,6 +48,8 @@ from client_message_counter import (
     aprs_message_counter,
 )
 
+from client_expdict import create_expiring_dict,aprs_message_cache
+
 import json
 from uuid import uuid1
 from aprs_communication import (
@@ -225,13 +227,13 @@ def aprs_callback(raw_aprs_packet: dict):
                         )
 
                 # Send our message(s) to APRS-IS
-                aprs_message_counter = send_aprs_message_list(
+                aprs_message_counter.value = send_aprs_message_list(
                     myaprsis=AIS,
                     simulate_send=program_config["testing"]["aprsis_simulate_send"],
                     message_text_array=output_message,
                     destination_call_sign=from_callsign,
                     send_with_msg_no=msg_no_supported,
-                    aprs_message_counter=aprs_message_counter,
+                    aprs_message_counter=aprs_message_counter.value,
                     external_message_number=msgno_string,
                     new_ackrej_format=new_ackrej_format,
                 )
@@ -304,7 +306,7 @@ def run_listener():
         exit(0)
 
     #
-    # Read the message counter (function will create the S3 object if it does not exist in the bucket)
+    # Read the message counter
     logger.info(msg="Reading APRS message counter...")
     aprs_message_counter = read_aprs_message_counter(
         file_name=program_config["data_storage"]["aprs_message_counter_file_name"]
@@ -313,21 +315,23 @@ def run_listener():
     # Initialize the aprs-is object
     AIS = None
 
+    aprs_message_cache= create_expiring_dict(max_len=program_config["dupe_detection"]["msg_cache_max_entries"],max_age_seconds=program_config["dupe_detection"]["msg_cache_time_to_live"])
+
+    """
+    # Create some local variables as otherwise, the 'black' prettifier will choke on it
+    _msg_cache_max_entries = program_config["dupe_detection"]["msg_cache_max_entries"]
+    _msg_cache_time_to_live = program_config["dupe_detection"]["msg_cache_time_to_live"]
+
     # Create the decaying APRS message cache. Any APRS message that is present in
     # this cache will be considered as a duplicate / delayed and will not be processed
-    message = (
-        "APRS message dupe cache set to "
-        + str(program_config["dupe_detection"]["msg_cache_max_entries"])
-        + " max possible entries and a TTL of "
-        + str(program_config["dupe_detection"]["msg_cache_time_to_live"] / 60)
-        + " mins"
-    )
+    message = f"APRS message dupe cache set to {str(_msg_cache_max_entries)}  max possible entries and a TTL of {str(_msg_cache_time_to_live / 60)} mins"
 
     logger.info(msg=message)
     aprs_message_cache = ExpiringDict(
         max_len=program_config["dupe_detection"]["msg_cache_max_entries"],
         max_age_seconds=program_config["dupe_detection"]["msg_cache_time_to_live"],
     )
+    """
 
     # Register the SIGTERM handler; this will allow a safe shutdown of the program
     logger.info(msg="Registering SIGTERM handler for safe shutdown...")

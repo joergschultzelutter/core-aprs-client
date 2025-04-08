@@ -29,8 +29,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+class MutableInt:
+    def __init__(self, value):
+        self.value = value
+
+
 # Our global message counter
-aprs_message_counter = 0
+aprs_message_counter = MutableInt(0)
 
 
 def read_aprs_message_counter(file_name: str):
@@ -46,7 +51,7 @@ def read_aprs_message_counter(file_name: str):
 
     Returns
     =======
-    message_counter: 'int'
+    aprs_message_counter: 'MutableInt'
         last message counter (or '0')
     """
     global aprs_message_counter
@@ -64,8 +69,8 @@ def read_aprs_message_counter(file_name: str):
             msg=f"Cannot read content from message counter file {absolute_path_filename}; will create a new file"
         )
 
-    aprs_message_counter = served_packages
-    return served_packages
+    aprs_message_counter.value = served_packages
+    return aprs_message_counter
 
 
 def write_aprs_message_counter(file_name: str):
@@ -85,7 +90,7 @@ def write_aprs_message_counter(file_name: str):
     absolute_path_filename = build_full_pathname(file_name=file_name)
     try:
         with open(f"{absolute_path_filename}", "w") as f:
-            f.write("%d" % aprs_message_counter)
+            f.write("%d" % aprs_message_counter.value)
             f.close()
     except (IOError, OSError):
         logger.info(msg=f"Cannot write message counter to {absolute_path_filename}")
