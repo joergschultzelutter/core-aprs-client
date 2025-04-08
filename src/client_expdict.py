@@ -32,15 +32,30 @@ logger = logging.getLogger(__name__)
 #
 # This is our (future) global variable for the expiring dictionary
 #
-aprs_message_cache = None
+aprs_message_cache: ExpiringDict = None
+
 
 # Helper method for creating our APRS message cache
-def CreateExpiringDict(max_len: int,
-                       max_age_seconds: int):
-    
+def create_expiring_dict(max_len: int, max_age_seconds: int):
+    """
+    Helper method for creating the ExpiringDict
+
+    Parameters
+    ==========
+    max_len: 'int'
+       Number of max dictionary entries
+    max_age_seconds: 'int'
+       life span per entry in seconds
+
+    Returns
+    =======
+    """
+
+    global aprs_message_cache
+
     # create the expiring dictionary
     aprs_message_cache = ExpiringDict(
-        max_len=max_len],
+        max_len=max_len,
         max_age_seconds=max_age_seconds,
     )
 
