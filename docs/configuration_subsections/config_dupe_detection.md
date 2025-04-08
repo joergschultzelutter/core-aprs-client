@@ -7,7 +7,7 @@ Due to the nature of APRS, we might receive the same APRS message as a resubmiss
 
 
 - ```msg_cache_max_entries``` defines the maximum number of incoming APRS messages that are checked for ingress duplicates.
-- ```msg_cache_time_to_live``` sets the life span for a dupe detection's dictionary entry. Every time an ingress APRS message is accepted, that entry is added to an internal dictionary. Each dictionary entry gets equipped with an individual life span which is defined by the ```msg_cache_time_to_live``` parameter. Once that time span has been exceeded, the entry gets removed from that dictionary.  
+- ```msg_cache_time_to_live``` sets the life span for a dupe detection's dictionary entry (unit of measure = seconds). Every time an ingress APRS message is accepted, that entry is added to an internal dictionary. Each dictionary entry gets equipped with an individual life span which is defined by the ```msg_cache_time_to_live``` parameter. Once that time span has been exceeded, the entry gets removed from that dictionary.  
 
 ```
 [dupe_detection]
@@ -17,6 +17,6 @@ Due to the nature of APRS, we might receive the same APRS message as a resubmiss
 # maximum number of messages
 msg_cache_max_entries = 2160
 #
-# max time span of dupe detection (3600 sec = 1 hour)
+# max time span of dupe detection in seconds (3600 sec = 1 hour)
 msg_cache_time_to_live = 3600
 ```
