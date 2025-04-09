@@ -29,84 +29,82 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-#
-# The variable which holds our future AIS object
-AIS: aprslib.inet.IS = None
 
+class AIS_Object:
+    def __init__(
+        self, aprsis_callsign, aprsis_passwd, aprsis_host, aprsis_port, aprsis_filter
+    ):
+        self.aprsis_callsign = aprsis_callsign
+        self.aprsis_passwd = aprsis_passwd
+        self.aprsis_host = aprsis_host
+        self.aprsis_port = aprsis_port
+        self.aprsis_filter = aprsis_filter
+        self.AIS: aprslib.inet.IS = None
 
-def ais_open(
-    aprsis_callsign: str,
-    aprsis_passwd: str,
-    aprsis_host: str,
-    aprsis_port: int,
-    aprsis_filter: str,
-):
-    """
-    Helper method for creating the APRS-IS object
+    def ais_open(self):
+        """
+        Helper method for creating the APRS-IS object
 
-    Parameters
-    ==========
-    aprsis_callsign: 'str'
-       Our login callsign
-    aprsis_passwd: 'str'
-       Our login password
-    aprsis_host: 'str'
-       Our login hostname
-    aprsis_port: 'int'
-       Our APS-IS port number
-    aprsis_filter: 'str'
-       Our APRS-IS filter settings
+        Parameters
+        ==========
+        self.aprsis_callsign: 'str'
+           Our login callsign
+        self.aprsis_passwd: 'str'
+           Our login password
+        self.aprsis_host: 'str'
+           Our login hostname
+        self.aprsis_port: 'int'
+           Our APS-IS port number
+        self.aprsis_filter: 'str'
+           Our APRS-IS filter settings
 
-    Returns
-    =======
-    """
+        Returns
+        =======
+        self.AIS: 'aprslib.inet.IS'
+           Our APRS-IS object
+        """
 
-    global AIS
-    AIS = aprslib.IS(
-        callsign=aprsis_callsign,
-        passwd=aprsis_passwd,
-        host=aprsis_host,
-        port=aprsis_port,
-    )
-    if AIS:
-        AIS.set_filter(aprsis_filter)
+        self.AIS = aprslib.IS(
+            callsign=self.aprsis_callsign,
+            passwd=self.aprsis_passwd,
+            host=self.aprsis_host,
+            port=self.aprsis_port,
+        )
+        if self.AIS:
+            self.AIS.set_filter(self.aprsis_filter)
 
+        return self.AIS
 
-def ais_start_consumer(aprsis_callback: object):
-    """
-    Helper method for starting the APRS-IS consumer
+    def ais_start_consumer(self, aprsis_callback: object):
+        """
+        Helper method for starting the APRS-IS consumer
 
-    Parameters
-    ==========
-    aprsis_callback: 'object'
-       The name of our callback function that we hand over
-       to the APRS-IS object
+        Parameters
+        ==========
+        aprsis_callback: 'object'
+           The name of our callback function that we hand over
+           to the APRS-IS object
 
-    Returns
-    =======
-    """
-    global AIS
-    if AIS:
-        AIS.consumer(aprsis_callback, blocking=True, immortal=True, raw=False)
+        Returns
+        =======
+        """
+        if self.AIS:
+            self.AIS.consumer(aprsis_callback, blocking=True, immortal=True, raw=False)
 
+    def ais_connect(self):
+        """
+        Helper method for connecting to the APRS-IS server
 
-def ais_connect():
-    """
-    Helper method for connecting to the APRS-IS server
+        Parameters
+        ==========
 
-    Parameters
-    ==========
+        Returns
+        =======
+        """
+        if self.AIS:
+            self.AIS.connect(blocking=True)
 
-    Returns
-    =======
-    """
-    global AIS
-    if AIS:
-        AIS.connect(blocking=True)
-
-
-def ais_is_connected():
-    def ais_connect():
+    def ais_is_connected(self):
         """
         Helper method for returning the current connection
         state to the user. Yes, this accesses a protected element
@@ -119,43 +117,38 @@ def ais_is_connected():
         =======
         """
 
-    global AIS
-    return AIS._connected
+        return self.AIS._connected
 
+    def ais_close(self):
+        """
+        Helper method for closing the APRS-IS connection
 
-def ais_close():
-    """
-    Helper method for closing the APRS-IS connection
+        Parameters
+        ==========
 
-    Parameters
-    ==========
+        Returns
+        =======
+        """
+        # Close APRS-IS connection whereas still present
+        if self.AIS:
+            logger.info(msg="Closing connection to APRS-IS")
+            self.AIS.close()
+            self.AIS = None
 
-    Returns
-    =======
-    """
-    global AIS
-    # Close APRS-IS connection whereas still present
-    if AIS:
-        logger.info(msg="Closing connection to APRS-IS")
-        AIS.close()
-        AIS = None
+    def ais_send(self, aprsis_data: str):
+        """
+        Helper method for starting the APRS-IS consumer
 
+        Parameters
+        ==========
+        aprsis_data: 'str'
+           The data that we want to send to the APRS-IS server
 
-def ais_send(aprsis_data: str):
-    """
-    Helper method for starting the APRS-IS consumer
-
-    Parameters
-    ==========
-    aprsis_data: 'str'
-       The data that we want to send to the APRS-IS server
-
-    Returns
-    =======
-    """
-    global AIS
-    if AIS:
-        AIS.sendall(aprsis_data)
+        Returns
+        =======
+        """
+        if self.AIS:
+            self.AIS.sendall(aprsis_data)
 
 
 if __name__ == "__main__":
