@@ -30,7 +30,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class aprsis_object:
+class APRSISObject:
     def __init__(
         self, aprsis_callsign, aprsis_passwd, aprsis_host, aprsis_port, aprsis_filter
     ):
