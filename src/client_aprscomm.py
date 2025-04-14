@@ -30,10 +30,24 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class AIS_Object:
+class aprsis_object:
     def __init__(
         self, aprsis_callsign, aprsis_passwd, aprsis_host, aprsis_port, aprsis_filter
     ):
+        """
+        Parameters
+        ==========
+        aprsis_callsign: 'str'
+           Our login callsign
+        aprsis_passwd: 'str'
+           Our login password
+        aprsis_host: 'str'
+           Our login hostname
+        aprsis_port: 'int'
+           Our APS-IS port number
+        aprsis_filter: 'str'
+           Our APRS-IS filter settings
+        """
         self.aprsis_callsign = aprsis_callsign
         self.aprsis_passwd = aprsis_passwd
         self.aprsis_host = aprsis_host
