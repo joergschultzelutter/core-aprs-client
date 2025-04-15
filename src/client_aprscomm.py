@@ -104,6 +104,8 @@ class APRSISObject:
         """
         if self.AIS:
             self.AIS.consumer(aprsis_callback, blocking=True, immortal=True, raw=False)
+        else:
+            logger.debug(msg="Not connected to APRS-IS")
 
     def ais_connect(self):
         """
@@ -130,8 +132,10 @@ class APRSISObject:
         Returns
         =======
         """
-
-        return self.AIS._connected
+        if self.AIS:
+            return self.AIS._connected
+        else:
+            return False
 
     def ais_close(self):
         """
@@ -148,6 +152,8 @@ class APRSISObject:
             logger.info(msg="Closing connection to APRS-IS")
             self.AIS.close()
             self.AIS = None
+        else:
+            logger.debug(msg="Not connected to APRS-IS")
 
     def ais_send(self, aprsis_data: str):
         """
@@ -163,6 +169,8 @@ class APRSISObject:
         """
         if self.AIS:
             self.AIS.sendall(aprsis_data)
+        else:
+            logger.debug(msg="Not connected to APRS-IS")
 
 
 if __name__ == "__main__":
