@@ -42,13 +42,9 @@ from input_parser import parse_input_message
 from output_generator import generate_output_message
 from _version import __version__
 
-from client_message_counter import (
-    read_aprs_message_counter,
-    write_aprs_message_counter,
-    aprs_message_counter,
-)
+from client_message_counter import APRSMessageCounter
 
-from client_expdict import create_expiring_dict,aprs_message_cache
+from client_expdict import create_expiring_dict, aprs_message_cache
 
 import json
 from uuid import uuid1
@@ -227,16 +223,19 @@ def aprs_callback(raw_aprs_packet: dict):
                         )
 
                 # Send our message(s) to APRS-IS
-                aprs_message_counter.value = send_aprs_message_list(
+                _aprs_msg_count = send_aprs_message_list(
                     myaprsis=AIS,
                     simulate_send=program_config["testing"]["aprsis_simulate_send"],
                     message_text_array=output_message,
                     destination_call_sign=from_callsign,
                     send_with_msg_no=msg_no_supported,
-                    aprs_message_counter=aprs_message_counter.value,
+                    aprs_message_counter=aprs_message_counter.get_counter(),
                     external_message_number=msgno_string,
                     new_ackrej_format=new_ackrej_format,
                 )
+
+                # And store the new APRS message number in our counter object
+                aprs_message_counter.set_counter(_aprs_msg_count)
 
                 # We've finished processing this message. Update the decaying
                 # cache with our message.
@@ -307,31 +306,19 @@ def run_listener():
 
     #
     # Read the message counter
-    logger.info(msg="Reading APRS message counter...")
-    aprs_message_counter = read_aprs_message_counter(
+    logger.info(msg="Creating APRS message counter object...")
+    aprs_message_counter = APRSMessageCounter(
         file_name=program_config["data_storage"]["aprs_message_counter_file_name"]
     )
 
     # Initialize the aprs-is object
     AIS = None
 
-    aprs_message_cache= create_expiring_dict(max_len=program_config["dupe_detection"]["msg_cache_max_entries"],max_age_seconds=program_config["dupe_detection"]["msg_cache_time_to_live"])
-
-    """
-    # Create some local variables as otherwise, the 'black' prettifier will choke on it
-    _msg_cache_max_entries = program_config["dupe_detection"]["msg_cache_max_entries"]
-    _msg_cache_time_to_live = program_config["dupe_detection"]["msg_cache_time_to_live"]
-
-    # Create the decaying APRS message cache. Any APRS message that is present in
-    # this cache will be considered as a duplicate / delayed and will not be processed
-    message = f"APRS message dupe cache set to {str(_msg_cache_max_entries)}  max possible entries and a TTL of {str(_msg_cache_time_to_live / 60)} mins"
-
-    logger.info(msg=message)
-    aprs_message_cache = ExpiringDict(
+    # Create the APRS-IS dupe message cache
+    aprs_message_cache = create_expiring_dict(
         max_len=program_config["dupe_detection"]["msg_cache_max_entries"],
         max_age_seconds=program_config["dupe_detection"]["msg_cache_time_to_live"],
     )
-    """
 
     # Register the SIGTERM handler; this will allow a safe shutdown of the program
     logger.info(msg="Registering SIGTERM handler for safe shutdown...")
@@ -527,11 +514,10 @@ def run_listener():
                 AIS = None
             else:
                 logger.info(msg="Cannot re-establish connection to APRS-IS")
-            write_aprs_message_counter(
-                file_name=program_config["data_storage"][
-                    "aprs_message_counter_file_name"
-                ],
-            )
+
+            # Write current number of packets to disk
+            logger.info(msg="Writing APRS message counter object to disk ...")
+            aprs_message_counter.write_counter()
 
             # Enter sleep mode and then restart the loop
             logger.info(msg=f"Sleeping ...")
@@ -544,10 +530,8 @@ def run_listener():
         )
 
         # write most recent APRS message counter to disk
-        logger.info(msg="Writing APRS message counter to disk ...")
-        write_aprs_message_counter(
-            file_name=program_config["data_storage"]["aprs_message_counter_file_name"],
-        )
+        logger.info(msg="Writing APRS message counter object to disk ...")
+        aprs_message_counter.write_counter()
 
         if aprs_scheduler:
             logger.info(msg="Pausing aprs_scheduler")

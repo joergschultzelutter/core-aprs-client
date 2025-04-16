@@ -29,71 +29,111 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-class MutableInt:
-    def __init__(self, value):
-        self.value = value
 
+class APRSMessageCounter:
+    def __init__(self, file_name: str):
+        """
+        This class implements the APRS message counter.
 
-# Our global message counter
-aprs_message_counter = MutableInt(0)
+        Parameters
+        ==========
+        file_name: 'str'
+           External file where the APRS message counter is stored.
 
+        Returns
+        =======
 
-def read_aprs_message_counter(file_name: str):
-    """
-    Reads the latest message counter from a file
+        """
 
-    If file is not present, we will start with '0'
+        # Init our future numeric counter
+        self.counter = 0
 
-    Parameters
-    ==========
-    file_name: 'str'
-        Name of the file we are going to read the data from
+        # sef the counter's local file name
+        self.file_name: str = build_full_pathname(file_name=file_name)
 
-    Returns
-    =======
-    aprs_message_counter: 'MutableInt'
-        last message counter (or '0')
-    """
-    global aprs_message_counter
-    served_packages = 0
-    absolute_path_filename = build_full_pathname(file_name=file_name)
-    try:
-        with open(f"{absolute_path_filename}", "r") as f:
-            if f.mode == "r":
-                contents = f.read()
+        # and finally, (try to) read the file from disk
+        self.read_counter()
+
+    def read_counter(self):
+        """
+        Reads the latest message counter from a file
+        and sets the class' internal counter
+
+        If file is not present, we will start with '0'
+
+        Parameters
+        ==========
+
+        Returns
+        =======
+
+        """
+
+        # Initially, assume that our source file does not exist
+        self.counter = 0
+
+        try:
+            with open(f"{self.file_name}", "r") as f:
+                if f.mode == "r":
+                    contents = f.read()
+                    f.close()
+                    self.counter = int(contents)
+        except (FileNotFoundError, Exception):
+            self.counter = 0
+            logger.info(
+                msg=f"Cannot read content from message counter file {self.file_name}; will create a new file"
+            )
+
+    def write_counter(self):
+        """
+        Writes the latest message counter to a file
+
+        Parameters
+        ==========
+
+        Returns
+        =======
+
+        """
+        try:
+            with open(f"{self.file_name}", "w") as f:
+                f.write("%d" % self.counter)
                 f.close()
-                served_packages = int(contents)
-    except (FileNotFoundError, Exception):
-        served_packages = 0
-        logger.info(
-            msg=f"Cannot read content from message counter file {absolute_path_filename}; will create a new file"
-        )
+        except (IOError, OSError):
+            logger.info(msg=f"Cannot write message counter to {self.file_name}")
 
-    aprs_message_counter.value = served_packages
-    return aprs_message_counter
+    def get_counter(self):
+        """
+        Getter method for the counter
 
+        Parameters
+        ==========
 
-def write_aprs_message_counter(file_name: str):
-    """
-    Writes the latest message counter to a file
+        Returns
+        =======
+        counter: 'int'
+            Our numeric APRS counter
 
-    Parameters
-    ==========
-    file_name: 'str'
-        Name of the file we are going to read the data from
+        """
+        return self.counter
 
-    Returns
-    =======
-    Nothing
-    """
-    global aprs_message_counter
-    absolute_path_filename = build_full_pathname(file_name=file_name)
-    try:
-        with open(f"{absolute_path_filename}", "w") as f:
-            f.write("%d" % aprs_message_counter.value)
-            f.close()
-    except (IOError, OSError):
-        logger.info(msg=f"Cannot write message counter to {absolute_path_filename}")
+    def set_counter(self, counter: int):
+        """
+        Setter method for the counter
+
+        Parameters
+        ==========
+        counter: 'int'
+            Our numeric APRS counter
+
+        Returns
+        =======
+
+        """
+        if type(counter) is int:
+            self.counter = counter
+        else:
+            raise ValueError("Value type must be int")
 
 
 if __name__ == "__main__":
