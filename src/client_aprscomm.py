@@ -55,6 +55,8 @@ class APRSISObject:
         self.aprsis_filter = aprsis_filter
         self.AIS: aprslib.inet.IS = None
 
+        self.ais_open()
+
     def ais_open(self):
         """
         Helper method for creating the APRS-IS object
@@ -102,7 +104,7 @@ class APRSISObject:
         Returns
         =======
         """
-        if self.AIS:
+        if type(self.AIS) is aprslib.inet.IS:
             self.AIS.consumer(aprsis_callback, blocking=True, immortal=True, raw=False)
         else:
             logger.debug(msg="Not connected to APRS-IS")
@@ -117,7 +119,7 @@ class APRSISObject:
         Returns
         =======
         """
-        if self.AIS:
+        if type(self.AIS) is aprslib.inet.IS:
             self.AIS.connect(blocking=True)
 
     def ais_is_connected(self):
@@ -132,7 +134,7 @@ class APRSISObject:
         Returns
         =======
         """
-        if self.AIS:
+        if type(self.AIS) is aprslib.inet.IS:
             return self.AIS._connected
         else:
             return False
@@ -148,7 +150,7 @@ class APRSISObject:
         =======
         """
         # Close APRS-IS connection whereas still present
-        if self.AIS:
+        if type(self.AIS) is aprslib.inet.IS:
             logger.info(msg="Closing connection to APRS-IS")
             self.AIS.close()
             self.AIS = None
@@ -167,10 +169,28 @@ class APRSISObject:
         Returns
         =======
         """
-        if self.AIS:
+        if type(self.AIS) is aprslib.inet.IS:
             self.AIS.sendall(aprsis_data)
         else:
             logger.debug(msg="Not connected to APRS-IS")
+
+    def ais_get(self):
+        """
+        Helper method for getting the APRS-IS consumer object
+
+        Parameters
+        ==========
+
+        Returns
+        =======
+        self.AIS: 'aprslib.inet.IS'
+            Our APRS-IS object (or 'None')
+
+        """
+        if type(self.AIS) is aprslib.inet.IS:
+            return self.AIS
+        else:
+            return None
 
 
 if __name__ == "__main__":

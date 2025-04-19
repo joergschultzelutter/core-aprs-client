@@ -28,6 +28,7 @@ from utils import (
 )
 from input_parser import parse_input_message
 from output_generator import generate_output_message
+from client_aprscomm import APRSISObject
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s %(module)s -%(levelname)s- %(message)s"
@@ -36,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 
 def send_ack(
-    myaprsis: aprslib.inet.IS,
+    myaprsis: APRSISObject,
     users_callsign: str,
     source_msg_no: str,
     alias: str,
@@ -76,14 +77,14 @@ def send_ack(
         stringtosend = f"{alias}>{tocall}::{users_callsign:9}:ack{source_msg_no}"
         if not simulate_send:
             logger.info(msg=f"Sending acknowledgment receipt: {stringtosend}")
-            myaprsis.sendall(stringtosend)
+            myaprsis.ais_send(aprsis_data=stringtosend)
             time.sleep(packet_delay)
         else:
             logger.info(msg=f"Simulating acknowledgment receipt: {stringtosend}")
 
 
 def send_aprs_message_list(
-    myaprsis: aprslib.inet.IS,
+    myaprsis: APRSISObject,
     message_text_array: list,
     destination_call_sign: str,
     send_with_msg_no: bool,
@@ -154,7 +155,7 @@ def send_aprs_message_list(
                 aprs_message_counter = 0
         if not simulate_send:
             logger.info(msg=f"Sending response message '{stringtosend}'")
-            myaprsis.sendall(stringtosend)
+            myaprsis.ais_send(aprs_data=stringtosend)
         else:
             logger.info(msg=f"Simulating response message '{stringtosend}'")
         time.sleep(packet_delay)
@@ -180,7 +181,7 @@ def get_alphanumeric_counter_value(numeric_counter: int):
 
 
 def send_beacon_and_status_msg(
-    myaprsis: aprslib.inet.IS, aprs_beacon_messages: list, simulate_send: bool = True
+    myaprsis: APRSISObject, aprs_beacon_messages: list, simulate_send: bool = True
 ):
     """
     Send beacon message list to APRS_IS
@@ -188,7 +189,7 @@ def send_beacon_and_status_msg(
 
     Parameters
     ==========
-    myaprsis: 'aprslib.inet.IS'
+    myaprsis: 'APRSISObject'
         Our aprslib object that we will use for the communication part
     aprs_beacon_messages: list
         List of pre-defined APRS beacon messages
@@ -210,14 +211,14 @@ def send_beacon_and_status_msg(
         stringtosend = f"{_aprsis_callsign}>{_aprsis_tocall}:{bcn}"
         if not simulate_send:
             logger.info(msg=f"Sending beacon: {stringtosend}")
-            myaprsis.sendall(stringtosend)
+            myaprsis.ais_send(aprs_data=stringtosend)
             time.sleep(program_config["message_delay"]["packet_delay_other"])
         else:
             logger.info(msg=f"Simulating beacons: {stringtosend}")
 
 
 def send_bulletin_messages(
-    myaprsis: aprslib.inet.IS, bulletin_dict: dict, simulate_send: bool = True
+    myaprsis: APRSISObject, bulletin_dict: dict, simulate_send: bool = True
 ):
     """
     Sends bulletin message list to APRS_IS
@@ -227,7 +228,7 @@ def send_bulletin_messages(
 
     Parameters
     ==========
-    myaprsis: 'aprslib.inet.IS'
+    myaprsis: 'APRSISObject'
         Our aprslib object that we will use for the communication part
     bulletin_dict: 'dict'
         The bulletins that we are going to send upt to the user. Key = BLNxxx, Value = Bulletin Text
@@ -249,7 +250,7 @@ def send_bulletin_messages(
         stringtosend = f"{_aprsis_callsign}>{_aprsis_tocall}::{recipient_id:9}:{bln}"
         if not simulate_send:
             logger.info(msg=f"Sending bulletin: {stringtosend}")
-            myaprsis.sendall(stringtosend)
+            myaprsis.ais_send(aprsis_data=stringtosend)
             time.sleep(program_config["message_delay"]["packet_delay_other"])
         else:
             logger.info(msg=f"simulating bulletins: {stringtosend}")

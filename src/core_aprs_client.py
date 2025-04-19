@@ -38,6 +38,7 @@ from utils import (
     check_for_default_config,
 )
 from client_configuration import load_config, program_config
+from client_aprscomm import APRSISObject
 from input_parser import parse_input_message
 from output_generator import generate_output_message
 from _version import __version__
@@ -84,6 +85,8 @@ def aprs_callback(raw_aprs_packet: dict):
     global aprs_message_counter
     global aprs_message_cache
     global AIS
+
+    a = type(AIS)
 
     # Get our relevant fields from the APRS message
     addresse_string = raw_aprs_packet.get("addresse")
@@ -311,9 +314,6 @@ def run_listener():
         file_name=program_config["data_storage"]["aprs_message_counter_file_name"]
     )
 
-    # Initialize the aprs-is object
-    AIS = None
-
     # Create the APRS-IS dupe message cache
     aprs_message_cache = create_expiring_dict(
         max_len=program_config["dupe_detection"]["msg_cache_max_entries"],
@@ -327,16 +327,13 @@ def run_listener():
     # Enter the 'eternal' receive loop
     try:
         while True:
-            # Create the APRS-IS object and set user/pass/host/port
-            AIS = aprslib.IS(
-                callsign=program_config["client_config"]["aprsis_callsign"],
-                passwd=str(program_config["network_config"]["aprsis_passcode"]),
-                host=program_config["network_config"]["aprsis_server_name"],
-                port=program_config["network_config"]["aprsis_server_port"],
+            AIS = APRSISObject(
+                aprsis_callsign=program_config["client_config"]["aprsis_callsign"],
+                aprsis_passwd=str(program_config["network_config"]["aprsis_passcode"]),
+                aprsis_host=program_config["network_config"]["aprsis_server_name"],
+                aprsis_port=program_config["network_config"]["aprsis_server_port"],
+                aprsis_filter=program_config["network_config"]["aprsis_server_filter"],
             )
-
-            # Set the APRS-IS server filter
-            AIS.set_filter(program_config["network_config"]["aprsis_server_filter"])
 
             # Establish the connection to APRS-IS
             # create a couple of local variables as the 'black' prettifier seems to
@@ -352,10 +349,10 @@ def run_listener():
             logger.info(
                 msg=f"Establishing connection to APRS-IS: server={_aprsis_server_name}, port={_aprsis_server_port}, filter={_aprsis_server_filter}, APRS-IS passcode={_aprsis_passcode}, APRS-IS User = {_aprsis_callsign}"
             )
-            AIS.connect(blocking=True)
+            AIS.ais_connect()
 
             # Are we connected?
-            if AIS._connected:
+            if AIS.ais_is_connected():
                 logger.debug(msg="Established the connection to APRS-IS")
 
                 aprs_scheduler = None
@@ -481,7 +478,7 @@ def run_listener():
                 # We are now ready to initiate the actual processing
                 # Start the consumer thread
                 logger.info(msg="Starting callback consumer")
-                AIS.consumer(aprs_callback, blocking=True, immortal=True, raw=False)
+                AIS.ais_start_consumer(aprs_callback)
 
                 #
                 # We have left the callback, let's clean up a few things
@@ -510,7 +507,7 @@ def run_listener():
                 #
                 # close connection
                 logger.debug(msg="Closing APRS connection to APRS-IS")
-                AIS.close()
+                AIS.ais_close()
                 AIS = None
             else:
                 logger.info(msg="Cannot re-establish connection to APRS-IS")
@@ -547,9 +544,9 @@ def run_listener():
                     )
 
         # Close APRS-IS connection whereas still present
-        if AIS:
+        if AIS.ais_is_connected():
             logger.info(msg="Closing connection to APRS-IS")
-            AIS.close()
+            AIS.ais_close()
 
 
 if __name__ == "__main__":
