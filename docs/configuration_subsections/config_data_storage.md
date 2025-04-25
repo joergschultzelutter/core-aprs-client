@@ -12,7 +12,7 @@ This configuration section contains two settings:
 [data_storage]
 #
 # This is the name of the subdiectory where the program will store the
-# APRS message counter file. Location: $cwd?<directory>
+# APRS message counter file. Location: $cwd/<directory>
 # If not present, then the directory will be created by the program
 aprs_data_directory = data_files
 #
