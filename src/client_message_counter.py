@@ -21,7 +21,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 import logging
-from utils import build_full_pathname
+from client_utils import build_full_pathname
 
 logging.basicConfig(
     level=logging.INFO,

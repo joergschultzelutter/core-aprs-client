@@ -22,7 +22,17 @@ import signal
 import logging
 import aprslib
 from expiringdict import ExpiringDict
-from utils import (
+import json
+from uuid import uuid1
+import time
+from datetime import datetime
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers import base as apbase
+import os
+
+import client_shared
+from client_utils import (
     add_aprs_message_to_cache,
     get_aprs_message_from_cache,
     get_command_line_params,
@@ -39,218 +49,22 @@ from utils import (
 )
 from client_configuration import load_config, program_config
 from client_aprscomm import APRSISObject
-from input_parser import parse_input_message
-from output_generator import generate_output_message
 from _version import __version__
-
 from client_message_counter import APRSMessageCounter
-
 from client_expdict import create_expiring_dict, aprs_message_cache
-
-import json
-from uuid import uuid1
-from aprs_communication import (
+from client_aprs_communication import (
     send_ack,
     send_aprs_message_list,
     send_bulletin_messages,
     send_beacon_and_status_msg,
+    aprs_callback,
 )
-import time
-from datetime import datetime
-import atexit
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.schedulers import base as apbase
-import os
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(module)s -%(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
-
-
-# APRSlib callback
-# Extract the fields from the APRS message, start the parsing process,
-# execute the command and send the command output back to the user
-def aprs_callback(raw_aprs_packet: dict):
-    """
-    aprslib callback; this is the core process that takes care of everything
-    Parameters
-    ==========
-    raw_aprs_packet: 'dict'
-        dict object, containing the raw APRS data
-    Returns
-    =======
-    """
-    global aprs_message_counter
-    global aprs_message_cache
-    global AIS
-
-    a = type(AIS)
-
-    # Get our relevant fields from the APRS message
-    addresse_string = raw_aprs_packet.get("addresse")
-    message_text_string = raw_aprs_packet.get("message_text")
-    response_string = raw_aprs_packet.get("response")
-    msgno_string = raw_aprs_packet.get("msgNo")
-    from_callsign = raw_aprs_packet.get("from")
-    format_string = raw_aprs_packet.get("format")
-    ackMsgno_string = raw_aprs_packet.get("ackMsgNo")
-
-    # lower the response in case we received one
-    if response_string:
-        response_string = response_string.lower()
-
-    # Check if we need to deal with the old vs the new message format
-    new_ackrej_format = True if ackMsgno_string else False
-
-    # Check if this request supports a msgno
-    msg_no_supported = True if msgno_string else False
-
-    # User's call sign. read: who has sent us this message?
-    if from_callsign:
-        from_callsign = from_callsign.upper()
-
-    if addresse_string:
-        # Lets examine what we've got:
-        # 1. Message format should always be 'message'.
-        #    This is even valid for ack/rej responses
-        # 2. Message text should contain content
-        # 3. response text should NOT be ack/rej
-        # Continue if both assumptions are correct
-        if (
-            format_string == "message"
-            and message_text_string
-            and response_string not in ["ack", "rej"]
-        ):
-            # This is a message that belongs to us
-
-            # logger.info(msg=dump_string_to_hex(message_text_string))
-
-            # Check if the message is present in our decaying message cache
-            # If the message can be located, then we can assume that we have
-            # processed (and potentially acknowledged) that message request
-            # within the last e.g. 5 minutes and that this is a delayed / dupe
-            # request, thus allowing us to ignore this request.
-            aprs_message_key = get_aprs_message_from_cache(
-                message_text=message_text_string,
-                message_no=msgno_string,
-                users_callsign=from_callsign,
-                aprs_cache=aprs_message_cache,
-            )
-            if aprs_message_key:
-                logger.debug(
-                    msg="DUPLICATE APRS PACKET - this message is still in our decaying message cache"
-                )
-                logger.debug(
-                    msg=f"Ignoring duplicate APRS packet raw_aprs_packet: {raw_aprs_packet}"
-                )
-            else:
-                logger.debug(msg=f"Received raw_aprs_packet: {raw_aprs_packet}")
-
-                # Send an ack if we DID receive a message number
-                # and we DID NOT have received a request in the
-                # new ack/rej format
-                # see aprs101.pdf pg. 71ff.
-                if msg_no_supported and not new_ackrej_format:
-                    send_ack(
-                        myaprsis=AIS,
-                        simulate_send=program_config["testing"]["aprsis_simulate_send"],
-                        alias=program_config["client_config"]["aprsis_callsign"],
-                        tocall=program_config["client_config"]["aprsis_tocall"],
-                        users_callsign=from_callsign,
-                        source_msg_no=msgno_string,
-                        packet_delay=program_config["message_delay"][
-                            "packet_delay_ack"
-                        ],
-                    )
-                #
-                # This is where the magic happens: Try to figure out what the user
-                # wants from us. If we were able to understand the user's message,
-                # 'success' will be true. In any case, the 'response_parameters'
-                # dictionary will give us a hint about what to do next (and even
-                # contains the parser's error message if 'success' != True)
-                # input parameters: the actual message, the user's call sign and
-                # the aprs.fi API access key for location lookups
-                success, response_parameters = parse_input_message(
-                    aprs_message=message_text_string,
-                    from_callsign=from_callsign,
-                )
-                logger.info(msg=f"Input parser result: {success}")
-                logger.info(msg=response_parameters)
-                #
-                # If the 'success' parameter is True, then we should know
-                # by now what the user wants from us. Now, we'll leave it to
-                # another module to generate the output data of what we want
-                # to send to the user.
-                # The result to this post-processor will be a general success
-                # status code and a list item, containing the messages that are
-                # ready to be sent to the user.
-                #
-                # parsing successful?
-                if success:
-                    # Generate the output message for the requested keyword
-                    # The 'success' status is ALWAYS positive even if the
-                    # message could not get processed - the inline'd error
-                    # message counts as positive message content
-                    success, output_message = generate_output_message(
-                        response_parameters=response_parameters,
-                    )
-                # darn - we failed to hail the Tripods
-                # this is the branch where the input parser failed to understand
-                # the message. A possible reason: you sent a keyword which requires
-                # an additional parameter but failed to send that one, too.
-                # As we only parse but never process data in that input
-                # parser, we sinply don't know what to do with the user's message
-                # and get back to him with a generic response.
-                else:
-                    input_parser_error_message = response_parameters[
-                        "input_parser_error_message"
-                    ]
-                    # Dump the human readable message to the user if we have one
-                    if input_parser_error_message:
-                        output_message = make_pretty_aprs_messages(
-                            message_to_add=f"{input_parser_error_message}",
-                            add_sep=False,
-                        )
-                    # If not, just dump the link to the instructions
-                    # This is the default branch which dumps generic information
-                    # to the client whenever there is no generic error text from the input parser
-                    else:
-                        output_message = make_pretty_aprs_messages(
-                            message_to_add="Sorry, did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client",
-                            add_sep=False,
-                        )
-                        logger.info(
-                            msg=f"Unable to process APRS packet {raw_aprs_packet}"
-                        )
-
-                # Send our message(s) to APRS-IS
-                _aprs_msg_count = send_aprs_message_list(
-                    myaprsis=AIS,
-                    simulate_send=program_config["testing"]["aprsis_simulate_send"],
-                    message_text_array=output_message,
-                    destination_call_sign=from_callsign,
-                    send_with_msg_no=msg_no_supported,
-                    aprs_message_counter=aprs_message_counter.get_counter(),
-                    external_message_number=msgno_string,
-                    new_ackrej_format=new_ackrej_format,
-                )
-
-                # And store the new APRS message number in our counter object
-                aprs_message_counter.set_counter(_aprs_msg_count)
-
-                # We've finished processing this message. Update the decaying
-                # cache with our message.
-                # Store the core message data in our decaying APRS message cache
-                # Dupe detection is applied regardless of the message's
-                # processing status
-                aprs_message_cache = add_aprs_message_to_cache(
-                    message_text=message_text_string,
-                    message_no=msgno_string,
-                    users_callsign=from_callsign,
-                    aprs_cache=aprs_message_cache,
-                )
 
 
 def run_listener():
@@ -272,12 +86,8 @@ def run_listener():
     if not configfile:
         sys.exit(0)
 
-    global aprs_message_counter
-    global aprs_message_cache
-    global AIS
-
-    # init our (future) global variables
-    apscheduler = AIS = None
+    # init our (future) scheduler
+    apscheduler = None
 
     # load the program config from our external config file
     load_config(config_file=configfile)
@@ -310,12 +120,12 @@ def run_listener():
     #
     # Read the message counter
     logger.info(msg="Creating APRS message counter object...")
-    aprs_message_counter = APRSMessageCounter(
+    client_shared.aprs_message_counter = APRSMessageCounter(
         file_name=program_config["data_storage"]["aprs_message_counter_file_name"]
     )
 
     # Create the APRS-IS dupe message cache
-    aprs_message_cache = create_expiring_dict(
+    client_shared.aprs_message_cache = create_expiring_dict(
         max_len=program_config["dupe_detection"]["msg_cache_max_entries"],
         max_age_seconds=program_config["dupe_detection"]["msg_cache_time_to_live"],
     )
@@ -327,7 +137,7 @@ def run_listener():
     # Enter the 'eternal' receive loop
     try:
         while True:
-            AIS = APRSISObject(
+            client_shared.AIS = APRSISObject(
                 aprsis_callsign=program_config["client_config"]["aprsis_callsign"],
                 aprsis_passwd=str(program_config["network_config"]["aprsis_passcode"]),
                 aprsis_host=program_config["network_config"]["aprsis_server_name"],
@@ -349,10 +159,10 @@ def run_listener():
             logger.info(
                 msg=f"Establishing connection to APRS-IS: server={_aprsis_server_name}, port={_aprsis_server_port}, filter={_aprsis_server_filter}, APRS-IS passcode={_aprsis_passcode}, APRS-IS User = {_aprsis_callsign}"
             )
-            AIS.ais_connect()
+            client_shared.AIS.ais_connect()
 
             # Are we connected?
-            if AIS.ais_is_connected():
+            if client_shared.AIS.ais_is_connected():
                 logger.debug(msg="Established the connection to APRS-IS")
 
                 aprs_scheduler = None
@@ -426,7 +236,7 @@ def run_listener():
 
                         # Ultimately, send the beacon
                         send_beacon_and_status_msg(
-                            myaprsis=AIS,
+                            myaprsis=client_shared.AIS,
                             aprs_beacon_messages=aprs_beacon_messages,
                             simulate_send=program_config["testing"][
                                 "aprsis_simulate_send"
@@ -442,7 +252,7 @@ def run_listener():
                                 "aprsis_beacon_interval_minutes"
                             ],
                             args=[
-                                AIS,
+                                client_shared.AIS,
                                 aprs_beacon_messages,
                                 program_config["testing"]["aprsis_simulate_send"],
                             ],
@@ -465,7 +275,7 @@ def run_listener():
                                 "aprsis_bulletin_interval_minutes"
                             ],
                             args=[
-                                AIS,
+                                client_shared.AIS,
                                 aprs_bulletin_messages,
                                 program_config["testing"]["aprsis_simulate_send"],
                             ],
@@ -478,7 +288,7 @@ def run_listener():
                 # We are now ready to initiate the actual processing
                 # Start the consumer thread
                 logger.info(msg="Starting callback consumer")
-                AIS.ais_start_consumer(aprs_callback)
+                client_shared.AIS.ais_start_consumer(aprs_callback)
 
                 #
                 # We have left the callback, let's clean up a few things
@@ -507,14 +317,14 @@ def run_listener():
                 #
                 # close connection
                 logger.debug(msg="Closing APRS connection to APRS-IS")
-                AIS.ais_close()
-                AIS = None
+                client_shared.AIS.ais_close()
+                client_shared.AIS = None
             else:
                 logger.info(msg="Cannot re-establish connection to APRS-IS")
 
             # Write current number of packets to disk
             logger.info(msg="Writing APRS message counter object to disk ...")
-            aprs_message_counter.write_counter()
+            client_shared.aprs_message_counter.write_counter()
 
             # Enter sleep mode and then restart the loop
             logger.info(msg=f"Sleeping ...")
@@ -528,7 +338,7 @@ def run_listener():
 
         # write most recent APRS message counter to disk
         logger.info(msg="Writing APRS message counter object to disk ...")
-        aprs_message_counter.write_counter()
+        client_shared.aprs_message_counter.write_counter()
 
         if aprs_scheduler:
             logger.info(msg="Pausing aprs_scheduler")
@@ -544,9 +354,9 @@ def run_listener():
                     )
 
         # Close APRS-IS connection whereas still present
-        if AIS.ais_is_connected():
+        if client_shared.AIS.ais_is_connected():
             logger.info(msg="Closing connection to APRS-IS")
-            AIS.ais_close()
+            client_shared.AIS.ais_close()
 
 
 if __name__ == "__main__":
