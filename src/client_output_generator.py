@@ -20,8 +20,9 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-from utils import make_pretty_aprs_messages
+from client_utils import make_pretty_aprs_messages
 from client_configuration import program_config
+
 
 def __process_greetme_keyword(response_parameters: dict):
     # Not let's assume that your code has processed the user's request and
@@ -31,12 +32,12 @@ def __process_greetme_keyword(response_parameters: dict):
     # 1..n future APRS messages. For adding additional content to that message,
     # simply pass that list item along as 'destination list' parameter for all
     # following calls
-    
+
     # generate our very first message; either pass an empty list item to the
     # function or omit the 'destination_list" parameter. In that case, the function
     # will create a list object for you
     output_message = make_pretty_aprs_messages(message_to_add="Hello")
-    
+
     # This is an example for adding an additional message part to the list item
     # Simply pass the list item as input parameter to our function, thus telling it
     # that you rather want to add additional content than having it create a new
@@ -45,11 +46,12 @@ def __process_greetme_keyword(response_parameters: dict):
         message_to_add=response_parameters["from_callsign"],
         destination_list=output_message,
     )
-    
+
     # Finally, indicate to the main process that we were successful
     success = True
 
     return success, output_message
+
 
 def __process_sayhello_keyword(response_parameters: dict):
     # Not let's assume that your code has processed the user's request and
@@ -75,7 +77,7 @@ def __process_sayhello_keyword(response_parameters: dict):
 
     # Finally, indicate to the main process that we were successful
     success = True
-    
+
     return success, output_message
 
 
@@ -86,7 +88,7 @@ def generate_output_message(response_parameters: dict):
     Parameters
     ==========
     response_parameters: 'dict'
-        dictionary object, containing data from input_parser.py
+        dictionary object, containing data from client_input_parser.py
         Literally speaking, you will use the content from this
         dictionary in order to generate an APRS output message.
         For this stub, that dictionary is empty.
@@ -118,11 +120,14 @@ def generate_output_message(response_parameters: dict):
 
     match response_parameters["command_code"]:
         case "greetme":
-            return __process_greetme_keyword(response_parameters = response_parameters)
+            return __process_greetme_keyword(response_parameters=response_parameters)
         case "sayhello":
-            return __process_sayhello_keyword(response_parameters = response_parameters)
+            return __process_sayhello_keyword(response_parameters=response_parameters)
         case _:
-            return False, ake_pretty_aprs_messages(message_to_add="Unknown command keyword")
+            return False, ake_pretty_aprs_messages(
+                message_to_add="Unknown command keyword"
+            )
+
 
 if __name__ == "__main__":
     pass

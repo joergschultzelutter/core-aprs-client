@@ -9,4 +9,4 @@ options:
   -h, --help                show this help message and exit
   --configfile CONFIGFILE   Program config file name (default is 'core_aprs_client.cfg')
 ```
- Run the program via ``nohup python core_aprs_client.py >nohup.out &``
+ Ideally, run the program via ``nohup python core_aprs_client.py >nohup.out &``. See also [the config file's section on the crash handler](configuration_subsections/config_crash_handler.md) on how to use the ``nohup.out`` file in case of program crashes.

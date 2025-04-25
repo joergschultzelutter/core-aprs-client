@@ -198,62 +198,6 @@ def get_command_line_params():
     return configfile
 
 
-def read_aprs_message_counter(file_name: str):
-    """
-    Reads the latest message counter from a file
-
-    If file is not present, we will start with '0'
-
-    Parameters
-    ==========
-    file_name: 'str'
-        Name of the file we are going to read the data from
-
-    Returns
-    =======
-    message_counter: 'int'
-        last message counter (or '0')
-    """
-    served_packages = 0
-    absolute_path_filename = build_full_pathname(file_name=file_name)
-    try:
-        with open(f"{absolute_path_filename}", "r") as f:
-            if f.mode == "r":
-                contents = f.read()
-                f.close()
-                served_packages = int(contents)
-    except:
-        served_packages = 0
-        logger.info(
-            msg=f"Cannot read content from message counter file {absolute_path_filename}; will create a new file"
-        )
-    return served_packages
-
-
-def write_aprs_message_counter(aprs_message_counter: int, file_name: str):
-    """
-    Writes the latest message counter to a file
-
-    Parameters
-    ==========
-    aprs_message_counter: 'int'
-        latest message counter # from file
-    file_name: 'str'
-        Name of the file we are going to read the data from
-
-    Returns
-    =======
-    Nothing
-    """
-    absolute_path_filename = build_full_pathname(file_name=file_name)
-    try:
-        with open(f"{absolute_path_filename}", "w") as f:
-            f.write("%d" % aprs_message_counter)
-            f.close()
-    except:
-        logger.info(msg=f"Cannot write message counter to {absolute_path_filename}")
-
-
 def build_full_pathname(
     file_name: str,
     root_path_name: str = os.path.abspath(os.getcwd()),

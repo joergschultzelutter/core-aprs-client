@@ -24,7 +24,7 @@ aprsis_server_port = 14580
 #
 # APRS-IS passcode (numeric). Replace with your very own passcode
 # If you don't know what this is, then this program is not for you
-aprsis_passcode = 29166
+aprsis_passcode = 12345
 #
 # APRS-IS message filter settings - see https://www.aprs-is.net/javAPRSFilter.aspx
 # Ensure that both aprsis_callsign and aprsis_server_filter relate to the same call sign!
