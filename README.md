@@ -24,11 +24,14 @@ The steps for modifying the client's config file are described [here](docs/confi
 ## Running the client
 The steps for starting the client are described [here](docs/client_start.md).
 
+## Source Code Anatomy
+A brief overview on the software modules used by the client can be found [here](docs/anatomy.md).
+
 ## Extending the client with your own code
 The steps for adding your own extensions to the client are described [here](docs/extensions.md).
 
 ## Client schematics
-If you want to learn about the bot's basic structure, then have a look at [this diagram](docs/schematics.md).
+If you want to learn about the bot's basic processing structure, then have a look at [this diagram](docs/schematics.md).
 
 ## Known issues and caveats
 - This software is single-threaded. Due to APRS-IS's technical nature of resubmitting non-ack'ed messages, this limitation should not be an issue, though. Future versions of this software might support queued processing of incoming requests.
@@ -36,4 +39,4 @@ If you want to learn about the bot's basic structure, then have a look at [this 
 - You should at least know the APRS basics before you use this software. Acquaint yourself with [the official APRS documentation](https://github.com/glidernet/ogn-aprs-protocol/blob/master/APRS101.PDF) and learn about [how APRS works](https://how.aprs.works/) in general. Additionally, have a look at the [APRS Foundation](https://www.aprsfoundation.org/)'s web site.
 - You HAVE to assign your personal call sign to the bot.
 - You HAVE to [request your personal APRS TOCALL](https://github.com/aprsorg/aprs-deviceid) for using this bot.
-- ```core_aprs_client``` uses [aprslib](https://github.com/rossengeorgiev/aprs-python) for its APRS-IS communication. As ```aprslib``` currently does not support the transfer of additional external variables to its callback function (e.g. via ```kwargs```), some of the variables that ```core-aprs-client``` needs to communicate with have been defined as global variables. 
+- ```core_aprs_client``` uses [aprslib](https://github.com/rossengeorgiev/aprs-python) for its APRS-IS communication. As ```aprslib``` currently does not support the transfer of additional external variables to its callback function (e.g. via ```kwargs```), some of the variables that ```core-aprs-client``` needs to communicate with have been defined as globally shared variables (via `client_shared.py`). 
