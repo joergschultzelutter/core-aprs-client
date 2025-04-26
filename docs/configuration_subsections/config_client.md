@@ -9,8 +9,10 @@
 You _*need*_ to modify the following values:
 
 - ```aprsis_callsign``` is the call sign that the bot listens to. Change the default value ```COAC``` to a call sign that is not in use.
-- ```aprsis_tocall``` is equivalent to the bot's technical identifier. Head over to Hessu's [APRS TOCALL repository](https://github.com/aprsorg/aprs-deviceid) and request a new TOCALL for your service, then change this setting accordingy. This setting's default value ```APRS``` in not to be used on a permanent basis.
-- ```aprs_client_name``` is used whenever the (optional) Apprise handler has to inform you of a program crash. See [the 'Crash Handler'](config_crash_handler.md) section for details. You should change this value to your own installation's program name - but there is no harm in keeping the default setting. 
+- ```aprsis_tocall``` is equivalent to the bot's technical identifier. Once it is time to deploy your code for __production__ usage, head over to Hessu's [APRS TOCALL repository](https://github.com/aprsorg/aprs-deviceid) and request a new TOCALL for your service, then change this setting accordingy. This setting's default value ```APRS``` is not to be used for production purposes (but can be used during its development phase). See the [APRS Device ID](https://github.com/aprsorg/aprs-deviceid/blob/main/ALLOCATING.md#development-phase) information section for further details.
+
+The following setting is optional:
+- ```aprs_client_name``` is used whenever the (optional) [Apprise messaging](https://www.github.com/caronc/apprise) handler has to inform you of a program crash. See [the 'Crash Handler'](config_crash_handler.md) section for details. You should change this value to your own installation's program name - but there is no harm in keeping the default setting. 
 
 ```
 [client_config]
