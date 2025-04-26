@@ -1,2 +1,2 @@
-## Schematics
+## Framework Schematics
 ![Schematics](../img/schematics.svg)

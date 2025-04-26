@@ -1,11 +1,15 @@
-# Message Delay
+# Message Delay Configuration
 
 > [!TIP]
 > These settings simply configire artificial delays after a message has been sent. With the exception of the 'acknoledgment' delay, all other delays are ONLY applied if more than one message has to be sent out to the user.
 
-- ```packet_delay_message``` - artificial message delay for regular APRS messages (e.g. responses to the user). Default = 6.0 seconds 
-- ```packet_delay_other``` - artificial message delay after sending out APRS bulletins and/or beacons. Default = 6.0 seconds 
-- ```packet_delay_ack``` - artificial message delay after sending out an APRS acknowledgment. Default = 2.0 seconds 
+| Config variable        | Type    | Default value        | Description                                                                      |
+|------------------------|---------|----------------------|----------------------------------------------------------------------------------|
+| `packet_delay_message` | `float` | `6.0`  (= 6 seconds) | Artificial message delay in seconds for regular APRS messages (e.g. responses to the user). |
+| `packet_delay_other`   | `float` | `6.0`  (= 6 seconds) | Artificial message delay in seconds after sending out APRS bulletins and/or beacons.        |
+| `packet_delay_ack`     | `float` | `2.0`  (= 2 seconds) | Artificial message delay in seconds after sending out an APRS acknowledgment     |
+
+The respective section from `core-aprs-client`'s config file lists as follows:
 
 ```
 [message_delay]
