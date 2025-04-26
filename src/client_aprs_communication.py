@@ -25,11 +25,15 @@ from client_utils import (
     make_pretty_aprs_messages,
     get_aprs_message_from_cache,
     add_aprs_message_to_cache,
+    parse_bulletin_data,
 )
+from _version import __version__
 from client_input_parser import parse_input_message
 from client_output_generator import generate_output_message
 from client_aprscomm import APRSISObject
 import client_shared
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers import base as apbase
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s %(module)s -%(levelname)s- %(message)s"
@@ -433,6 +437,139 @@ def aprs_callback(raw_aprs_packet: dict):
                     users_callsign=from_callsign,
                     aprs_cache=client_shared.aprs_message_cache,
                 )
+
+
+def init_scheduler_jobs():
+    """
+    Initializes the scheduler jobs for APRS bulletins and / or beacons.
+
+    Parameters
+    ==========
+
+    Returns
+    =======
+    my_scheduler: 'BackgroundScheduler' object or 'None' if no scheduler was initialized.
+    """
+
+    my_scheduler = None
+    if (
+        program_config["beacon_config"]["aprsis_broadcast_beacon"]
+        or program_config["bulletin_config"]["aprsis_broadcast_bulletins"]
+    ):
+        # If we reach this position in the code, we have at least one
+        # task that needs to be scheduled (bulletins and/or position messages
+        #
+        # Create the scheduler
+        my_scheduler = BackgroundScheduler()
+
+        # Install two schedulers tasks, if requested by the user
+        # The first task is responsible for sending out beacon messages
+        # to APRS; it will be triggered every 30 mins
+        #
+
+        # The 2nd task is responsible for sending out bulletin messages
+        # to APRS; it will be triggered every 4 hours
+        #
+
+        if program_config["beacon_config"]["aprsis_broadcast_beacon"]:
+            # Send initial beacon after establishing the connection to APRS_IS
+            logger.info(
+                msg="Send initial beacon after establishing the connection to APRS_IS"
+            )
+
+            #
+            # APRS_IS beacon messages (will be sent every 30 mins)
+            # - APRS Position (first line) needs to have 63 characters or less
+            # - APRS Status can have 67 chars (as usual)
+            # Details: see aprs101.pdf chapter 8
+            #
+            # The client will NOT check the content and send it out 'as is'
+            #
+            # This message is a position report; format description can be found on pg. 23ff and pg. 94ff.
+            # of aprs101.pdf. Message symbols: see http://www.aprs.org/symbols/symbolsX.txt and aprs101.pdf
+            # on page 104ff.
+            # Format is as follows: =Lat primary-symbol-table-identifier lon symbol-identifier test-message
+            # Lat/lon from the configuration have to be valid or the message will not be accepted by aprs-is
+            #
+            # Example nessage: COAC>APRS:=5150.34N/00819.60E?COAC 0.01
+            # results in
+            # lat = 5150.34N
+            # primary symbol identifier = /
+            # lon = 00819.60E
+            # symbol identifier = ?
+            # plus some text.
+            # The overall total symbol code /? refers to a server icon - see list of symbols
+            #
+            # as all of our parameters are stored in a dictionary, we need to construct
+
+            # create a couple of local variables as the 'black' prettifier seems to
+            # choke on multi-dimensional dictionaries
+
+            # fmt:off
+            _aprsis_latitude = program_config["beacon_config"]["aprsis_latitude"]
+            _aprsis_longitude = program_config["beacon_config"]["aprsis_longitude"]
+            _aprsis_table = program_config["beacon_config"]["aprsis_table"]
+            _aprsis_symbol = program_config["beacon_config"]["aprsis_symbol"]
+            _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
+            _aprsis_beacon_altitude_ft = str(program_config["beacon_config"]["aprsis_beacon_altitude_ft"])[:6]
+            # fmt:on
+
+            # generate our beacon string
+            _beacon = f"{_aprsis_latitude}{_aprsis_table}{_aprsis_longitude}{_aprsis_symbol}{_aprsis_callsign} {__version__} /A={_aprsis_beacon_altitude_ft}"
+
+            # and store it in a list item
+            aprs_beacon_messages: list = [_beacon]
+
+            # Ultimately, send the beacon
+            send_beacon_and_status_msg(
+                myaprsis=client_shared.AIS,
+                aprs_beacon_messages=aprs_beacon_messages,
+                simulate_send=program_config["testing"]["aprsis_simulate_send"],
+            )
+
+            # Add position beaconing to scheduler
+            my_scheduler.add_job(
+                send_beacon_and_status_msg,
+                "interval",
+                id="aprsbeacon",
+                minutes=program_config["beacon_config"][
+                    "aprsis_beacon_interval_minutes"
+                ],
+                args=[
+                    client_shared.AIS,
+                    aprs_beacon_messages,
+                    program_config["testing"]["aprsis_simulate_send"],
+                ],
+            )
+
+        if program_config["bulletin_config"]["aprsis_broadcast_bulletins"]:
+            # prepare the bulletin data
+            aprs_bulletin_messages = parse_bulletin_data(core_config=program_config)
+
+            # Install scheduler task 2 - send standard bulletins (advertising the program instance)
+            # The bulletin messages consist of fixed content and are defined at the beginning of
+            # this program code
+            my_scheduler.add_job(
+                send_bulletin_messages,
+                "interval",
+                id="aprsbulletin",
+                minutes=program_config["bulletin_config"][
+                    "aprsis_bulletin_interval_minutes"
+                ],
+                args=[
+                    client_shared.AIS,
+                    aprs_bulletin_messages,
+                    program_config["testing"]["aprsis_simulate_send"],
+                ],
+            )
+
+        # Ultimately, start the scheduler
+        my_scheduler.start()
+    # Default handler in case we neither want bulletins nor beacons
+    else:
+        my_scheduler = None
+
+    return my_scheduler
 
 
 if __name__ == "__main__":
