@@ -5,11 +5,11 @@
 
 
 
-Core APRS client framework with dupe detection and other APRS-IS related stuff.
+Core APRS client framework with dupe detection, bulletin/beaconing support, and other APRS-IS related stuff.
 
-```core-aprs-client``` is a modernized version of [mpad](https://github.com/joergschultzelutter/mpad)'s APRS functions which can be used for building your very own APRS client / bot. It supports all of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS messaging functions, such as connecting to APRS-IS, message dupe detection, ACK/REJ handling, and other functionality. Hoewever, ```core-aprs-client``` deliberately lacks any 'standard' APRS bot functions such as WX reporting etc. 
+```core-aprs-client``` is a modernized version of [mpad](https://github.com/joergschultzelutter/mpad)'s APRS functions which can be used for building your very own APRS client / bot. Its framework supports all of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS messaging functions, such as connecting to APRS-IS, message dupe detection, ACK/REJ handling, and other functionality such as APRS bulletins and beacons. However, ```core-aprs-client``` deliberately lacks any _specific_ APRS bot functions such as WX reporting etc. 
 
-This is where _you_ step in. Add your bot-specific code to the client's framework. Everything else related to APRS messaging and communication with APRS-IS will be covered by ```core-aprs-client```.
+This is where _you_ step in. Add your bot-specific code to the client's APRS framework code. Everything else related to APRS messaging and communication with APRS-IS will be covered by the ```core-aprs-client``` framework.
 
 ## Core features
 - Core APRS-IS functionality, covering both 'old' and '[new](http://www.aprs.org/aprs11/replyacks.txt)' ACK/REJ processing
