@@ -8,9 +8,11 @@
 
 By default, ```core-aprs-client```'s default installation comes with three keywords that you can send to its associated APRS call sign:
 
-- ```greetings``` - Generate output string ```Greetings <callsign>```, meaning that your output message will be ```Greetings DF1JSL-1``` if DF1JSL-1 has sent the command to ```core-aprs-client```
-- ```hello``` - Generates a "Hello World" output string
-- ```error``` - Triggers the input processor's error mechanism and generates an input-processor specific error. This demo will use a fixed string with the value of ```Triggered input processor error```. Your own input processor could use this mechanism in case e.g. a keyword expects an additional parameter which was not supplied to ```core-aprs-client``` by the user.
+| APRS Command Code | Purpose                                                                                                                                                                                                                                                                                                                                                   |
+|-------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `greetings`       | Generate output string `Greetings <callsign>`. For example, if DF1JSL-1 has sent that command to `core-aprs-client`, its output message will be `Greetings DF1JSL-1`.                                                                                                                                                                                     |
+| `hello`           | Generates a "Hello World" output string                                                                                                                                                                                                                                                                                                                   |
+| `error`           | Triggers the input processor's error mechanism and generates an input-processor specific error. This demo will use a fixed string with the value of `Triggered input processor error`. Your own input processor could use this mechanism in case e.g. a keyword expects an additional parameter which was not supplied to `core-aprs-client` by the user. |
 
 Any _other_ command that is sent to ```core-aprs-client``` will generate the bot's _generic_ error message, such as ```Unknown command```.
 
