@@ -72,9 +72,6 @@ def run_listener():
     if not configfile:
         sys.exit(0)
 
-    # init our (future) scheduler
-    apscheduler = None
-
     # load the program config from our external config file
     load_config(config_file=configfile)
     if len(program_config) == 0:
