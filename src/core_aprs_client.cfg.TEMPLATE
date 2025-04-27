@@ -22,6 +22,10 @@ aprsis_tocall = APRS
 # Its contents are freely configurable and will be used in case
 # of program crashes (e.g. Telegram messages to the bot's host)
 aprs_client_name = Core APRS Client
+#
+# This is the bot's default error message. It will be sent to the user
+# whenever the input parser was unable to understand the user's message.
+aprs_input_parser_default_error_message = Did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client
 
 [network_config]
 #

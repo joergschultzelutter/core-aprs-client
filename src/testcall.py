@@ -75,8 +75,9 @@ def testcall(message_text: str, from_callsign: str):
         # If not, just dump the link to the instructions
         else:
             output_message = make_pretty_aprs_messages(
-                message_to_add="Sorry, did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client",
-                add_sep=False,
+                message_to_add=program_config["client_config"][
+                    "aprs_input_parser_default_error_message"
+                ],
             )
         logger.info(output_message)
         logger.info(msg=pformat(response_parameters))
@@ -104,4 +105,4 @@ if __name__ == "__main__":
     # This call will trigger the framework's input parser and its
     # output generator. Just add your call sign and your APRS message
     # text; the latter will then be processed by the input parser.
-    testcall(message_text="hello", from_callsign="DF1JSL-1")
+    testcall(message_text="fuckyou", from_callsign="DF1JSL-1")

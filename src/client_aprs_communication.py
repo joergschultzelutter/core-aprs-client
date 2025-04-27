@@ -403,7 +403,9 @@ def aprs_callback(raw_aprs_packet: dict):
                     # to the client whenever there is no generic error text from the input parser
                     else:
                         output_message = make_pretty_aprs_messages(
-                            message_to_add="Sorry, did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client",
+                            message_to_add=program_config["client_config"][
+                                "aprs_input_parser_default_error_message"
+                            ],
                             add_sep=False,
                         )
                         logger.info(
