@@ -58,6 +58,7 @@ def testcall(message_text: str, from_callsign: str):
     )
 
     logger.info(msg=pformat(response_parameters))
+    logger.info(msg=f"success: {success}")
     if success:
         # enrich our response parameters with all API keys that we need for
         # the completion of the remaining tasks. The APRS access details
@@ -70,7 +71,6 @@ def testcall(message_text: str, from_callsign: str):
         if input_parser_error_message:
             output_message = make_pretty_aprs_messages(
                 message_to_add=f"{input_parser_error_message}",
-                add_sep=False,
             )
         # If not, just dump the link to the instructions
         else:
@@ -105,4 +105,4 @@ if __name__ == "__main__":
     # This call will trigger the framework's input parser and its
     # output generator. Just add your call sign and your APRS message
     # text; the latter will then be processed by the input parser.
-    testcall(message_text="fuckyou", from_callsign="DF1JSL-1")
+    testcall(message_text="error", from_callsign="DF1JSL-1")

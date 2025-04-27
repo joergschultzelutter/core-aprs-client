@@ -396,7 +396,6 @@ def aprs_callback(raw_aprs_packet: dict):
                     if input_parser_error_message:
                         output_message = make_pretty_aprs_messages(
                             message_to_add=f"{input_parser_error_message}",
-                            add_sep=False,
                         )
                     # If not, just dump the link to the instructions
                     # This is the default branch which dumps generic information
@@ -406,7 +405,6 @@ def aprs_callback(raw_aprs_packet: dict):
                             message_to_add=program_config["client_config"][
                                 "aprs_input_parser_default_error_message"
                             ],
-                            add_sep=False,
                         )
                         logger.info(
                             msg=f"Unable to process APRS packet {raw_aprs_packet}"
