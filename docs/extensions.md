@@ -1,7 +1,9 @@
 # Extending `core-aprs-client` with your own bot processing code
 
+## Basic schematics
 ![Workflow Input-Output Processing](../img/workflow_input_output_processing.svg)
 
+## General Info
 > [!TIP]
 > - `client_input_parser.py` digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us.
 > - `client_output_generator.py` takes the data from `client_input_parser.py` and builds the outgoing message which is later to be sent to APRS-IS.
