@@ -20,7 +20,7 @@ This is where _you_ step in. Add your bot-specific code to the client's APRS fra
 
 ## Installation and Configuration
 
-## Installation instructions
+### Installation instructions
 Documentation on how to install the client to your computer can be found [here](docs/installation.md)
 
 ### Client Configuration
