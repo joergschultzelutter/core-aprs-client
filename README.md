@@ -18,19 +18,24 @@ This is where _you_ step in. Add your bot-specific code to the client's APRS fra
     - Support for APRS beaconing and bulletins
     - Program crash handler, allowing you to get notified in case the client crashes
 
-## Configuring the client
+## Installation and Configuration
+
+## Installation instructions
+Documentation on how to install the client to your computer can be found [here](docs/installation.md)
+
+### Configuring the client
 The steps for modifying the client's config file are described [here](docs/configuration.md).
 
-## Running the client
+### Running the client
 The steps for starting the client are described [here](docs/client_start.md).
 
-## Source Code Anatomy
+### Source Code Anatomy
 A brief overview on the software modules used by the client can be found [here](docs/anatomy.md).
 
-## Extending the client with your own code
+### Extending the client with your own code
 The steps for adding your own extensions to the client are described [here](docs/extensions.md).
 
-## Client schematics
+### Client schematics
 If you want to learn about the bot's basic processing structure, then have a look at [this diagram](docs/schematics.md).
 
 ## Known issues and caveats
