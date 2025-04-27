@@ -57,6 +57,9 @@ def parse_input_message(aprs_message: str, from_callsign: str):
     # Command #2 - "hello" keyword
     #              Sends a "Hello World" string to the user
     #              Internal command code = "sayhello"
+    # Command #3 - "error" keyword
+    #              Simulates an error (e.g. missing keyword parameter)
+    #              Internal command code = "sayhello"
     #
     # Due to simplicity reasons, the demo parser uses very crude code. For a
     # production release, you rather might want to use e.g. regular expressions

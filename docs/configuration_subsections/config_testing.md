@@ -15,6 +15,7 @@ The respective section from `core-aprs-client`'s config file lists as follows:
 #
 # Force outgoing unicode messages (default: false)
 # When set to 'true', outgoing content will allow UTF-8 encoding
+# When set to 'false', outgoing content will get downconverted to ASCII 7bit
 # Enabling this setting is only recommended for APRS-IS-to-APRS-IS testing
 aprsis_enforce_unicode_messages = false
 #

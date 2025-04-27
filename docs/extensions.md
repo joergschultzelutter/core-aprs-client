@@ -5,6 +5,7 @@
 > [!TIP]
 > - `client_input_parser.py` digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us.
 > - `client_output_generator.py` takes the data from `client_input_parser.py` and builds the outgoing message which is later to be sent to APRS-IS.
+> - You can always use 'testcall.py' for a 100% offline testing option.
 
 By default, `core-aprs-client`'s default installation comes with three keywords that you can send to its associated APRS call sign:
 

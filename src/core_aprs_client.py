@@ -42,7 +42,7 @@ from client_utils import (
     check_for_default_config,
 )
 from client_configuration import load_config, program_config
-from client_aprscomm import APRSISObject
+from client_aprsobject import APRSISObject
 from client_message_counter import APRSMessageCounter
 from client_expdict import create_expiring_dict, aprs_message_cache
 from client_aprs_communication import aprs_callback, init_scheduler_jobs

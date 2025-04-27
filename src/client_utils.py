@@ -409,7 +409,7 @@ def make_pretty_aprs_messages(
     separator_char: str = " ",
     add_sep: bool = True,
     force_outgoing_unicode_messages: bool = False,
-):
+) -> list:
     """
     Pretty Printer for APRS messages. As APRS messages are likely to be split
     up (due to the 67 chars message len limitation), this function prevents

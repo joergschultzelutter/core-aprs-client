@@ -31,7 +31,7 @@ from client_utils import (
 from _version import __version__
 from client_input_parser import parse_input_message
 from client_output_generator import generate_output_message
-from client_aprscomm import APRSISObject
+from client_aprsobject import APRSISObject
 import client_shared
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers import base as apbase
