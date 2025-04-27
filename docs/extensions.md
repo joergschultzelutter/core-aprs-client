@@ -8,10 +8,12 @@
 > - `client_input_parser.py` digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us.
 > - `client_output_generator.py` takes the data from `client_input_parser.py` and builds the outgoing message which is later to be sent to APRS-IS.
 
+## Usage of the offline test option for your bot integration
 > [!TIP]
-> - You can always use `testcall.py` for a 100% offline testing option which does not connect to APRS-IS. `testcall.py` will route a user's call sign and APRS message through both input parser and output generator modules.
+> - You can use [`testcall.py`](../src/testcall.py) for a 100% offline testing option which does not connect to APRS-IS. `testcall.py` will route a user's call sign and APRS message through both input parser and output generator modules.
 
-By default, `core-aprs-client`'s default installation comes with three keywords that you can send to its associated APRS call sign:
+## Implemented APRS Command Stubs
+By default, `core-aprs-client`'s default installation comes with three keywords that you can send to its associated APRS call sign. Once the client is up and running, it will process these keywords:
 
 | APRS Command Code | Purpose                                                                                                                                                                                                                                                                                                                                                   |
 |-------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -19,10 +21,10 @@ By default, `core-aprs-client`'s default installation comes with three keywords 
 | `hello`           | Generates a "Hello World" output string                                                                                                                                                                                                                                                                                                                   |
 | `error`           | Triggers the input processor's error mechanism and generates an input-processor specific error. This demo will use a fixed string with the value of `Triggered input processor error`. Your own input processor could use this mechanism in case e.g. a keyword expects an additional parameter which was not supplied to `core-aprs-client` by the user. |
 
-Any _other_ command that is sent to `core-aprs-client` will generate the bot's _generic_ error message, such as `Unknown command`.
+Any _other_ command that is sent to `core-aprs-client` will generate the bot's _generic_ error message which is defined in the [configuration file](configuration_subsections/config_client.md).
 
 > [!TIP]
-> For demonstration purposes, both `client_input_parser.py` and `client_output_generator.py` use a _very_ simplified processing algorithm. For your future code, you might want to implement proper parsing (e.g. by using regular expressions) and error handling.
+> For demonstration purposes, both `client_input_parser.py` and `client_output_generator.py` use a _VERY_ simplified processing algorithm. For your future code, you might want to implement proper parsing (e.g. by using regular expressions) and error handling.
 
 ## Extending the input parser `client_input_parser.py`
 

@@ -64,6 +64,10 @@ def parse_input_message(aprs_message: str, from_callsign: str):
     # Due to simplicity reasons, the demo parser uses very crude code. For a
     # production release, you rather might want to use e.g. regular expressions
     # for keyword parsing
+    #
+    # The internal command code will tell the output processor what to do. For mere
+    # illustration purposes, this code stub's internal command codes differ from
+    # the user's input (via the APRS message)
 
     # Initially assume that the user has sent us no valid keyword
     # This will trigger the output parser's error handler, thus allowing it
@@ -87,18 +91,35 @@ def parse_input_message(aprs_message: str, from_callsign: str):
     # Convert our APRS message string to lowercase
     aprs_message = aprs_message.lower()
 
-    # START of crude input data parser
+    # START of super crude input data parser
     if "greetings" in aprs_message:
+        # We found a valid command
         command_code = "greetme"
         success = True
     if "hello" in aprs_message:
+        # We found a valid command
         command_code = "sayhello"
         success = True
     if "error" in aprs_message:
+        # Simulate that we did NOT find a valid command
+        # Instead of using a default error message, we will use the
+        # value from the 'input_parser_error_message' instead.
+        #
+        # Note that whenever 'success == False', these commands will
+        # NOT be sent to the output processor for further processing.
+        # We did not figure out what the user wants from us, therefore
+        # there is nothing that we can do for the user.
+        #
+        # if 'input_parser_error_message' is pupulated AND 'success == False',
+        # the content from 'input_parser_error_message' will be returned to
+        # the user. If 'input_parser_error_message' is empty AND 'success == False',
+        # then the default error message will be sent to the user.
+        #
         input_parser_error_message = "Triggered input processor error"
         success = False
 
-    # our target dictionary
+    # our target dictionary that is going to be used by the output processor
+    # for further processing.
     response_parameters = {
         "from_callsign": from_callsign,
         "input_parser_error_message": input_parser_error_message,

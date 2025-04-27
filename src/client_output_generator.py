@@ -114,6 +114,10 @@ def generate_output_message(response_parameters: dict):
     #              Internal command code = "sayhello"
     #
     # Every other keyword will result in an error message
+    #
+    # The output processor takes input from a dictionary that was prepared by the
+    # input processor. Note that those cases where the input processor FAILED to
+    # guess the user's intentions will NOT be sent to this module.
 
     # First, let's assume that we are in a 'failed state' mode
     # value accordingly
@@ -125,8 +129,11 @@ def generate_output_message(response_parameters: dict):
         case "sayhello":
             return __process_sayhello_keyword(response_parameters=response_parameters)
         case _:
-            return False, ake_pretty_aprs_messages(
-                message_to_add="Unknown command keyword"
+            # Unless properly parsed via input processor, we should never reach this code
+            return False, make_pretty_aprs_messages(
+                message_to_add=program_config["client_config"][
+                    "aprs_input_parser_default_error_message"
+                ]
             )
 
 
