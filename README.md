@@ -23,7 +23,7 @@ This is where _you_ step in. Add your bot-specific code to the client's APRS fra
 ## Installation instructions
 Documentation on how to install the client to your computer can be found [here](docs/installation.md)
 
-### Configuring the client
+### Client Configuration
 The steps for modifying the client's config file are described [here](docs/configuration.md).
 
 ### Running the client
@@ -32,7 +32,7 @@ The steps for starting the client are described [here](docs/client_start.md).
 ### Source Code Anatomy
 A brief overview on the software modules used by the client can be found [here](docs/anatomy.md).
 
-### Extending the client with your own code
+### Extending the client with your own bot code
 The steps for adding your own extensions to the client are described [here](docs/extensions.md).
 
 ### Client schematics
