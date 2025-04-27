@@ -51,6 +51,23 @@ logger = logging.getLogger(__name__)
 
 
 def testcall(message_text: str, from_callsign: str):
+    # Get the command line params
+    configfile = get_command_line_params()
+    if not configfile:
+        sys.exit(0)
+
+    # load the program config from our external config file
+    load_config(config_file=configfile)
+    if len(program_config) == 0:
+        logger.info(msg="Program config file is empty or contains an error; exiting")
+        sys.exit(0)
+
+    # Register the on_exit function to be called on program exit
+    atexit.register(client_exception_handler)
+
+    # Set up the exception handler to catch unhandled exceptions
+    sys.excepthook = handle_exception
+
     logger.info(msg=f"parsing message '{message_text}' for callsign '{from_callsign}'")
 
     success, response_parameters = parse_input_message(
@@ -84,23 +101,6 @@ def testcall(message_text: str, from_callsign: str):
 
 
 if __name__ == "__main__":
-
-    # Get the command line params
-    configfile = get_command_line_params()
-    if not configfile:
-        sys.exit(0)
-
-    # load the program config from our external config file
-    load_config(config_file=configfile)
-    if len(program_config) == 0:
-        logger.info(msg="Program config file is empty or contains an error; exiting")
-        sys.exit(0)
-
-    # Register the on_exit function to be called on program exit
-    atexit.register(client_exception_handler)
-
-    # Set up the exception handler to catch unhandled exceptions
-    sys.excepthook = handle_exception
 
     # This call will trigger the framework's input parser and its
     # output generator. Just add your call sign and your APRS message
