@@ -1,5 +1,6 @@
 #
-# Core APRS Client: various APRS routines
+# Core APRS Client
+# Various APRS communication routines
 # Author: Joerg Schultze-Lutter, 2022
 #
 # This program is free software; you can redistribute it and/or modify
@@ -310,9 +311,7 @@ def aprs_callback(raw_aprs_packet: dict):
             and response_string not in ["ack", "rej"]
         ):
             # This is a message that belongs to us
-
-            # logger.info(msg=dump_string_to_hex(message_text_string))
-
+            #
             # Check if the message is present in our decaying message cache
             # If the message can be located, then we can assume that we have
             # processed (and potentially acknowledged) that message request

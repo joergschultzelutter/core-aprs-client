@@ -1,5 +1,6 @@
 #
-# Core APRS Client: Wrapper for APRS-IS communication
+# Core APRS Client
+# Wrapper for APRS-IS communication
 # Author: Joerg Schultze-Lutter, 2025
 #
 # aprslib does not allow us to pass additional parameters to its

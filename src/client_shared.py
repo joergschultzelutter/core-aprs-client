@@ -1,5 +1,6 @@
 #
-# Core APRS Client: Shared variables for 'aprslib' callback routine
+# Core APRS Client
+# Shared variables for 'aprslib' callback routine
 # Author: Joerg Schultze-Lutter, 2025
 #
 # aprslib does not allow us to pass additional parameters to its

@@ -1,5 +1,6 @@
 #
-# Core APRS Client: Wrapper for expiring dictionary
+# Core APRS Client
+# Wrapper for expiring dictionary / dupe detection
 # Author: Joerg Schultze-Lutter, 2025
 #
 # aprslib does not allow us to pass additional parameters to its

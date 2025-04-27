@@ -1,5 +1,6 @@
 #
-# Core APRS Client: Input parser stub
+# Core APRS Client
+# APRS input parser stub
 # Author: Joerg Schultze-Lutter, 2025
 #
 # This is the module where you check the incoming APRS message and

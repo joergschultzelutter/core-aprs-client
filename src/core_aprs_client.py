@@ -1,6 +1,7 @@
 #!/usr/local/bin/python3
 #
 # Core APRS Client
+# Main program
 # Author: Joerg Schultze-Lutter, 2025
 #
 # This program is free software; you can redistribute it and/or modify

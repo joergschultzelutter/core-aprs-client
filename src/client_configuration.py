@@ -1,5 +1,6 @@
 #
-# Core APRS Client: Wrapper for configparser data
+# Core APRS Client
+# Wrapper for configparser data
 # Author: Joerg Schultze-Lutter, 2025
 #
 # aprslib does not allow us to pass additional parameters to its

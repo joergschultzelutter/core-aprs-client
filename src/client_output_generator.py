@@ -1,5 +1,6 @@
 #
-# Core APRS Client: Output generator stub
+# Core APRS Client
+# APRS output generator stub
 # Author: Joerg Schultze-Lutter, 2025
 #
 # This is the module where you generate the outgoing APRS message
