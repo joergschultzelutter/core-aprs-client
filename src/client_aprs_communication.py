@@ -513,7 +513,7 @@ def init_scheduler_jobs():
             _aprsis_beacon_altitude_ft = str(program_config["beacon_config"]["aprsis_beacon_altitude_ft"]).zfill(6)[:6]
             # fmt:on
 
-            # generate our beacon string
+            # generate the APRS beacon string
             _beacon = f"={_aprsis_latitude}{_aprsis_table}{_aprsis_longitude}{_aprsis_symbol}{_aprsis_callsign} {__version__} /A={_aprsis_beacon_altitude_ft}"
 
             # and store it in a list item
