@@ -22,5 +22,8 @@ aprsis_enforce_unicode_messages = false
 # Simulates sending to APRS only, if set to true
 # (useful for initial testing purposes only)
 # Default: false
+#
+# false: receive AND SEND between program and APRS-IS
+# true: receive from APRS-IS, but don't send anything to APRS-IS
 aprsis_simulate_send = false
 ```
