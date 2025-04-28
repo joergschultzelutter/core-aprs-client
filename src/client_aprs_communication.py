@@ -514,7 +514,7 @@ def init_scheduler_jobs():
             # fmt:on
 
             # generate our beacon string
-            _beacon = f"{_aprsis_latitude}{_aprsis_table}{_aprsis_longitude}{_aprsis_symbol}{_aprsis_callsign} {__version__} /A={_aprsis_beacon_altitude_ft}"
+            _beacon = f"={_aprsis_latitude}{_aprsis_table}{_aprsis_longitude}{_aprsis_symbol}{_aprsis_callsign} {__version__} /A={_aprsis_beacon_altitude_ft}"
 
             # and store it in a list item
             aprs_beacon_messages: list = [_beacon]
