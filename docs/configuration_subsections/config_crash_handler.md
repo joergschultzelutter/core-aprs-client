@@ -30,3 +30,7 @@ apprise_config_file = apprise.yml
 # in case the program crashes
 nohup_filename = nohup.out
 ```
+
+All crash messages will be sent to Apprise - which will then forward the content to the messenger accounts configured in `apprise_config_file`. Dependent on whether the `nohup_filename` resource is available, that message might also contain this file as attachment. Example:
+
+![Crash Example](../../img/crash_example.jpg)
