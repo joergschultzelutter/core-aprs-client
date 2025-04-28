@@ -161,7 +161,7 @@ def send_aprs_message_list(
                 aprs_message_counter = 0
         if not simulate_send:
             logger.info(msg=f"Sending response message '{stringtosend}'")
-            myaprsis.ais_send(aprs_data=stringtosend)
+            myaprsis.ais_send(aprsis_data=stringtosend)
         else:
             logger.info(msg=f"Simulating response message '{stringtosend}'")
         time.sleep(packet_delay)
@@ -217,7 +217,7 @@ def send_beacon_and_status_msg(
         stringtosend = f"{_aprsis_callsign}>{_aprsis_tocall}:{bcn}"
         if not simulate_send:
             logger.info(msg=f"Sending beacon: {stringtosend}")
-            myaprsis.ais_send(aprs_data=stringtosend)
+            myaprsis.ais_send(aprsis_data=stringtosend)
             time.sleep(program_config["message_delay"]["packet_delay_other"])
         else:
             logger.info(msg=f"Simulating beacons: {stringtosend}")
