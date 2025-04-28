@@ -510,7 +510,7 @@ def init_scheduler_jobs():
             _aprsis_table = program_config["beacon_config"]["aprsis_table"]
             _aprsis_symbol = program_config["beacon_config"]["aprsis_symbol"]
             _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
-            _aprsis_beacon_altitude_ft = str(program_config["beacon_config"]["aprsis_beacon_altitude_ft"])[:6]
+            _aprsis_beacon_altitude_ft = str(program_config["beacon_config"]["aprsis_beacon_altitude_ft"]).zfill(6)[:6]
             # fmt:on
 
             # generate our beacon string
