@@ -484,8 +484,8 @@ def make_pretty_aprs_messages(
         destination_list = []
 
     # replace non-permitted APRS characters from the
-    # message text
-    # see APRS specification pg. 71
+    # message text as APRS-IS might choke on this content
+    # Details: see APRS specification pg. 71
     message_to_add = re.sub("[{}|~]+", "", message_to_add)
 
     # Check if the user wants unicode messages. Default is ASCII
