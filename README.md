@@ -16,7 +16,7 @@ This is where _you_ step in. Add your bot-specific code to the client's APRS fra
 - Configurable dupe message handler
 - Optional:
     - Support for APRS beaconing and bulletins
-    - Program crash handler, allowing you to get notified in case the client crashes
+    - Program crash handler, allowing you to get notified in case the client program crashes
 
 ## Installation and Configuration
 
