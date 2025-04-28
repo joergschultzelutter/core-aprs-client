@@ -51,6 +51,23 @@ logger = logging.getLogger(__name__)
 
 
 def testcall(message_text: str, from_callsign: str):
+    """
+    Simulates an external call from APRS-IS. You can use this
+    function for integration testing. It performs the same
+    steps as core-aprs-client's live routines - but everything
+    happens 100% offline and there is no communication between
+    the program and APRS-IS.
+
+    Parameters
+    ==========
+    message_text: 'str'
+       The incoming APRS message. 1..67 bytes in length
+    from_callsign: 'str'
+       The sender's call sign
+
+    Returns
+    =======
+    """
     # Get the command line params
     configfile = get_command_line_params()
     if not configfile:
