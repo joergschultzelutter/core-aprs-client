@@ -20,7 +20,6 @@
 #
 import sys
 import signal
-import logging
 import aprslib
 from expiringdict import ExpiringDict
 import json
@@ -46,12 +45,7 @@ from client_aprsobject import APRSISObject
 from client_message_counter import APRSMessageCounter
 from client_expdict import create_expiring_dict, aprs_message_cache
 from client_aprs_communication import aprs_callback, init_scheduler_jobs
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(module)s -%(levelname)s - %(message)s",
-)
-logger = logging.getLogger(__name__)
+from client_logger import logger
 
 
 def run_listener():

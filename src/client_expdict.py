@@ -21,14 +21,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-import logging
 from expiringdict import ExpiringDict
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(module)s -%(levelname)s - %(message)s",
-)
-logger = logging.getLogger(__name__)
+from client_logger import logger
 
 #
 # This is our (future) global variable for the expiring dictionary

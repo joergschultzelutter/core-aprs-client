@@ -21,7 +21,6 @@ from expiringdict import ExpiringDict
 import datetime
 import hashlib
 import os
-import logging
 from unidecode import unidecode
 import argparse
 import zipfile
@@ -29,12 +28,8 @@ import sys
 import apprise
 import re
 from client_configuration import program_config
+from client_logger import logger
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(module)s -%(levelname)s - %(message)s",
-)
-logger = logging.getLogger(__name__)
 
 # These are global variables which will be used
 # in case of an uncaught exception where we send
