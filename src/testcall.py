@@ -35,19 +35,14 @@ from client_utils import (
 )
 from client_input_parser import parse_input_message
 from client_output_generator import generate_output_message
-import logging
 from pprint import pformat
 import sys
 import atexit
 from client_configuration import load_config, program_config
+from client_logger import logger
 
 exception_occurred = False
 ex_type = ex_value = ex_traceback = None
-
-logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s %(module)s -%(levelname)s- %(message)s"
-)
-logger = logging.getLogger(__name__)
 
 
 def testcall(message_text: str, from_callsign: str):

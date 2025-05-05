@@ -19,7 +19,6 @@
 #
 
 import aprslib
-import logging
 import time
 from client_configuration import program_config
 from client_utils import (
@@ -33,13 +32,9 @@ from client_input_parser import parse_input_message
 from client_output_generator import generate_output_message
 from client_aprsobject import APRSISObject
 import client_shared
+from client_logger import logger
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers import base as apbase
-
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s %(module)s -%(levelname)s- %(message)s"
-)
-logger = logging.getLogger(__name__)
 
 
 def send_ack(
