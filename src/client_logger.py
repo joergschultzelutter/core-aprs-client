@@ -23,6 +23,8 @@
 #
 import logging
 
+# Change the logging level to logging.DEBUG if you want to see more
+# content in the program's log file.
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(module)s -%(levelname)s - %(message)s",
