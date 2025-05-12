@@ -74,14 +74,14 @@ def send_ack(
     """
 
     if source_msg_no:
-        logger.info(msg="Preparing acknowledgment receipt")
+        logger.debug(msg="Preparing acknowledgment receipt")
         stringtosend = f"{alias}>{tocall}::{users_callsign:9}:ack{source_msg_no}"
         if not simulate_send:
-            logger.info(msg=f"Sending acknowledgment receipt: {stringtosend}")
+            logger.debug(msg=f"Sending acknowledgment receipt: {stringtosend}")
             myaprsis.ais_send(aprsis_data=stringtosend)
             time.sleep(packet_delay)
         else:
-            logger.info(msg=f"Simulating acknowledgment receipt: {stringtosend}")
+            logger.debug(msg=f"Simulating acknowledgment receipt: {stringtosend}")
 
 
 def send_aprs_message_list(
@@ -155,10 +155,10 @@ def send_aprs_message_list(
             ):  # for the alphanumeric counter AA..ZZ, this is equal to "ZZ"
                 aprs_message_counter = 0
         if not simulate_send:
-            logger.info(msg=f"Sending response message '{stringtosend}'")
+            logger.debug(msg=f"Sending response message '{stringtosend}'")
             myaprsis.ais_send(aprsis_data=stringtosend)
         else:
-            logger.info(msg=f"Simulating response message '{stringtosend}'")
+            logger.debug(msg=f"Simulating response message '{stringtosend}'")
         time.sleep(packet_delay)
     return aprs_message_counter
 
@@ -201,7 +201,7 @@ def send_beacon_and_status_msg(
     =======
     none
     """
-    logger.info(msg="Reached beacon interval; sending beacons")
+    logger.debug(msg="Reached beacon interval; sending beacons")
 
     # Generate some local variables because the 'black' beautifier seems
     # to choke on multi-dimensional dictionaries
@@ -211,11 +211,11 @@ def send_beacon_and_status_msg(
     for bcn in aprs_beacon_messages:
         stringtosend = f"{_aprsis_callsign}>{_aprsis_tocall}:{bcn}"
         if not simulate_send:
-            logger.info(msg=f"Sending beacon: {stringtosend}")
+            logger.debug(msg=f"Sending beacon: {stringtosend}")
             myaprsis.ais_send(aprsis_data=stringtosend)
             time.sleep(program_config["message_delay"]["packet_delay_other"])
         else:
-            logger.info(msg=f"Simulating beacons: {stringtosend}")
+            logger.debug(msg=f"Simulating beacons: {stringtosend}")
 
 
 def send_bulletin_messages(
@@ -240,7 +240,7 @@ def send_bulletin_messages(
     =======
     none
     """
-    logger.info(msg="reached bulletin interval; sending bulletins")
+    logger.debug(msg="reached bulletin interval; sending bulletins")
 
     # Generate some local variables because the 'black' beautifier seems
     # to choke on multi-dimensional dictionaries
@@ -250,11 +250,11 @@ def send_bulletin_messages(
     for recipient_id, bln in bulletin_dict.items():
         stringtosend = f"{_aprsis_callsign}>{_aprsis_tocall}::{recipient_id:9}:{bln}"
         if not simulate_send:
-            logger.info(msg=f"Sending bulletin: {stringtosend}")
+            logger.debug(msg=f"Sending bulletin: {stringtosend}")
             myaprsis.ais_send(aprsis_data=stringtosend)
             time.sleep(program_config["message_delay"]["packet_delay_other"])
         else:
-            logger.info(msg=f"simulating bulletins: {stringtosend}")
+            logger.debug(msg=f"simulating bulletins: {stringtosend}")
 
 
 # APRSlib callback
@@ -356,8 +356,8 @@ def aprs_callback(raw_aprs_packet: dict):
                     aprs_message=message_text_string,
                     from_callsign=from_callsign,
                 )
-                logger.info(msg=f"Input parser result: {success}")
-                logger.info(msg=response_parameters)
+                logger.debug(msg=f"Input parser result: {success}")
+                logger.debug(msg=response_parameters)
                 #
                 # If the 'success' parameter is True, then we should know
                 # by now what the user wants from us. Now, we'll leave it to
@@ -401,7 +401,7 @@ def aprs_callback(raw_aprs_packet: dict):
                                 "aprs_input_parser_default_error_message"
                             ],
                         )
-                        logger.info(
+                        logger.debug(
                             msg=f"Unable to process APRS packet {raw_aprs_packet}"
                         )
 
@@ -467,7 +467,7 @@ def init_scheduler_jobs():
 
         if program_config["beacon_config"]["aprsis_broadcast_beacon"]:
             # Send initial beacon after establishing the connection to APRS_IS
-            logger.info(
+            logger.debug(
                 msg="Send initial beacon after establishing the connection to APRS_IS"
             )
 
@@ -564,6 +564,31 @@ def init_scheduler_jobs():
         my_scheduler = None
 
     return my_scheduler
+
+
+def remove_scheduler(aprs_scheduler: BackgroundScheduler):
+    """
+    Shuts down and the scheduler whereas present.
+
+    Parameters
+    ==========
+    aprs_scheduler: BackgroundScheduler object or 'None' if no scheduler was initialized.
+
+    Returns
+    =======
+
+    """
+    # If the scheduler object exists, then try to pause it before it gets destroyed
+    if type(aprs_scheduler) == BackgroundScheduler:
+        logger.debug(msg="Pausing aprs_scheduler")
+        aprs_scheduler.pause()
+        aprs_scheduler.remove_all_jobs()
+        logger.debug(msg="Shutting down aprs_scheduler")
+        if aprs_scheduler.state != apbase.STATE_STOPPED:
+            try:
+                aprs_scheduler.shutdown()
+            except:
+                logger.debug(msg="Exception during scheduler shutdown SystemExit loop")
 
 
 if __name__ == "__main__":

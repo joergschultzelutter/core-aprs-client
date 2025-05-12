@@ -64,6 +64,8 @@ class APRSMessageCounter:
 
         """
 
+        logger.debug(msg="Creating APRS message counter object...")
+
         # Initially, assume that our source file does not exist
         self.counter = 0
 
@@ -75,7 +77,7 @@ class APRSMessageCounter:
                     self.counter = int(contents)
         except (FileNotFoundError, Exception):
             self.counter = 0
-            logger.info(
+            logger.debug(
                 msg=f"Cannot read content from message counter file {self.file_name}; will create a new file"
             )
 
@@ -90,12 +92,13 @@ class APRSMessageCounter:
         =======
 
         """
+        logger.debug(msg="Writing APRS message counter object to disk ...")
         try:
             with open(f"{self.file_name}", "w") as f:
                 f.write("%d" % self.counter)
                 f.close()
         except (IOError, OSError):
-            logger.info(msg=f"Cannot write message counter to {self.file_name}")
+            logger.debug(msg=f"Cannot write message counter to {self.file_name}")
 
     def get_counter(self):
         """
