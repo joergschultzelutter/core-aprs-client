@@ -27,8 +27,6 @@ from uuid import uuid1
 import time
 from datetime import datetime
 import atexit
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.schedulers import base as apbase
 import os
 
 import client_shared
@@ -44,7 +42,11 @@ from client_configuration import load_config, program_config
 from client_aprsobject import APRSISObject
 from client_message_counter import APRSMessageCounter
 from client_expdict import create_expiring_dict, aprs_message_cache
-from client_aprs_communication import aprs_callback, init_scheduler_jobs
+from client_aprs_communication import (
+    aprs_callback,
+    init_scheduler_jobs,
+    remove_scheduler,
+)
 from client_logger import logger
 
 
@@ -70,7 +72,7 @@ def run_listener():
     # load the program config from our external config file
     load_config(config_file=configfile)
     if len(program_config) == 0:
-        logger.info(msg="Program config file is empty or contains an error; exiting")
+        logger.error(msg="Program config file is empty or contains an error; exiting")
         sys.exit(0)
 
     # And check if the user still runs with the default config
@@ -83,7 +85,7 @@ def run_listener():
     #
     # if you are not interested in a post-mortem call stack, remove the following
     # two lines
-    logger.info(msg=f"Activating bot exception handler")
+    logger.debug(msg=f"Activating bot exception handler")
     atexit.register(client_exception_handler)
     sys.excepthook = handle_exception
 
@@ -97,7 +99,6 @@ def run_listener():
 
     #
     # Read the message counter
-    logger.info(msg="Creating APRS message counter object...")
     client_shared.aprs_message_counter = APRSMessageCounter(
         file_name=program_config["data_storage"]["aprs_message_counter_file_name"]
     )
@@ -109,7 +110,7 @@ def run_listener():
     )
 
     # Register the SIGTERM handler; this will allow a safe shutdown of the program
-    logger.info(msg="Registering SIGTERM handler for safe shutdown...")
+    logger.debug(msg="Registering SIGTERM handler for safe shutdown...")
     signal.signal(signal.SIGTERM, signal_term_handler)
 
     # Enter the 'eternal' receive loop
@@ -123,20 +124,8 @@ def run_listener():
                 aprsis_filter=program_config["network_config"]["aprsis_server_filter"],
             )
 
-            # Establish the connection to APRS-IS
-            # create a couple of local variables as the 'black' prettifier seems to
-            # choke on multi-dimensional dictionaries
-            # fmt:off
-            _aprsis_server_name = program_config["network_config"]["aprsis_server_name"]
-            _aprsis_server_port = str(program_config["network_config"]["aprsis_server_port"])
-            _aprsis_server_filter = program_config["network_config"]["aprsis_server_filter"]
-            _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
-            _aprsis_passcode = str(program_config["network_config"]["aprsis_passcode"])
-            # fmt: on
-
-            logger.info(
-                msg=f"Establishing connection to APRS-IS: server={_aprsis_server_name}, port={_aprsis_server_port}, filter={_aprsis_server_filter}, APRS-IS passcode={_aprsis_passcode}, APRS-IS User = {_aprsis_callsign}"
-            )
+            # Connect to APRS-IS
+            logger.debug(msg="Establishing connection to APRS-IS...")
             client_shared.AIS.ais_connect()
 
             # Are we connected?
@@ -156,70 +145,43 @@ def run_listener():
 
                 #
                 # We have left the callback, let's clean up a few things
-                logger.info(msg="Have left the callback consumer")
+                logger.debug(msg="Have left the callback consumer")
                 #
                 # First, stop all schedulers. Then remove the associated jobs
                 # This will prevent the beacon/bulletin processes from sending out
                 # messages to APRS_IS
                 # Note that the scheduler might not be active - its existence depends
                 # on the user's configuration file settings.
-                if aprs_scheduler:
-                    # pause the scheduler and remove all jobs
-                    aprs_scheduler.pause()
-                    aprs_scheduler.remove_all_jobs()
-                    if (
-                        aprs_scheduler.state
-                        != apscheduler.schedulers.base.STATE_STOPPED
-                    ):
-                        try:
-                            aprs_scheduler.shutdown()
-                        except:
-                            logger.info(
-                                msg="Exception during scheduler shutdown eternal loop"
-                            )
+                remove_scheduler(aprs_scheduler=aprs_scheduler)
 
-                #
-                # close connection
+                # close the connection to APRS-IS
                 logger.debug(msg="Closing APRS connection to APRS-IS")
                 client_shared.AIS.ais_close()
                 client_shared.AIS = None
             else:
-                logger.info(msg="Cannot re-establish connection to APRS-IS")
+                logger.debug(msg="Cannot re-establish connection to APRS-IS")
 
             # Write current number of packets to disk
-            logger.info(msg="Writing APRS message counter object to disk ...")
             client_shared.aprs_message_counter.write_counter()
 
             # Enter sleep mode and then restart the loop
-            logger.info(msg=f"Sleeping ...")
+            logger.debug(msg=f"Sleeping ...")
             time.sleep(program_config["message_delay"]["packet_delay_message"])
 
     except (KeyboardInterrupt, SystemExit):
         # Tell the user that we are about to terminate our work
-        logger.info(
+        logger.debug(
             msg="KeyboardInterrupt or SystemExit in progress; shutting down ..."
         )
 
         # write most recent APRS message counter to disk
-        logger.info(msg="Writing APRS message counter object to disk ...")
         client_shared.aprs_message_counter.write_counter()
 
-        if aprs_scheduler:
-            logger.info(msg="Pausing aprs_scheduler")
-            aprs_scheduler.pause()
-            aprs_scheduler.remove_all_jobs()
-            logger.info(msg="Shutting down aprs_scheduler")
-            if aprs_scheduler.state != apbase.STATE_STOPPED:
-                try:
-                    aprs_scheduler.shutdown()
-                except:
-                    logger.info(
-                        msg="Exception during scheduler shutdown SystemExit loop"
-                    )
+        # Shutdown (and remove) the scheduler if it still exists
+        remove_scheduler(aprs_scheduler=aprs_scheduler)
 
         # Close APRS-IS connection whereas still present
         if client_shared.AIS.ais_is_connected():
-            logger.info(msg="Closing connection to APRS-IS")
             client_shared.AIS.ais_close()
 
 

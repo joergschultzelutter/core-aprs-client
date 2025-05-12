@@ -75,6 +75,10 @@ class APRSISObject:
            Our APRS-IS object
         """
 
+        logger.debug(
+            msg=f"Configuring APRS object: server={self.aprsis_host}, port={self.aprsis_port}, filter={self.aprsis_filter}, APRS-IS passcode={self.aprsis_passwd}, APRS-IS User = {self.aprsis_callsign}"
+        )
+
         self.AIS = aprslib.IS(
             callsign=self.aprsis_callsign,
             passwd=self.aprsis_passwd,
@@ -146,7 +150,7 @@ class APRSISObject:
         """
         # Close APRS-IS connection whereas still present
         if type(self.AIS) is aprslib.inet.IS:
-            logger.info(msg="Closing connection to APRS-IS")
+            logger.debug(msg="Closing connection to APRS-IS")
             self.AIS.close()
             self.AIS = None
         else:

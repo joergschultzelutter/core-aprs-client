@@ -71,7 +71,7 @@ def testcall(message_text: str, from_callsign: str):
     # load the program config from our external config file
     load_config(config_file=configfile)
     if len(program_config) == 0:
-        logger.info(msg="Program config file is empty or contains an error; exiting")
+        logger.error(msg="Program config file is empty or contains an error; exiting")
         sys.exit(0)
 
     # Register the on_exit function to be called on program exit

@@ -188,7 +188,7 @@ def get_command_line_params():
     configfile = args.configfile.name
 
     if not check_if_file_exists(file_name=configfile):
-        logger.info(msg="Config file does not exist; exiting")
+        logger.error(msg="Config file does not exist; exiting")
         sys.exit(0)
 
     return configfile
@@ -270,7 +270,7 @@ def signal_term_handler(signal_number, frame):
     =======
     """
 
-    logger.info(msg="Received SIGTERM; forcing clean program exit")
+    logger.debug(msg="Received SIGTERM; forcing clean program exit")
     sys.exit(0)
 
 
@@ -380,19 +380,19 @@ def check_and_create_data_directory(
     success = True
     _data_directory = os.path.join(root_path_name, relative_path_name)
     if not os.path.exists(_data_directory):
-        logger.info(
+        logger.debug(
             msg=f"Data directory {_data_directory} does not exist, creating ..."
         )
         try:
             os.mkdir(path=_data_directory)
         except OSError:
-            logger.info(
+            logger.error(
                 msg=f"Cannot create data directory {_data_directory}, aborting ..."
             )
             success = False
     else:
         if not os.path.isdir(_data_directory):
-            logger.info(msg=f"{_data_directory} is not a directory, aborting ...")
+            logger.error(msg=f"{_data_directory} is not a directory, aborting ...")
             success = False
     return success
 
@@ -599,7 +599,7 @@ def parse_bulletin_data(core_config: dict):
                 # used characters in the actual message which are special to APRS
                 match = re.findall(r"[{}|~]+", value)
                 if match:
-                    logger.info(
+                    logger.debug(
                         msg=f"APRS bulletin message '{key}': removing special APRS characters from 'value' setting; check your configuration file"
                     )
                     # Let's get rid of those control characters from the message
@@ -689,7 +689,7 @@ def handle_exception(exc_type, exc_value, exc_traceback):
     ex_value = exc_value
     ex_traceback = exc_traceback
 
-    logger.info(f"Core process has received uncaught exception: {exc_value}")
+    logger.debug(f"Core process has received uncaught exception: {exc_value}")
 
     # and continue with the regular flow of things
     sys.__excepthook__(exc_type, exc_value, exc_traceback)

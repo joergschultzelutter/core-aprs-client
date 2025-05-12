@@ -50,7 +50,7 @@ def create_expiring_dict(max_len: int, max_age_seconds: int):
 
     # Create the decaying APRS message cache. Any APRS message that is present in
     # this cache will be considered as a duplicate / delayed and will not be processed
-    logger.info(
+    logger.debug(
         msg=f"APRS message dupe cache set to {str(max_len)} max possible entries and a TTL of {str(max_age_seconds / 60)} mins"
     )
     aprs_message_cache = ExpiringDict(
