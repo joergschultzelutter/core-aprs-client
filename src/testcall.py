@@ -32,6 +32,7 @@ from client_utils import (
     client_exception_handler,
     handle_exception,
     get_command_line_params,
+    finalize_pretty_aprs_messages,
 )
 from client_input_parser import parse_input_message
 from client_output_generator import generate_output_message
@@ -93,7 +94,9 @@ def testcall(message_text: str, from_callsign: str):
         # the completion of the remaining tasks. The APRS access details
         # are not known and will be set to simulation mode
         logger.info(msg="Response:")
-        logger.info(msg=pformat(generate_output_message(response_parameters)))
+        output_message = generate_output_message(response_parameters)
+        output_message = finalize_pretty_aprs_messages(mylistarray=output_message)
+        logger.info(msg=pformat(output_message))
     else:
         input_parser_error_message = response_parameters["input_parser_error_message"]
         # Dump the HRM to the user if we have one
@@ -108,12 +111,16 @@ def testcall(message_text: str, from_callsign: str):
                     "aprs_input_parser_default_error_message"
                 ],
             )
-        logger.info(output_message)
+        # Ultimately, finalize the outgoing message(s) and add the message
+        # numbers if the user has requested this in his configuration
+        # settings
+        output_message = finalize_pretty_aprs_messages(mylistarray=output_message)
+
+        logger.info(pformat(output_message))
         logger.info(msg=pformat(response_parameters))
 
 
 if __name__ == "__main__":
-
     # This call will trigger the framework's input parser and its
     # output generator. Just add your call sign and your APRS message
     # text; the latter will then be processed by the input parser.

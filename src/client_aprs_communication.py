@@ -26,6 +26,7 @@ from client_utils import (
     get_aprs_message_from_cache,
     add_aprs_message_to_cache,
     parse_bulletin_data,
+    finalize_pretty_aprs_messages,
 )
 from _version import __version__
 from client_input_parser import parse_input_message
@@ -404,6 +405,13 @@ def aprs_callback(raw_aprs_packet: dict):
                         logger.debug(
                             msg=f"Unable to process APRS packet {raw_aprs_packet}"
                         )
+
+                # Ultimately, finalize the outgoing message(s) and add the message
+                # numbers if the user has requested this in his configuration
+                # settings
+                output_message = finalize_pretty_aprs_messages(
+                    mylistarray=output_message
+                )
 
                 # Send our message(s) to APRS-IS
                 _aprs_msg_count = send_aprs_message_list(
