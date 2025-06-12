@@ -29,7 +29,7 @@ import apprise
 import re
 from client_configuration import program_config
 from client_logger import logger
-
+import sys
 
 # These are global variables which will be used
 # in case of an uncaught exception where we send
@@ -37,6 +37,41 @@ from client_logger import logger
 # program's stack trace
 exception_occurred = False
 ex_type = ex_value = ex_traceback = None
+
+# maximum APRS message lengths with and without trailing
+# message number in the outgoing message
+#
+# When trailing message numbers are activated, the message
+# ALWAYS ends with a trailing " (xx/yy)" string whereas
+# xx - current message number
+# yy - max message number
+APRS_MSG_LEN_TRAILING = 59
+APRS_MSG_LEN_NOTRAILING = 67
+
+
+def _get_aprs_msg_len() -> int:
+    """
+    Internal helper function which determines the maximum length of a single APRS message.
+    The corresponding value is dependent on whether the user has activated trailing
+    message numbers for the outgoing APRS message or not.
+
+    Parameters
+    ==========
+
+    Returns
+    =======
+    aprs_msg_len: 'int'
+        trailing message no enabled: 59
+        trailing message no disabled: 67
+    """
+    if "__main__" not in sys.modules:
+        return (
+            APRS_MSG_LEN_TRAILING
+            if program_config["client_config"]["aprs_message_enumeration"]
+            else APRS_MSG_LEN_NOTRAILING
+        )
+    else:
+        return APRS_MSG_LEN_TRAILING
 
 
 def add_aprs_message_to_cache(
@@ -174,6 +209,18 @@ def convert_text_to_plain_ascii(message_string: str):
 
 
 def get_command_line_params():
+    """
+    Gets and returns the command line arguments
+
+    Parameters
+    ==========
+
+    Returns
+    =======
+    configfile: 'str'
+        name of the configuration file
+    """
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -400,7 +447,7 @@ def check_and_create_data_directory(
 def make_pretty_aprs_messages(
     message_to_add: str,
     destination_list: list = None,
-    max_len: int = 67,
+    max_len: int = _get_aprs_msg_len(),
     separator_char: str = " ",
     add_sep: bool = True,
     force_outgoing_unicode_messages: bool = False,
@@ -451,7 +498,11 @@ def make_pretty_aprs_messages(
         List with string elements which will be enriched with the
         'mesage_to_add' string. Default: empty list aka user wants new list
     max_len: 'int':
-        Max length of the list's string len. 67 for APRS messages
+        Max length of the list's string len.
+        The length is dependent on whether the user has activated trailing
+        message number information in the outgoing message or not.
+        When activated, the message length is 59 - otherwise, it is 67.
+        _get_aprs_msg_len() auto-determines the appropriate value.
     separator_char: 'str'
         Separator that is going to be used for dividing the single
         elements that the user is going to add
@@ -538,7 +589,9 @@ def make_pretty_aprs_messages(
     return destination_list
 
 
-def split_string_to_string_list(message_string: str, max_len: int = 67):
+def split_string_to_string_list(
+    message_string: str, max_len: int = _get_aprs_msg_len()
+):
     """
     Force-split the string into chunks of max_len size and return a list of
     strings. This function is going to be called if the string that the user
@@ -552,7 +605,11 @@ def split_string_to_string_list(message_string: str, max_len: int = 67):
         message string that is to be divided into 1..n strings of 'max_len"
         text length
     max_len: 'int':
-        Max length of the list's string len. Default = 67 for APRS messages
+        Max length of the list's string len.
+        The length is dependent on whether the user has activated trailing
+        message number information in the outgoing message or not.
+        When activated, the message length is 59 - otherwise, it is 67.
+        _get_aprs_msg_len() auto-determines the appropriate value.
 
     Returns
     =======
@@ -587,7 +644,7 @@ def parse_bulletin_data(core_config: dict):
     # Get the key and value from our configuration file's bulletin messages section
     for key, value in core_config["bulletin_messages"].items():
         # Message populated and less than max APRS message length?
-        if 0 < len(value) <= 67:
+        if 0 < len(value) <= _get_aprs_msg_len():
             # Check if the identifier follows these APRS requirements:
             # 1) must start with fixed "BLN" string
             # 2) needs to be followed by 1..6 ASCII-7 characters and/or digits
@@ -717,6 +774,75 @@ def check_for_default_config():
         logger.error(
             msg="'aprsis_callsign' is still set to default config; change config file ASAP"
         )
+
+
+def format_list_with_enumeration(mylistarray: list) -> list:
+    """
+    Adds a trailing enumeration to the list if the user has activated this configuration in
+    the client's config file
+
+    Parameters
+    ==========
+
+    Returns
+    =======
+    listitem: 'list'
+        Either formatted list (if more than one list entry was present) or
+        the original list item
+    """
+
+    max_total_length = APRS_MSG_LEN_NOTRAILING
+    annotation_length = APRS_MSG_LEN_NOTRAILING - APRS_MSG_LEN_TRAILING
+    max_content_length = max_total_length - annotation_length
+
+    # check if we have more than 99 entries. We always truncate the list (just to be
+    # on the safe side) but whenever more than 99 entries were detected, we also supply
+    # the user with a warning message and notify him about the truncation
+    if len(mylistarray) > 99:
+        logger.warning(
+            msg="User has supplied list with more than 99 elements; truncating"
+        )
+    trimmed_listarray = mylistarray[:99]
+    total = len(trimmed_listarray)
+
+    # now let's add the enumeration to the list - but only if we have
+    # more than one list item in our outgoing list
+    if len(trimmed_listarray) > 1:
+        formatted_list = []
+        for i, s in enumerate(trimmed_listarray, start=1):
+            annotation = f" ({i:02d}/{total:02d})"
+            truncated = s[:max_content_length]
+            padded = truncated.ljust(max_content_length)
+            final = padded + annotation
+            formatted_list.append(final)
+
+        return formatted_list
+    else:
+        # return the original list to the user
+        return trimmed_listarray
+
+
+def finalize_pretty_aprs_messages(mylistarray: list) -> list:
+    """
+    Helper method which finalizes the prettified APRS messages
+    and triggers the addition of the trailing message numbers (if
+    activated by the user).
+
+    Parameters
+    ==========
+    mylistarray: 'list'
+        List of APRS messages
+
+    Returns
+    =======
+    listitem: 'list'
+        Either formatted list (if more than one list entry was present) or
+        the original list item
+    """
+    if program_config["client_config"]["aprs_message_enumeration"]:
+        return format_list_with_enumeration(mylistarray=mylistarray)
+    else:
+        return mylistarray
 
 
 if __name__ == "__main__":

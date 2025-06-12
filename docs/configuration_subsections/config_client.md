@@ -17,10 +17,11 @@ You _*need*_ to modify the following values:
 
 The following settings are optional:
 
-| Config variable                           | Type  | Default value                                                                                                                 | Description                                                                                                                                                                                                                                                                                                                               |
-|-------------------------------------------|-------|-------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `aprs_client_name`                        | `str` | `Core APRS Client`                                                                                                            | Used whenever the (optional) [Apprise messaging](https://www.github.com/caronc/apprise) handler has to inform you of a program crash. See [the 'Crash Handler'](config_crash_handler.md) section for details. You should change this value to your own installation's program name - but there is no harm in keeping the default setting. |
-| `aprs_input_parser_default_error_message` | `str` | `Did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client` | This is the bot's default error message. It will be sent to the user whenever the input parser was unable to understand the user's message.                                                                                                                                                                                               |
+| Config variable                           | Type      | Default value                                                                                                                 | Description                                                                                                                                                                                                                                                                                                                               |
+|-------------------------------------------|-----------|-------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `aprs_client_name`                        | `str`     | `Core APRS Client`                                                                                                            | Used whenever the (optional) [Apprise messaging](https://www.github.com/caronc/apprise) handler has to inform you of a program crash. See [the 'Crash Handler'](config_crash_handler.md) section for details. You should change this value to your own installation's program name - but there is no harm in keeping the default setting. |
+| `aprs_input_parser_default_error_message` | `str`     | `Did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client` | This is the bot's default error message. It will be sent to the user whenever the input parser was unable to understand the user's message.                                                                                                                                                                                               |
+| `aprs_message_enumeration`                | `boolean` | `False`                                                                                                                       | When set to `True`, outgoing messages will get enumerated (in case there is more than one message present). This change will allow the recipient to identify the correct order of multi-APRS messages. Note that by activating this option, the effective message content per APRS message gets reduced from 67 to 59 bytes.              |
 
 The respective section from `core-aprs-client`'s config file lists as follows:
 
@@ -48,4 +49,35 @@ aprs_client_name = Core APRS Client
 # This is the bot's default error message. It will be sent to the user
 # whenever the input parser was unable to understand the user's message.
 aprs_input_parser_default_error_message = Did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client
+#
+# This is the bot's default error message. It will be sent to the user
+# whenever the input parser was unable to understand the user's message.
+aprs_input_parser_default_error_message = Did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client
+#
+# Enable or disable message enumeration.
+# message enumeration = True:  add trailing two-digit message number to the
+#                              end of each message. Content for the max msg
+#                              len gets reduced to 59 characters (excluding
+#                              message number)
+# message enumeration = False: do not add trailing message number to the end
+#                              of each message. Message len stays at 67 chars
+#
+# Default setting: message enumeration = False
+#
+aprs_message_enumeration = False
 ```
+
+> [!CAUTION]
+> In case message enumeration is activated AND the user has generated more than 99 outgoing messages,
+> any _additional_ messages (exceeding those 99 messages) will be purged from the outgoing queue.
+
+Sample outputs:
+
+`aprs_message_enumeration` = `False`:
+
+- Output for list element 1 = `123456789012345678901234567890123456789012345678901234567890`
+- Output for list element 2 = `12345678901234567890123456789012345678901234567890`
+
+`aprs_message_enumeration` = `True` (underscore characters represent spaces):
+- Output for list element 1 = `1234567890123456789012345678901234567890123456789012345_____(01/02)`
+- Output for list element 1 = `12345678901234567890123456789012345678901234567890__________(02/02)`
