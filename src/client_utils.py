@@ -802,7 +802,10 @@ def format_list_with_enumeration(mylistarray: list) -> list:
         logger.warning(
             msg="User has supplied list with more than 99 elements; truncating"
         )
-    trimmed_listarray = mylistarray[:99]
+        trimmed_listarray = mylistarray[:98]
+        trimmed_listarray.append("[message truncated]")
+    else:
+        trimmed_listarray = mylistarray
     total = len(trimmed_listarray)
 
     # now let's add the enumeration to the list - but only if we have
