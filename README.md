@@ -45,3 +45,8 @@ If you want to learn about the bot's basic processing structure, then have a loo
 - You HAVE to assign your personal call sign to the bot.
 - You HAVE to [request your personal APRS TOCALL](https://github.com/aprsorg/aprs-deviceid) for using this bot __in production__. See the [APRS Device ID](https://github.com/aprsorg/aprs-deviceid/blob/main/ALLOCATING.md#development-phase) information section on proper usage.
 - ```core_aprs_client``` uses [aprslib](https://github.com/rossengeorgiev/aprs-python) for its APRS-IS communication. As ```aprslib``` currently does not support the transfer of additional external variables to its callback function (e.g. via ```kwargs```), some of the variables that ```core-aprs-client``` needs to communicate with have been defined as globally shared variables (via `client_shared.py`). 
+
+## Q & A
+
+Q: _Why didn't you design this as a Python package?_
+A: Because of [this](https://github.com/rossengeorgiev/aprs-python/pull/56) pending PR
