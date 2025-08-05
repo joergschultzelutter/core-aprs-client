@@ -40,9 +40,9 @@ from apscheduler.schedulers import base as apbase
 
 def send_ack(
     myaprsis: APRSISObject,
-    users_callsign: str,
+    target_callsign: str,
     source_msg_no: str,
-    alias: str,
+    source_callsign: str,
     tocall: str,
     packet_delay: float,
     simulate_send: bool = True,
@@ -55,15 +55,15 @@ def send_ack(
     ==========
     myaprsis: 'aprslib.inet.IS'
         Our aprslib object that we will use for the communication part
-    users_callsign: 'str'
+    target_callsign: 'str'
         Call sign of the user that has sent us the message
     source_msg_no: 'str'
         message number from user's request. Can be 'None'. In that case, we don't send a message acknowledgment to the user
         (normally, we should not enter this function at all if this value is 'None'. The safeguard will still stay in place)
     simulate_send: 'bool'
         If True: Prepare string but only send it to logger
-    alias: 'str'
-        Our APRS alias (COAC)
+    source_callsign: 'str'
+        Our very own APRS callsign (e.g. COAC)
     packet_delay: 'float'
         Delay after sending out our APRS acknowledgment request
     tocall: 'str'
@@ -76,7 +76,9 @@ def send_ack(
 
     if source_msg_no:
         logger.debug(msg="Preparing acknowledgment receipt")
-        stringtosend = f"{alias}>{tocall}::{users_callsign:9}:ack{source_msg_no}"
+        stringtosend = (
+            f"{source_callsign}>{tocall}::{target_callsign:9}:ack{source_msg_no}"
+        )
         if not simulate_send:
             logger.debug(msg=f"Sending acknowledgment receipt: {stringtosend}")
             myaprsis.ais_send(aprsis_data=stringtosend)
@@ -94,7 +96,7 @@ def send_aprs_message_list(
     external_message_number: str,
     simulate_send: bool = True,
     new_ackrej_format: bool = False,
-    alias: str = "COAC",
+    source_callsign: str = "COAC",
     packet_delay: float = 10.0,
     tocall: str = "APRS",
 ):
@@ -131,8 +133,8 @@ def send_aprs_message_list(
         We generate our own message id. The user's message ID
         (from the original request) WILL be added to the
         outgoing message
-    alias: 'str'
-        Our APRS alias (COAC)
+    source_callsign: 'str'
+        Our very own APRS callsign (e.g. COAC)
     packet_delay: 'float'
         Delay after sending out our APRS acknowledgment request
     tocall: 'str'
@@ -144,7 +146,9 @@ def send_aprs_message_list(
         new value for message_counter for messages that require to be ack'ed
     """
     for single_message in message_text_array:
-        stringtosend = f"{alias}>{tocall}::{destination_call_sign:9}:{single_message}"
+        stringtosend = (
+            f"{source_callsign}>{tocall}::{destination_call_sign:9}:{single_message}"
+        )
         if send_with_msg_no:
             alpha_counter = get_alphanumeric_counter_value(aprs_message_counter)
             stringtosend = stringtosend + "{" + alpha_counter
@@ -316,7 +320,7 @@ def aprs_callback(raw_aprs_packet: dict):
             aprs_message_key = get_aprs_message_from_cache(
                 message_text=message_text_string,
                 message_no=msgno_string,
-                users_callsign=from_callsign,
+                target_callsign=from_callsign,
                 aprs_cache=client_shared.aprs_message_cache,
             )
             if aprs_message_key:
@@ -337,9 +341,11 @@ def aprs_callback(raw_aprs_packet: dict):
                     send_ack(
                         myaprsis=client_shared.AIS,
                         simulate_send=program_config["testing"]["aprsis_simulate_send"],
-                        alias=program_config["client_config"]["aprsis_callsign"],
+                        source_callsign=program_config["client_config"][
+                            "aprsis_callsign"
+                        ],
                         tocall=program_config["client_config"]["aprsis_tocall"],
-                        users_callsign=from_callsign,
+                        target_callsign=from_callsign,
                         source_msg_no=msgno_string,
                         packet_delay=program_config["message_delay"][
                             "packet_delay_ack"
@@ -436,7 +442,7 @@ def aprs_callback(raw_aprs_packet: dict):
                 client_shared.aprs_message_cache = add_aprs_message_to_cache(
                     message_text=message_text_string,
                     message_no=msgno_string,
-                    users_callsign=from_callsign,
+                    target_callsign=from_callsign,
                     aprs_cache=client_shared.aprs_message_cache,
                 )
 
