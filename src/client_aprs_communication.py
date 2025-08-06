@@ -145,7 +145,7 @@ def send_aprs_message_list(
     aprs_message_counter: 'int'
         new value for message_counter for messages that require to be ack'ed
     """
-    for single_message in message_text_array:
+    for index, single_message in enumerate(message_text_array, start=1):
         stringtosend = (
             f"{source_callsign}>{tocall}::{destination_call_sign:9}:{single_message}"
         )
@@ -164,7 +164,8 @@ def send_aprs_message_list(
             myaprsis.ais_send(aprsis_data=stringtosend)
         else:
             logger.debug(msg=f"Simulating response message '{stringtosend}'")
-        time.sleep(packet_delay)
+        if index < len(message_text_array):
+            time.sleep(packet_delay)
     return aprs_message_counter
 
 
@@ -213,12 +214,13 @@ def send_beacon_and_status_msg(
     _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
     _aprsis_tocall = program_config["client_config"]["aprsis_tocall"]
 
-    for bcn in aprs_beacon_messages:
+    for index, bcn in enumerate(aprs_beacon_messages, start=1):
         stringtosend = f"{_aprsis_callsign}>{_aprsis_tocall}:{bcn}"
         if not simulate_send:
             logger.debug(msg=f"Sending beacon: {stringtosend}")
             myaprsis.ais_send(aprsis_data=stringtosend)
-            time.sleep(program_config["message_delay"]["packet_delay_other"])
+            if index < len(aprs_beacon_messages):
+                time.sleep(program_config["message_delay"]["packet_delay_other"])
         else:
             logger.debug(msg=f"Simulating beacons: {stringtosend}")
 
