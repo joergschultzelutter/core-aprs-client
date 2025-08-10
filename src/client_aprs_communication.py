@@ -48,7 +48,7 @@ def send_ack(
     simulate_send: bool = True,
 ):
     """
-    Send acknowledgment for received package to APRS_IS if
+    Send acknowledgment for received package to APRS-IS if
     a message number was present
     If 'simulate_send'= True, we still prepare the message but only send it to our log file
     Parameters
@@ -74,13 +74,16 @@ def send_ack(
     none
     """
 
+    # only prepare an ack if the incoming message contained a message number
     if source_msg_no:
         logger.debug(msg="Preparing acknowledgment receipt")
+        # build the ack string
         stringtosend = (
             f"{source_callsign}>{tocall}::{target_callsign:9}:ack{source_msg_no}"
         )
         if not simulate_send:
             logger.debug(msg=f"Sending acknowledgment receipt: {stringtosend}")
+            # send the data to APRS-IS
             myaprsis.ais_send(aprsis_data=stringtosend)
             time.sleep(packet_delay)
         else:
@@ -98,6 +101,7 @@ def send_aprs_message_list(
     new_ackrej_format: bool = False,
     source_callsign: str = "COAC",
     packet_delay: float = 10.0,
+    packet_delay_grace_period: float = 1.0,
     tocall: str = "APRS",
 ):
     """
@@ -137,35 +141,53 @@ def send_aprs_message_list(
         Our very own APRS callsign (e.g. COAC)
     packet_delay: 'float'
         Delay after sending out our APRS acknowledgment request
+        Applied in case there are still remaining messages
+    packet_delay_grace_period: 'float'
+        Delay after sending out our APRS acknowledgment request
+        Applied in case there no more still remaining messages
     tocall: 'str'
-        This bot uses the default TOCALL ("APRS")
+        This bot uses the default TOCALL ("APRS"). You need to apply
+        for your very own TOCALL, see program documentation
 
     Returns
     =======
     aprs_message_counter: 'int'
         new value for message_counter for messages that require to be ack'ed
     """
+
+    # Send our message list
     for index, single_message in enumerate(message_text_array, start=1):
+        # Build the output string
         stringtosend = (
             f"{source_callsign}>{tocall}::{destination_call_sign:9}:{single_message}"
         )
+        # Does the outgoing message require to have a message number? (Read:
+        # did our INCOMING message request contain a message number, thus requiring
+        # us to honor this behavior with our OUTGOING message by adding a message no)?
         if send_with_msg_no:
+            # Build the alphanumeric message number
             alpha_counter = get_alphanumeric_counter_value(aprs_message_counter)
             stringtosend = stringtosend + "{" + alpha_counter
             if new_ackrej_format:
                 stringtosend = stringtosend + "}" + external_message_number[:2]
             aprs_message_counter = aprs_message_counter + 1
+            # reset the message number if we have exceeded the maximum count
             if (
                 aprs_message_counter > 676 or alpha_counter == "ZZ"
             ):  # for the alphanumeric counter AA..ZZ, this is equal to "ZZ"
                 aprs_message_counter = 0
+        # Check if we need to send the message for real or have to simulate it
         if not simulate_send:
             logger.debug(msg=f"Sending response message '{stringtosend}'")
             myaprsis.ais_send(aprsis_data=stringtosend)
         else:
             logger.debug(msg=f"Simulating response message '{stringtosend}'")
+        # Apply the regular sleep cycle if there are still messages to be sent
+        # Otherwise, use the shorter sleep cycle
         if index < len(message_text_array):
             time.sleep(packet_delay)
+        else:
+            time.sleep(packet_delay_grace_period)
     return aprs_message_counter
 
 
@@ -180,6 +202,7 @@ def get_alphanumeric_counter_value(numeric_counter: int):
     =======
     alphanumeric_counter: 'str'
         alphanumeric counter that is based on the numeric counter
+        Range from AA to ZZ
     """
     first_char = int(numeric_counter / 26)
     second_char = int(numeric_counter % 26)
@@ -214,15 +237,26 @@ def send_beacon_and_status_msg(
     _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
     _aprsis_tocall = program_config["client_config"]["aprsis_tocall"]
 
+    # Build and send the list of beacons
     for index, bcn in enumerate(aprs_beacon_messages, start=1):
+        # build the beacon string
         stringtosend = f"{_aprsis_callsign}>{_aprsis_tocall}:{bcn}"
+        # simulate sending yes/no
         if not simulate_send:
             logger.debug(msg=f"Sending beacon: {stringtosend}")
+            # send the beacon to APRS-IS
             myaprsis.ais_send(aprsis_data=stringtosend)
-            if index < len(aprs_beacon_messages):
-                time.sleep(program_config["message_delay"]["packet_delay_other"])
         else:
             logger.debug(msg=f"Simulating beacons: {stringtosend}")
+        # apply sleep cycle(s)
+        # do we still have messages in our queue?
+        # Yes, apply the regular beacon sleep cycle
+        if index < len(aprs_beacon_messages):
+            time.sleep(program_config["message_delay"]["packet_delay_beacon"])
+        else:
+            # Otherwise, apply the shorter sleep cycle after sending out
+            # our very last beacon message
+            time.sleep(program_config["message_delay"]["packet_delay_grace_period"])
 
 
 def send_bulletin_messages(
@@ -254,14 +288,26 @@ def send_bulletin_messages(
     _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
     _aprsis_tocall = program_config["client_config"]["aprsis_tocall"]
 
-    for recipient_id, bln in bulletin_dict.items():
+    # Build and send the list of bulletins
+    for index, (recipient_id, bln) in enumerate(bulletin_dict.items(), start=1):
+        # build the bulletin string
         stringtosend = f"{_aprsis_callsign}>{_aprsis_tocall}::{recipient_id:9}:{bln}"
+        # simulate sending yes/no
         if not simulate_send:
             logger.debug(msg=f"Sending bulletin: {stringtosend}")
+            # send the bulletin to APRS-IS
             myaprsis.ais_send(aprsis_data=stringtosend)
-            time.sleep(program_config["message_delay"]["packet_delay_other"])
         else:
             logger.debug(msg=f"simulating bulletins: {stringtosend}")
+        # apply sleep cycle(s)
+        # do we still have messages in our queue?
+        # Yes, apply the regular bulletin sleep cycle
+        if index < len(bulletin_dict):
+            time.sleep(program_config["message_delay"]["packet_delay_bulletin"])
+        else:
+            # Otherwise, apply the shorter sleep cycle after sending out
+            # our very last bulletin message
+            time.sleep(program_config["message_delay"]["packet_delay_grace_period"])
 
 
 # APRSlib callback
@@ -431,6 +477,12 @@ def aprs_callback(raw_aprs_packet: dict):
                     aprs_message_counter=client_shared.aprs_message_counter.get_counter(),
                     external_message_number=msgno_string,
                     new_ackrej_format=new_ackrej_format,
+                    packet_delay=program_config["message_delay"][
+                        "packet_delay_message"
+                    ],
+                    packet_delay_grace_period=program_config["message_delay"][
+                        "packet_delay_grace_period"
+                    ],
                 )
 
                 # And store the new APRS message number in our counter object
