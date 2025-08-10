@@ -164,13 +164,26 @@ msg_cache_time_to_live = 3600
 # Unit of measure: seconds
 packet_delay_message = 6.0
 #
-# packet delay after sending a bulletin or beacon
-# Unit of measure: seconds
-packet_delay_other = 6.0
-#
 # packet delay after sending an ackknowledgment
 # Unit of measure: seconds
 packet_delay_ack = 2.0
+#
+# packet delay after sending the very last message from a message queue
+# applies to regular messages, beacons and bulletins and is used as a grace
+# period for not hitting APRS-IS messages too fast after processing a user's
+# APRS request
+# Unit of measure: seconds
+packet_delay_grace_period = 1.0
+#
+# packet delay after sending a bulletin to APRS-IS and there are still pending
+# bulletins in our outgoing message list
+# Unit of measure: seconds
+packet_delay_bulletin = 6.0
+#
+# packet delay after sending a beacon to APRS-IS and there are still pending
+# bulletins in our outgoing message list
+# Unit of measure: seconds
+packet_delay_beacon = 6.0
 
 [testing]
 #
