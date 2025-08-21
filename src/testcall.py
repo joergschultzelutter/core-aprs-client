@@ -56,9 +56,9 @@ def testcall(message_text: str, from_callsign: str):
 
     Parameters
     ==========
-    message_text: 'str'
+    message_text: str
        The incoming APRS message. 1..67 bytes in length
-    from_callsign: 'str'
+    from_callsign: str
        The sender's call sign
 
     Returns

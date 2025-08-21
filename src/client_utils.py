@@ -24,7 +24,6 @@ import os
 from unidecode import unidecode
 import argparse
 import zipfile
-import sys
 import apprise
 import re
 from client_configuration import program_config
@@ -60,7 +59,7 @@ def _get_aprs_msg_len() -> int:
 
     Returns
     =======
-    aprs_msg_len: 'int'
+    aprs_msg_len: int
         trailing message no enabled: 59
         trailing message no disabled: 67
     """

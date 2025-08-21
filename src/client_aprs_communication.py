@@ -18,7 +18,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-import aprslib
 import time
 from client_configuration import program_config
 from client_utils import (
@@ -53,20 +52,20 @@ def send_ack(
     If 'simulate_send'= True, we still prepare the message but only send it to our log file
     Parameters
     ==========
-    myaprsis: 'aprslib.inet.IS'
+    myaprsis: aprslib.inet.IS
         Our aprslib object that we will use for the communication part
-    target_callsign: 'str'
+    target_callsign: str
         Call sign of the user that has sent us the message
-    source_msg_no: 'str'
+    source_msg_no: str
         message number from user's request. Can be 'None'. In that case, we don't send a message acknowledgment to the user
         (normally, we should not enter this function at all if this value is 'None'. The safeguard will still stay in place)
-    simulate_send: 'bool'
+    simulate_send: bool
         If True: Prepare string but only send it to logger
-    source_callsign: 'str'
+    source_callsign: str
         Our very own APRS callsign (e.g. COAC)
-    packet_delay: 'float'
+    packet_delay: float
         Delay after sending out our APRS acknowledgment request
-    tocall: 'str'
+    tocall: str
         This bot uses the default TOCALL ("APRS")
 
     Returns
@@ -110,48 +109,48 @@ def send_aprs_message_list(
     If 'simulate_send'= True, we still prepare the message but only send it to our log file
     Parameters
     ==========
-    myaprsis: 'aprslib.inet.IS'
+    myaprsis: aprslib.inet.IS
         Our aprslib object that we will use for the communication part
-    message_text_array: 'list'
+    message_text_array: list
         Contains 1..n entries of the content that we want to send to the user
-    destination_call_sign: 'str'
+    destination_call_sign: str
         Target user call sign that is going to receive the message (usually, this
         is the user's call sign who has sent us the initial message)
-    send_with_msg_no: 'bool'
+    send_with_msg_no: bool
         If True, each outgoing message will have its own message ID attached to the outgoing content
         If False, no message ID is added
     aprs_message_counter: int
         message_counter for messages that require to be ack'ed
-    simulate_send: 'bool'
+    simulate_send: bool
         If True: Prepare string but only send it to logger
-    external_message_number: 'str'
+    external_message_number: str
         only used if we deal with the new ackrej format
-    new_ackrej_format: 'bool'
+    new_ackrej_format: bool
         false: apply the old ack/rej logic as described in aprs101.pdf.
         We generate our own message id. The user's message ID
         (from the original request) will NOT be added to the
         outgoing message
         ---
         True: apply the new ack/rej logic as described
-        in http://www.aprs.org/aprs11/replyacks.txt
+        in www.aprs.org/aprs11/replyacks.txt
         We generate our own message id. The user's message ID
         (from the original request) WILL be added to the
         outgoing message
-    source_callsign: 'str'
+    source_callsign: str
         Our very own APRS callsign (e.g. COAC)
-    packet_delay: 'float'
+    packet_delay: float
         Delay after sending out our APRS acknowledgment request
         Applied in case there are still remaining messages
-    packet_delay_grace_period: 'float'
+    packet_delay_grace_period: float
         Delay after sending out our APRS acknowledgment request
         Applied in case there no more still remaining messages
-    tocall: 'str'
+    tocall: str
         This bot uses the default TOCALL ("APRS"). You need to apply
         for your very own TOCALL, see program documentation
 
     Returns
     =======
-    aprs_message_counter: 'int'
+    aprs_message_counter: int
         new value for message_counter for messages that require to be ack'ed
     """
 
@@ -196,11 +195,11 @@ def get_alphanumeric_counter_value(numeric_counter: int):
     Calculate an alphanumeric
     Parameters
     ==========
-    numeric_counter: 'int'
+    numeric_counter: int
         numeric counter that is used for calculating the start value
     Returns
     =======
-    alphanumeric_counter: 'str'
+    alphanumeric_counter: str
         alphanumeric counter that is based on the numeric counter
         Range from AA to ZZ
     """
@@ -219,11 +218,11 @@ def send_beacon_and_status_msg(
 
     Parameters
     ==========
-    myaprsis: 'APRSISObject'
+    myaprsis: APRSISObject
         Our aprslib object that we will use for the communication part
     aprs_beacon_messages: list
         List of pre-defined APRS beacon messages
-    simulate_send: 'bool'
+    simulate_send: bool
         If True: Prepare string but only send it to logger
 
     Returns
@@ -270,11 +269,11 @@ def send_bulletin_messages(
 
     Parameters
     ==========
-    myaprsis: 'APRSISObject'
+    myaprsis: APRSISObject
         Our aprslib object that we will use for the communication part
-    bulletin_dict: 'dict'
+    bulletin_dict: dict
         The bulletins that we are going to send upt to the user. Key = BLNxxx, Value = Bulletin Text
-    simulate_send: 'bool'
+    simulate_send: bool
         If True: Prepare string but only send it to logger
 
     Returns
@@ -318,7 +317,7 @@ def aprs_callback(raw_aprs_packet: dict):
     aprslib callback; this is the core process that takes care of everything
     Parameters
     ==========
-    raw_aprs_packet: 'dict'
+    raw_aprs_packet: dict
         dict object, containing the raw APRS data
     Returns
     =======
@@ -330,14 +329,14 @@ def aprs_callback(raw_aprs_packet: dict):
     msgno_string = raw_aprs_packet.get("msgNo")
     from_callsign = raw_aprs_packet.get("from")
     format_string = raw_aprs_packet.get("format")
-    ackMsgno_string = raw_aprs_packet.get("ackMsgNo")
+    ack_msgno_string = raw_aprs_packet.get("ackMsgNo")
 
     # lower the response in case we received one
     if response_string:
         response_string = response_string.lower()
 
     # Check if we need to deal with the old vs the new message format
-    new_ackrej_format = True if ackMsgno_string else False
+    new_ackrej_format = True if ack_msgno_string else False
 
     # Check if this request supports a msgno
     msg_no_supported = True if msgno_string else False
@@ -510,7 +509,7 @@ def init_scheduler_jobs():
 
     Returns
     =======
-    my_scheduler: 'BackgroundScheduler' object or 'None' if no scheduler was initialized.
+    my_scheduler: BackgroundScheduler object or 'None' if no scheduler was initialized.
     """
 
     my_scheduler = None
@@ -640,14 +639,14 @@ def remove_scheduler(aprs_scheduler: BackgroundScheduler):
 
     Parameters
     ==========
-    aprs_scheduler: BackgroundScheduler object or 'None' if no scheduler was initialized.
+    aprs_scheduler: BackgroundScheduler object or None if no scheduler was initialized.
 
     Returns
     =======
 
     """
     # If the scheduler object exists, then try to pause it before it gets destroyed
-    if type(aprs_scheduler) == BackgroundScheduler:
+    if type(aprs_scheduler) is BackgroundScheduler:
         logger.debug(msg="Pausing aprs_scheduler")
         aprs_scheduler.pause()
         aprs_scheduler.remove_all_jobs()

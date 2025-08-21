@@ -85,12 +85,12 @@ def config_to_dict(myconfig: configparser.ConfigParser):
 
     Parameters
     ==========
-    myconfig: 'configparser.ConfigParser'
+    myconfig: configparser.ConfigParser
        ConfigParser input object
 
     Returns
     =======
-    program_config: 'dict'
+    program_config: dict
         Our program configuration dictionary
     """
     program_config.clear()

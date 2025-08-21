@@ -32,15 +32,15 @@ class APRSISObject:
         """
         Parameters
         ==========
-        aprsis_callsign: 'str'
+        aprsis_callsign: str
            Our login callsign
-        aprsis_passwd: 'str'
+        aprsis_passwd: str
            Our login password
-        aprsis_host: 'str'
+        aprsis_host: str
            Our login hostname
-        aprsis_port: 'int'
+        aprsis_port: int
            Our APS-IS port number
-        aprsis_filter: 'str'
+        aprsis_filter: str
            Our APRS-IS filter settings
         """
         self.aprsis_callsign = aprsis_callsign
@@ -58,20 +58,20 @@ class APRSISObject:
 
         Parameters
         ==========
-        self.aprsis_callsign: 'str'
+        self.aprsis_callsign: str
            Our login callsign
-        self.aprsis_passwd: 'str'
+        self.aprsis_passwd: str
            Our login password
-        self.aprsis_host: 'str'
+        self.aprsis_host: str
            Our login hostname
-        self.aprsis_port: 'int'
+        self.aprsis_port: int
            Our APS-IS port number
-        self.aprsis_filter: 'str'
+        self.aprsis_filter: str
            Our APRS-IS filter settings
 
         Returns
         =======
-        self.AIS: 'aprslib.inet.IS'
+        self.AIS: aprslib.inet.IS
            Our APRS-IS object
         """
 
@@ -96,7 +96,7 @@ class APRSISObject:
 
         Parameters
         ==========
-        aprsis_callback: 'object'
+        aprsis_callback: object
            The name of our callback function that we hand over
            to the APRS-IS object
 
@@ -162,7 +162,7 @@ class APRSISObject:
 
         Parameters
         ==========
-        aprsis_data: 'str'
+        aprsis_data: str
            The data that we want to send to the APRS-IS server
 
         Returns
@@ -182,7 +182,7 @@ class APRSISObject:
 
         Returns
         =======
-        self.AIS: 'aprslib.inet.IS'
+        self.AIS: aprslib.inet.IS
             Our APRS-IS object (or 'None')
 
         """
