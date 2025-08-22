@@ -512,7 +512,6 @@ def init_scheduler_jobs():
     my_scheduler: BackgroundScheduler object or 'None' if no scheduler was initialized.
     """
 
-    my_scheduler = None
     if (
         program_config["beacon_config"]["aprsis_broadcast_beacon"]
         or program_config["bulletin_config"]["aprsis_broadcast_bulletins"]

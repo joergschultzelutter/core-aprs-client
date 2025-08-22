@@ -121,7 +121,7 @@ class APRSMessageCounter:
 
         Parameters
         ==========
-        counter: 'int'
+        counter: int
             Our numeric APRS counter
 
         Returns
