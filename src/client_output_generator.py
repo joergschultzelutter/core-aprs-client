@@ -90,7 +90,9 @@ def __process_loremipsum_keyword(response_parameters: dict):
     # generate our very first message; either pass an empty list item to the
     # function or omit the 'destination_list" parameter. In that case, the function
     # will create a list object for you
-    output_message = make_pretty_aprs_messages(message_to_add="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.")
+    output_message = make_pretty_aprs_messages(
+        message_to_add="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+    )
 
     # Finally, indicate to the main process that we were successful
     success = True
@@ -137,10 +139,6 @@ def generate_output_message(response_parameters: dict):
     # The output processor takes input from a dictionary that was prepared by the
     # input processor. Note that those cases where the input processor FAILED to
     # guess the user's intentions will NOT be sent to this module.
-
-    # First, let's assume that we are in a 'failed state' mode
-    # value accordingly
-    success = False
 
     match response_parameters["command_code"]:
         case "greetme":
