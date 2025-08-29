@@ -24,7 +24,6 @@ import os
 from unidecode import unidecode
 import argparse
 import zipfile
-import sys
 import apprise
 import re
 from client_configuration import program_config
@@ -60,7 +59,7 @@ def _get_aprs_msg_len() -> int:
 
     Returns
     =======
-    aprs_msg_len: 'int'
+    aprs_msg_len: int
         trailing message no enabled: 59
         trailing message no disabled: 67
     """
@@ -85,17 +84,17 @@ def add_aprs_message_to_cache(
     we will not send it out again and consider the request to be fulfilled
     Parameters
     ==========
-    message_text: 'str'
+    message_text: str
         APRS message (as extracted from the original incoming message)
-    message_no: 'str'
+    message_no: str
         APRS message number (or 'None' if not present)
-    target_callsign: 'str'
+    target_callsign: str
         Call sign of the user who has sent this message
-    aprs_cache: 'ExpiringDict'
+    aprs_cache: ExpiringDict
         Reference to the ExpiringDict cache
     Returns
     =======
-    aprs_cache: 'ExpiringDict'
+    aprs_cache: ExpiringDict
         Reference to the ExpiringDict cache, now containing our entry
     """
     # Create message key which consists of:
@@ -139,13 +138,13 @@ def get_aprs_message_from_cache(
     we consider the request to be fulfilled and will not process it again
     Parameters
     ==========
-    message_text: 'str'
+    message_text: str
         APRS message (as extracted from the original incoming message)
-    message_no: 'str'
+    message_no: str
         APRS message number (or 'None' if not present)
-    target_callsign: 'str'
+    target_callsign: str
         Call sign of the user who has sent this message
-    aprs_cache: 'ExpiringDict'
+    aprs_cache: ExpiringDict
         Reference to the ExpiringDict cache
     Returns
     =======
@@ -175,7 +174,7 @@ def dump_string_to_hex(message_text_string: str):
     we consider the request to be fulfilled and will not process it again
     Parameters
     ==========
-    message_text_string: 'str'
+    message_text_string: str
         Text that needs to be converted
     Returns
     =======
@@ -189,7 +188,7 @@ def convert_text_to_plain_ascii(message_string: str):
     Converts a string to plain ASCII
     Parameters
     ==========
-    message_string: 'str'
+    message_string: str
         Text that needs to be converted
     Returns
     =======
@@ -217,7 +216,7 @@ def get_command_line_params():
 
     Returns
     =======
-    configfile: 'str'
+    configfile: str
         name of the configuration file
     """
 
@@ -251,16 +250,16 @@ def build_full_pathname(
 
     Parameters
     ==========
-    file_name: 'str'
+    file_name: str
         file name without path
-    root_path_name: 'str'
+    root_path_name: str
         relative path name that we are going to add.
-    relative_path_name: 'str'
+    relative_path_name: str
         relative path name that we are going to add.
 
     Returns
     =======
-    full_path_name: 'str'
+    full_path_name: str
         full path, consisting of root path name, the relative path name and the file name
     """
     return os.path.join(root_path_name, relative_path_name, file_name)
@@ -273,12 +272,12 @@ def create_zip_file_from_log(log_file_name: str):
 
     Parameters
     ==========
-    log_file_name: 'str'
+    log_file_name: str
         our file name, e.g. 'nohup.out'
 
     Returns
     =======
-    success: 'bool'
+    success: bool
         True if we were able to create our zip file, otherwise false
     """
 
@@ -334,19 +333,19 @@ def send_apprise_message(
 
     Parameters
     ==========
-    message_header : 'str'
+    message_header : str
         The message header that we want to send to the user
-    message_body : 'str'
+    message_body : str
         The message body that we want to send to the user
-    apprise_config_file: 'str'
+    apprise_config_file: str
         Apprise Yaml configuration file
-    message_attachment: 'str'
+    message_attachment: str
         The message attachment that we want to send to the user
         'None' if we don't want to send an attachment
 
     Returns
     =======
-    success: 'bool'
+    success: bool
         True if successful
     """
 
@@ -414,9 +413,9 @@ def check_and_create_data_directory(
 
     Parameters
     ==========
-    root_path_name: 'str'
+    root_path_name: str
         relative path name that we are going to add.
-    relative_path_name: 'str'
+    relative_path_name: str
         relative path name that we are going to add.
 
     Returns
@@ -491,35 +490,35 @@ def make_pretty_aprs_messages(
 
     Parameters
     ==========
-    message_to_add: 'str'
+    message_to_add: str
         message string that is to be added to the list in a pretty way
         If string is longer than 67 chars, we will truncate the information
-    destination_list: 'list'
+    destination_list: list
         List with string elements which will be enriched with the
         'mesage_to_add' string. Default: empty list aka user wants new list
-    max_len: 'int':
+    max_len: int:
         Max length of the list's string len.
         The length is dependent on whether the user has activated trailing
         message number information in the outgoing message or not.
         When activated, the message length is 59 - otherwise, it is 67.
         _get_aprs_msg_len() auto-determines the appropriate value.
-    separator_char: 'str'
+    separator_char: str
         Separator that is going to be used for dividing the single
         elements that the user is going to add
-    add_sep: 'bool'
+    add_sep: bool
         True = we will add the separator when more than one item
                is in our string. This is the default
         False = do not add the separator (e.g. if we add the
                 very first line of text, then we don't want a
                 comma straight after the location
-    force_outgoing_unicode_messages: 'bool'
+    force_outgoing_unicode_messages: bool
         False = all outgoing UTF-8 content will be down-converted
                 to ASCII content
         True = all outgoing UTF-8 content will sent out 'as is'
 
     Returns
     =======
-    destination_list: 'list'
+    destination_list: list
         List array, containing 1..n human readable strings with
         the "message_to_add' input data
     """
@@ -601,10 +600,10 @@ def split_string_to_string_list(
 
     Parameters
     ==========
-    message_string: 'str'
+    message_string: str
         message string that is to be divided into 1..n strings of 'max_len"
         text length
-    max_len: 'int':
+    max_len: int:
         Max length of the list's string len.
         The length is dependent on whether the user has activated trailing
         message number information in the outgoing message or not.
@@ -613,11 +612,11 @@ def split_string_to_string_list(
 
     Returns
     =======
-    split_strings: 'list'
+    split_strings: list
         List array, containing 1..n strings with a max len of 'max_len'
     """
     split_strings = [
-        message_string[index : index + max_len]
+        message_string[index: index + max_len]
         for index in range(0, len(message_string), max_len)
     ]
     return split_strings
@@ -631,7 +630,7 @@ def parse_bulletin_data(core_config: dict):
 
     Parameters
     ==========
-    core_config: 'dict'
+    core_config: dict
         The bulletin messages from the configuration file in their raw state
 
     Returns
@@ -776,7 +775,7 @@ def check_for_default_config():
         )
 
 
-def format_list_with_enumeration(mylistarray: list) -> list:
+def format_list_with_enumeration(mylistarray: list):
     """
     Adds a trailing enumeration to the list if the user has activated this configuration in
     the client's config file
@@ -786,7 +785,7 @@ def format_list_with_enumeration(mylistarray: list) -> list:
 
     Returns
     =======
-    listitem: 'list'
+    listitem: list
         Either formatted list (if more than one list entry was present) or
         the original list item
     """
@@ -833,12 +832,12 @@ def finalize_pretty_aprs_messages(mylistarray: list) -> list:
 
     Parameters
     ==========
-    mylistarray: 'list'
+    mylistarray: list
         List of APRS messages
 
     Returns
     =======
-    listitem: 'list'
+    listitem: list
         Either formatted list (if more than one list entry was present) or
         the original list item
     """

@@ -20,12 +20,7 @@
 #
 import sys
 import signal
-import aprslib
-from expiringdict import ExpiringDict
-import json
-from uuid import uuid1
 import time
-from datetime import datetime
 import atexit
 import os
 
@@ -41,7 +36,7 @@ from client_utils import (
 from client_configuration import load_config, program_config
 from client_aprsobject import APRSISObject
 from client_message_counter import APRSMessageCounter
-from client_expdict import create_expiring_dict, aprs_message_cache
+from client_expdict import create_expiring_dict
 from client_aprs_communication import (
     aprs_callback,
     init_scheduler_jobs,
@@ -113,6 +108,9 @@ def run_listener():
     logger.debug(msg="Registering SIGTERM handler for safe shutdown...")
     signal.signal(signal.SIGTERM, signal_term_handler)
 
+    # Create the future aprs_scheduler variable
+    aprs_scheduler = None
+
     # Enter the 'eternal' receive loop
     try:
         while True:
@@ -152,7 +150,9 @@ def run_listener():
                 # messages to APRS_IS
                 # Note that the scheduler might not be active - its existence depends
                 # on the user's configuration file settings.
-                remove_scheduler(aprs_scheduler=aprs_scheduler)
+                if aprs_scheduler:
+                    remove_scheduler(aprs_scheduler=aprs_scheduler)
+                aprs_scheduler = None
 
                 # close the connection to APRS-IS
                 logger.debug(msg="Closing APRS connection to APRS-IS")
@@ -178,7 +178,8 @@ def run_listener():
         client_shared.aprs_message_counter.write_counter()
 
         # Shutdown (and remove) the scheduler if it still exists
-        remove_scheduler(aprs_scheduler=aprs_scheduler)
+        if aprs_scheduler:
+            remove_scheduler(aprs_scheduler=aprs_scheduler)
 
         # Close APRS-IS connection whereas still present
         if client_shared.AIS.ais_is_connected():

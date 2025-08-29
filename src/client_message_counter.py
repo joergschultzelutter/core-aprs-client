@@ -32,7 +32,7 @@ class APRSMessageCounter:
 
         Parameters
         ==========
-        file_name: 'str'
+        file_name: str
            External file where the APRS message counter is stored.
 
         Returns
@@ -109,7 +109,7 @@ class APRSMessageCounter:
 
         Returns
         =======
-        counter: 'int'
+        counter: int
             Our numeric APRS counter
 
         """
@@ -121,7 +121,7 @@ class APRSMessageCounter:
 
         Parameters
         ==========
-        counter: 'int'
+        counter: int
             Our numeric APRS counter
 
         Returns

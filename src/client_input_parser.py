@@ -22,8 +22,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-from client_configuration import program_config
-
 
 def parse_input_message(aprs_message: str, from_callsign: str):
     """
@@ -31,18 +29,18 @@ def parse_input_message(aprs_message: str, from_callsign: str):
 
     Parameters
     ==========
-    aprs_message: 'str'
+    aprs_message: str
         The APRS message that the user has provided us with (1..67
         bytes in length). Parse the content and figure out what
         the user wants you to do.
-    from_callsign: 'str'
+    from_callsign: str
         Ham radio callsign that sent the message to us.
 
     Returns
     =======
-    success: 'bool'
+    success: bool
         True if everything is fine, False otherwise.
-    response_parameters: 'dict'
+    response_parameters: dict
         Dictionary object where we store the data that is required
         by the 'output_generator' module for generating the APRS message.
         For this stub, that dictionary is empty.
@@ -57,7 +55,10 @@ def parse_input_message(aprs_message: str, from_callsign: str):
     # Command #2 - "hello" keyword
     #              Sends a "Hello World" string to the user
     #              Internal command code = "sayhello"
-    # Command #3 - "error" keyword
+    # Command #3 - "lorem" keyword
+    #              Sends a really long "lorem ipsum" string to the user
+    #              Internal command code = "loremipsum"
+    # Command #4 - "error" keyword
     #              Simulates an error (e.g. missing keyword parameter)
     #              Internal command code = "sayhello"
     #
@@ -99,6 +100,10 @@ def parse_input_message(aprs_message: str, from_callsign: str):
     if "hello" in aprs_message:
         # We found a valid command
         command_code = "sayhello"
+        success = True
+    if "lorem" in aprs_message:
+        # We found a valid command
+        command_code = "loremipsum"
         success = True
     if "error" in aprs_message:
         # Simulate that we did NOT find a valid command

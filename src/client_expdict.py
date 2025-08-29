@@ -37,9 +37,9 @@ def create_expiring_dict(max_len: int, max_age_seconds: int):
 
     Parameters
     ==========
-    max_len: 'int'
+    max_len: int
        Number of max dictionary entries
-    max_age_seconds: 'int'
+    max_age_seconds: int
        life span per entry in seconds
 
     Returns
