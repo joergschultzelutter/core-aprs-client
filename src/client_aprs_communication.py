@@ -430,6 +430,15 @@ def aprs_callback(raw_aprs_packet: dict):
                     success, output_message = generate_output_message(
                         response_parameters=response_parameters,
                     )
+                    # This code branch should never be reached unless there is a
+                    # discrepancy between the action determined by the input parser
+                    # and the responsive counter-action in the output processor
+                    if not success:
+                        output_message = make_pretty_aprs_messages(
+                            message_to_add=program_config["client_config"][
+                                "aprs_input_parser_default_error_message"
+                            ],
+                        )
                 # darn - we failed to hail the Tripods
                 # this is the branch where the input parser failed to understand
                 # the message. A possible reason: you sent a keyword which requires

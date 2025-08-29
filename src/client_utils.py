@@ -616,7 +616,7 @@ def split_string_to_string_list(
         List array, containing 1..n strings with a max len of 'max_len'
     """
     split_strings = [
-        message_string[index : index + max_len]
+        message_string[index: index + max_len]
         for index in range(0, len(message_string), max_len)
     ]
     return split_strings

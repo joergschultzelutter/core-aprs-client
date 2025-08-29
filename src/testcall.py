@@ -94,8 +94,19 @@ def testcall(message_text: str, from_callsign: str):
         # the completion of the remaining tasks. The APRS access details
         # are not known and will be set to simulation mode
         logger.info(msg="Response:")
-        output_message = generate_output_message(response_parameters)
-        output_message = finalize_pretty_aprs_messages(mylistarray=output_message)
+        success, output_message = generate_output_message(response_parameters)
+        # And finalize the output message, if needed
+        if success:
+            output_message = finalize_pretty_aprs_messages(mylistarray=output_message)
+        else:
+            # This code branch should never be reached unless there is a
+            # discrepancy between the action determined by the input parser
+            # and the responsive counter-action in the output processor
+            output_message = make_pretty_aprs_messages(
+                message_to_add=program_config["client_config"][
+                    "aprs_input_parser_default_error_message"
+                ],
+            )
         logger.info(msg=pformat(output_message))
     else:
         input_parser_error_message = response_parameters["input_parser_error_message"]
@@ -124,4 +135,4 @@ if __name__ == "__main__":
     # This call will trigger the framework's input parser and its
     # output generator. Just add your call sign and your APRS message
     # text; the latter will then be processed by the input parser.
-    testcall(message_text="error", from_callsign="DF1JSL-1")
+    testcall(message_text="lorem", from_callsign="DF1JSL-1")
