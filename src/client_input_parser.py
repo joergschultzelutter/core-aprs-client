@@ -35,11 +35,18 @@ def parse_input_message(aprs_message: str, from_callsign: str):
         the user wants you to do.
     from_callsign: str
         Ham radio callsign that sent the message to us.
+        Might be required by the input processor e.g. in case you
+        have to determine the from_callsign's latitude/longitude.
 
     Returns
     =======
     success: bool
         True if everything is fine, False otherwise.
+    input_parser_error_message: str
+        if success==False, this field can contain an optional
+        error message (e.g. context-specific errors related to the
+        keyword that was sent to the bot). If this field is empty AND
+        success=False, then the default error message will be returned.
     response_parameters: dict
         Dictionary object where we store the data that is required
         by the 'output_generator' module for generating the APRS message.
@@ -125,13 +132,15 @@ def parse_input_message(aprs_message: str, from_callsign: str):
 
     # our target dictionary that is going to be used by the output processor
     # for further processing.
+    # You can (and have to) amend this dict object so that it contains all fields
+    # relevant for output processing. Ensure that both input parser and output processor
+    # use the same dictionary structure.
     response_parameters = {
         "from_callsign": from_callsign,
-        "input_parser_error_message": input_parser_error_message,
         "command_code": command_code,
     }
 
-    return success, response_parameters
+    return success, input_parser_error_message, response_parameters
 
 
 if __name__ == "__main__":

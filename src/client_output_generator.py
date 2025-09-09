@@ -110,7 +110,8 @@ def generate_output_message(response_parameters: dict):
         dictionary object, containing data from client_input_parser.py
         Literally speaking, you will use the content from this
         dictionary in order to generate an APRS output message.
-        For this stub, that dictionary is empty.
+        You can (and should!) customize this dict object but ensure that
+        both input_parser and output_processor use the same structure
 
     Returns
     =======

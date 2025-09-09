@@ -23,6 +23,7 @@ import signal
 import time
 import atexit
 import os
+from functools import partial
 
 import client_shared
 from client_utils import (
@@ -43,6 +44,9 @@ from client_aprs_communication import (
     remove_scheduler,
 )
 from client_logger import logger
+
+from client_input_parser import parse_input_message
+from client_output_generator import generate_output_message
 
 
 def run_listener():
@@ -135,11 +139,18 @@ def run_listener():
                 # Otherwise, this field's value will be 'None'
                 aprs_scheduler = init_scheduler_jobs()
 
+                # create the partial object for our callback
+                enhanced_callback = partial(
+                    aprs_callback,
+                    parser=parse_input_message,
+                    generator=generate_output_message,
+                )
+
                 #
                 # We are now ready to initiate the actual processing
                 # Start the consumer thread
                 logger.info(msg="Starting callback consumer")
-                client_shared.AIS.ais_start_consumer(aprs_callback)
+                client_shared.AIS.ais_start_consumer(enhanced_callback)
 
                 #
                 # We have left the callback, let's clean up a few things

@@ -19,6 +19,8 @@
 #
 
 import time
+import types
+
 from client_configuration import program_config
 from client_utils import (
     make_pretty_aprs_messages,
@@ -28,8 +30,6 @@ from client_utils import (
     finalize_pretty_aprs_messages,
 )
 from _version import __version__
-from client_input_parser import parse_input_message
-from client_output_generator import generate_output_message
 from client_aprsobject import APRSISObject
 import client_shared
 from client_logger import logger
@@ -312,13 +312,19 @@ def send_bulletin_messages(
 # APRSlib callback
 # Extract the fields from the APRS message, start the parsing process,
 # execute the command and send the command output back to the user
-def aprs_callback(raw_aprs_packet: dict):
+def aprs_callback(
+    raw_aprs_packet: dict, parser: types.FunctionType, generator: types.FunctionType
+):
     """
     aprslib callback; this is the core process that takes care of everything
     Parameters
     ==========
     raw_aprs_packet: dict
         dict object, containing the raw APRS data
+    parser: types.FunctionType
+        input parser function
+    generator: types.FunctionType
+        output generator function
     Returns
     =======
     """
@@ -406,7 +412,10 @@ def aprs_callback(raw_aprs_packet: dict):
                 # contains the parser's error message if 'success' != True)
                 # input parameters: the actual message, the user's call sign and
                 # the aprs.fi API access key for location lookups
-                success, response_parameters = parse_input_message(
+                #
+                # Note: we call the function which was passed along with the
+                # callback object
+                success, input_parser_error_message, response_parameters = parser(
                     aprs_message=message_text_string,
                     from_callsign=from_callsign,
                 )
@@ -427,7 +436,10 @@ def aprs_callback(raw_aprs_packet: dict):
                     # The 'success' status is ALWAYS positive even if the
                     # message could not get processed - the inline'd error
                     # message counts as positive message content
-                    success, output_message = generate_output_message(
+                    #
+                    # Note: we call the function which was passed along with the
+                    # callback object
+                    success, output_message = generator(
                         response_parameters=response_parameters,
                     )
                     # This code branch should never be reached unless there is a
@@ -447,9 +459,6 @@ def aprs_callback(raw_aprs_packet: dict):
                 # parser, we sinply don't know what to do with the user's message
                 # and get back to him with a generic response.
                 else:
-                    input_parser_error_message = response_parameters[
-                        "input_parser_error_message"
-                    ]
                     # Dump the human readable message to the user if we have one
                     if input_parser_error_message:
                         output_message = make_pretty_aprs_messages(
