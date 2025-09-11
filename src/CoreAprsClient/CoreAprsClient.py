@@ -29,7 +29,6 @@ from pprint import pformat
 
 import client_shared
 from client_utils import (
-    get_command_line_params,
     signal_term_handler,
     check_and_create_data_directory,
     client_exception_handler,
@@ -227,7 +226,7 @@ class CoreAprsClient:
             msg=f"parsing message '{message_text}' for callsign '{from_callsign}'"
         )
 
-        success, response_parameters = self.input_parser(
+        success, input_parser_error_message, response_parameters = self.input_parser(
             aprs_message=message_text, from_callsign=from_callsign
         )
 
@@ -255,10 +254,7 @@ class CoreAprsClient:
                 )
             logger.info(msg=pformat(output_message))
         else:
-            input_parser_error_message = response_parameters[
-                "input_parser_error_message"
-            ]
-            # Dump the HRM to the user if we have one
+            # Dump the human readable message to the user if we have one
             if input_parser_error_message:
                 output_message = make_pretty_aprs_messages(
                     message_to_add=f"{input_parser_error_message}",
