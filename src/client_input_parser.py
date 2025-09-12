@@ -47,7 +47,7 @@ def parse_input_message(aprs_message: str, from_callsign: str):
         error message (e.g. context-specific errors related to the
         keyword that was sent to the bot). If this field is empty AND
         success=False, then the default error message will be returned.
-    response_parameters: dict
+    input_parser_response_object: dict
         Dictionary object where we store the data that is required
         by the 'output_generator' module for generating the APRS message.
         For this stub, that dictionary is empty.
@@ -135,12 +135,12 @@ def parse_input_message(aprs_message: str, from_callsign: str):
     # You can (and have to) amend this dict object so that it contains all fields
     # relevant for output processing. Ensure that both input parser and output processor
     # use the same dictionary structure.
-    response_parameters = {
+    input_parser_response_object = {
         "from_callsign": from_callsign,
         "command_code": command_code,
     }
 
-    return success, input_parser_error_message, response_parameters
+    return success, input_parser_error_message, input_parser_response_object
 
 
 if __name__ == "__main__":

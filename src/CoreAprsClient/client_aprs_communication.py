@@ -439,13 +439,20 @@ def aprs_callback(
                     #
                     # Note: we call the function which was passed along with the
                     # callback object
-                    success, output_message = generator(
+                    success, output_string = generator(
                         response_parameters=response_parameters,
+                        default_error_message=program_config["client_config"][
+                            "aprs_input_parser_default_error_message"
+                        ],
                     )
-                    # This code branch should never be reached unless there is a
-                    # discrepancy between the action determined by the input parser
-                    # and the responsive counter-action in the output processor
-                    if not success:
+                    if success:
+                        output_message = make_pretty_aprs_messages(
+                            message_to_add=output_string
+                        )
+                    else:
+                        # This code branch should never be reached unless there is a
+                        # discrepancy between the action determined by the input parser
+                        # and the responsive counter-action in the output processor
                         output_message = make_pretty_aprs_messages(
                             message_to_add=program_config["client_config"][
                                 "aprs_input_parser_default_error_message"
