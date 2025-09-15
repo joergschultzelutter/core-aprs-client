@@ -26,8 +26,8 @@ import argparse
 import zipfile
 import apprise
 import re
-from client_configuration import program_config
-from client_logger import logger
+from .client_configuration import program_config
+from .client_logger import logger
 import sys
 
 # These are global variables which will be used

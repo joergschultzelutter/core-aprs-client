@@ -27,8 +27,8 @@ from functools import partial
 import logging
 from pprint import pformat
 
-import client_shared
-from client_utils import (
+from . import client_shared
+from .client_utils import (
     signal_term_handler,
     check_and_create_data_directory,
     client_exception_handler,
@@ -37,16 +37,16 @@ from client_utils import (
     finalize_pretty_aprs_messages,
     make_pretty_aprs_messages,
 )
-from client_configuration import load_config, program_config
-from client_aprsobject import APRSISObject
-from client_message_counter import APRSMessageCounter
-from client_expdict import create_expiring_dict
-from client_aprs_communication import (
+from .client_configuration import load_config, program_config
+from .client_aprsobject import APRSISObject
+from .client_message_counter import APRSMessageCounter
+from .client_expdict import create_expiring_dict
+from .client_aprs_communication import (
     aprs_callback,
     init_scheduler_jobs,
     remove_scheduler,
 )
-from client_logger import logger, update_logging_level
+from .client_logger import logger, update_logging_level
 
 
 class CoreAprsClient:

@@ -21,18 +21,18 @@
 import time
 import types
 
-from client_configuration import program_config
-from client_utils import (
+from .client_configuration import program_config
+from .client_utils import (
     make_pretty_aprs_messages,
     get_aprs_message_from_cache,
     add_aprs_message_to_cache,
     parse_bulletin_data,
     finalize_pretty_aprs_messages,
 )
-from _version import __version__
-from client_aprsobject import APRSISObject
-import client_shared
-from client_logger import logger
+from ._version import __version__
+from .client_aprsobject import APRSISObject
+from . import client_shared
+from .client_logger import logger
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers import base as apbase
 
