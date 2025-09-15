@@ -237,7 +237,13 @@ class CoreAprsClient:
             # the completion of the remaining tasks. The APRS access details
             # are not known and will be set to simulation mode
             logger.info(msg="Response:")
-            success, output_message = self.output_generator(response_parameters)
+            success, output_message = self.output_generator(
+                input_parser_response_object=response_parameters,
+                default_error_message=program_config["client_config"][
+                    "aprs_input_parser_default_error_message"
+                ],
+            )
+            logger.info(msg=output_message)
             # And finalize the output message, if needed
             if success:
                 output_message = finalize_pretty_aprs_messages(
