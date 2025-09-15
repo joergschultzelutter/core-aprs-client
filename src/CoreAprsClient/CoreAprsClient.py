@@ -233,19 +233,24 @@ class CoreAprsClient:
         logger.info(msg=pformat(response_parameters))
         logger.info(msg=f"success: {success}")
         if success:
-            # enrich our response parameters with all API keys that we need for
-            # the completion of the remaining tasks. The APRS access details
-            # are not known and will be set to simulation mode
+            # (Try to) build the outgoing message string
             logger.info(msg="Response:")
-            success, output_message = self.output_generator(
+            success, output_message_string = self.output_generator(
                 input_parser_response_object=response_parameters,
                 default_error_message=program_config["client_config"][
                     "aprs_input_parser_default_error_message"
                 ],
             )
-            logger.info(msg=output_message)
-            # And finalize the output message, if needed
+            logger.info(msg=output_message_string)
+
+            # Generate the outgoing content, if successful
             if success:
+                # Convert to pretty APRS messaging
+                output_message = make_pretty_aprs_messages(
+                    message_to_add=output_message_string
+                )
+
+                # And finalize the output message, if needed
                 output_message = finalize_pretty_aprs_messages(
                     mylistarray=output_message
                 )
