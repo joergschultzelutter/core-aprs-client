@@ -21,8 +21,8 @@ if __name__ == "__main__":
         author="Joerg Schultze-Lutter",
         author_email="joerg.schultze.lutter@gmail.com",
         url="https://github.com/joergschultzelutter/core-aprs-client",
-        packages=find_packages(where="src/CoreAprsClient"),
-#        package_dir={"": "src"},
+        packages=find_packages(where="src"),
+        package_dir={"": "src"},
         include_package_data=True,
         classifiers=[
             "Intended Audience :: Developers",
