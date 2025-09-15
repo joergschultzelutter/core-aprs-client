@@ -12,7 +12,7 @@ if __name__ == "__main__":
 #        raise ValueError("Did not receive version info from GitHub")
 
     setup(
-        name="coreaprsclient",
+        name="core-aprs-client",
 #        version=VERSION,
         version="0.0.1",
         description="Core APRS Client framework",
@@ -22,7 +22,7 @@ if __name__ == "__main__":
         author_email="joerg.schultze.lutter@gmail.com",
         url="https://github.com/joergschultzelutter/core-aprs-client",
         packages=find_packages(where="src"),
-        package_dir={"": "src"},
+#        package_dir={"": "src"},
         include_package_data=True,
         classifiers=[
             "Intended Audience :: Developers",
