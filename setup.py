@@ -7,13 +7,14 @@ if __name__ == "__main__":
     with open("README.md", "r") as fh:
         long_description = fh.read()
 
-    VERSION = os.getenv("GITHUB_PROGRAM_VERSION")
-    if not VERSION:
-        raise ValueError("Did not receive version info from GitHub")
+#    VERSION = os.getenv("GITHUB_PROGRAM_VERSION")
+#    if not VERSION:
+#        raise ValueError("Did not receive version info from GitHub")
 
     setup(
         name="core-aprs-client",
-        version=VERSION,
+#        version=VERSION,
+        version="0.0.1",
         description="Core APRS Client framework",
         long_description=long_description,
         long_description_content_type="text/markdown",
