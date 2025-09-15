@@ -33,12 +33,12 @@ if __name__ == "__main__":
             "Topic :: Communications :: Ham Radio",
         ],
         license="GNU General Public License v3 (GPLv3)",
-        install_requires=["aprslib>=0.7.2",
-                          "apprise>=1.9.4",
-                          "expiringdict>=1.2.2",
-                          "unidecode>=1.4.0",
-                          "apscheduler>=3.11.0"],
-        keywords=["Ham Radio",
-                  "Amateur Radio",
-                  "APRS"]
+        install_requires=[
+            "aprslib>=0.7.2",
+            "apprise>=1.9.4",
+            "expiringdict>=1.2.2",
+            "unidecode>=1.4.0",
+            "apscheduler>=3.11.0",
+        ],
+        keywords=["Ham Radio", "Amateur Radio", "APRS"],
     )
