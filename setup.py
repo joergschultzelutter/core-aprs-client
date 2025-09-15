@@ -12,7 +12,7 @@ if __name__ == "__main__":
 #        raise ValueError("Did not receive version info from GitHub")
 
     setup(
-        name="core-aprs-client",
+        name="core-aprsclient",
 #        version=VERSION,
         version="0.0.1",
         description="Core APRS Client framework",
