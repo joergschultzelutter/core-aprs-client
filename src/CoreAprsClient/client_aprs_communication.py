@@ -33,6 +33,7 @@ from ._version import __version__
 from .client_aprsobject import APRSISObject
 from . import client_shared
 from .client_logger import logger
+from .client_return_codes import CoreAprsClientInputParserStatus
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers import base as apbase
 
