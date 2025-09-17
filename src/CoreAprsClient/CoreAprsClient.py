@@ -47,6 +47,7 @@ from .client_aprs_communication import (
     remove_scheduler,
 )
 from .client_logger import logger, update_logging_level
+from .client_return_codes import CoreAprsClientInputParserStatus
 
 
 class CoreAprsClient:
@@ -70,7 +71,7 @@ class CoreAprsClient:
         # Update the log level (if needed)
         update_logging_level(logging_level=self.log_level)
 
-    def run_listener(self):
+    def activate_client(self):
         # load the program config from our external config file
         load_config(config_file=self.config_file)
         if len(program_config) == 0:
@@ -158,7 +159,7 @@ class CoreAprsClient:
                     #
                     # We are now ready to initiate the actual processing
                     # Start the consumer thread
-                    logger.info(msg="Starting callback consumer")
+                    logger.debug(msg="Starting callback consumer")
                     client_shared.AIS.ais_start_consumer(enhanced_callback)
 
                     #
@@ -207,7 +208,9 @@ class CoreAprsClient:
 
         pass
 
-    def testcall(self, message_text: str, from_callsign: str):
+    def dryrun_testcall(self, message_text: str, from_callsign: str):
+        logger.info("Activating dryrun testcall...")
+
         # load the program config from our external config file
         load_config(config_file=self.config_file)
         if len(program_config) == 0:
@@ -226,61 +229,75 @@ class CoreAprsClient:
             msg=f"parsing message '{message_text}' for callsign '{from_callsign}'"
         )
 
-        success, input_parser_error_message, response_parameters = self.input_parser(
+        retcode, input_parser_error_message, response_parameters = self.input_parser(
             aprs_message=message_text, from_callsign=from_callsign
         )
 
+        logger.info(msg="Parsed message:")
         logger.info(msg=pformat(response_parameters))
-        logger.info(msg=f"success: {success}")
-        if success:
-            # (Try to) build the outgoing message string
-            logger.info(msg="Response:")
-            success, output_message_string = self.output_generator(
-                input_parser_response_object=response_parameters,
-                default_error_message=program_config["client_config"][
-                    "aprs_input_parser_default_error_message"
-                ],
-            )
-            logger.info(msg=output_message_string)
+        logger.info(msg=f"return code: {retcode}")
+        match retcode:
+            case CoreAprsClientInputParserStatus.PARSE_OK:
 
-            # Generate the outgoing content, if successful
-            if success:
-                # Convert to pretty APRS messaging
-                output_message = make_pretty_aprs_messages(
-                    message_to_add=output_message_string
+                logger.info("Running Output Processor build ...")
+
+                # (Try to) build the outgoing message string
+                success, output_message_string = self.output_generator(
+                    input_parser_response_object=response_parameters,
+                    default_error_message=program_config["client_config"][
+                        "aprs_input_parser_default_error_message"
+                    ],
                 )
+                logger.info(msg=f"Output Processor response= {success}, message:")
+                logger.info(msg=output_message_string)
 
-                # And finalize the output message, if needed
+                # Generate the outgoing content, if successful
+                if success:
+                    logger.info(
+                        "Output processor status successful; building outgoing messages ..."
+                    )
+                    # Convert to pretty APRS messaging
+                    output_message = make_pretty_aprs_messages(
+                        message_to_add=output_message_string
+                    )
+
+                    # And finalize the output message, if needed
+                    output_message = finalize_pretty_aprs_messages(
+                        mylistarray=output_message
+                    )
+                else:
+                    logger.info("Output processor status unsuccessful")
+                    # This code branch should never be reached unless there is a
+                    # discrepancy between the action determined by the input parser
+                    # and the responsive counter-action in the output processor
+                    output_message = make_pretty_aprs_messages(
+                        message_to_add=program_config["client_config"][
+                            "aprs_input_parser_default_error_message"
+                        ],
+                    )
+                logger.info(msg=pformat(output_message))
+            case CoreAprsClientInputParserStatus.PARSE_ERROR | _:
+                logger.error(
+                    msg="input_parser_error_message = {input_parser_error_message}"
+                )
+                # Dump the human readable message to the user if we have one
+                if input_parser_error_message:
+                    output_message = make_pretty_aprs_messages(
+                        message_to_add=f"{input_parser_error_message}",
+                    )
+                # If not, just dump the link to the instructions
+                else:
+                    output_message = make_pretty_aprs_messages(
+                        message_to_add=program_config["client_config"][
+                            "aprs_input_parser_default_error_message"
+                        ],
+                    )
+                # Ultimately, finalize the outgoing message(s) and add the message
+                # numbers if the user has requested this in his configuration
+                # settings
                 output_message = finalize_pretty_aprs_messages(
                     mylistarray=output_message
                 )
-            else:
-                # This code branch should never be reached unless there is a
-                # discrepancy between the action determined by the input parser
-                # and the responsive counter-action in the output processor
-                output_message = make_pretty_aprs_messages(
-                    message_to_add=program_config["client_config"][
-                        "aprs_input_parser_default_error_message"
-                    ],
-                )
-            logger.info(msg=pformat(output_message))
-        else:
-            # Dump the human readable message to the user if we have one
-            if input_parser_error_message:
-                output_message = make_pretty_aprs_messages(
-                    message_to_add=f"{input_parser_error_message}",
-                )
-            # If not, just dump the link to the instructions
-            else:
-                output_message = make_pretty_aprs_messages(
-                    message_to_add=program_config["client_config"][
-                        "aprs_input_parser_default_error_message"
-                    ],
-                )
-            # Ultimately, finalize the outgoing message(s) and add the message
-            # numbers if the user has requested this in his configuration
-            # settings
-            output_message = finalize_pretty_aprs_messages(mylistarray=output_message)
 
-            logger.info(pformat(output_message))
-            logger.info(msg=pformat(response_parameters))
+                logger.info(pformat(output_message))
+                logger.info(msg=pformat(response_parameters))

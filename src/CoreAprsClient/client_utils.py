@@ -616,7 +616,7 @@ def split_string_to_string_list(
         List array, containing 1..n strings with a max len of 'max_len'
     """
     split_strings = [
-        message_string[index: index + max_len]
+        message_string[index : index + max_len]
         for index in range(0, len(message_string), max_len)
     ]
     return split_strings
@@ -643,7 +643,9 @@ def parse_bulletin_data(core_config: dict):
     # Get the key and value from our configuration file's bulletin messages section
     for key, value in core_config["bulletin_messages"].items():
         # Message populated and less than max APRS message length?
-        if 0 < len(value) <= _get_aprs_msg_len():
+        # note: we do not use message enumeration for bulletins
+        # therefore, the max length requirement is always fixed (67 bytes)
+        if 0 < len(value) <= APRS_MSG_LEN_NOTRAILING:
             # Check if the identifier follows these APRS requirements:
             # 1) must start with fixed "BLN" string
             # 2) needs to be followed by 1..6 ASCII-7 characters and/or digits
@@ -669,7 +671,7 @@ def parse_bulletin_data(core_config: dict):
                     aprs_bulletin_messages[key] = value
         else:
             logger.debug(
-                f"Ignoring bulletin setting for '{key}'; value is either empty or too long. Check your configuration"
+                f"Ignoring bulletin setting for '{key}'; value is either empty or exceeds {APRS_MSG_LEN_NOTRAILING} characters. Check your configuration file"
             )
     return aprs_bulletin_messages
 
