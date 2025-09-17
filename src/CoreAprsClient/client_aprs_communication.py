@@ -416,23 +416,54 @@ def aprs_callback(
                 #
                 # Note: we call the function which was passed along with the
                 # callback object
-                success, input_parser_error_message, response_parameters = parser(
+                retcode, input_parser_error_message, response_parameters = parser(
                     aprs_message=message_text_string,
                     from_callsign=from_callsign,
                 )
-                logger.debug(msg=f"Input parser result: {success}")
+                logger.debug(msg=f"Input parser result: {retcode}")
                 logger.debug(msg=response_parameters)
-                #
-                # If the 'success' parameter is True, then we should know
-                # by now what the user wants from us. Now, we'll leave it to
-                # another module to generate the output data of what we want
-                # to send to the user.
-                # The result to this post-processor will be a general success
-                # status code and a list item, containing the messages that are
-                # ready to be sent to the user.
+
+                # this is our future output message object
+                output_message = []
+
                 #
                 # parsing successful?
-                if success:
+                #
+                # We support three possible return codes:
+                # PARSE_OK     - Input processor has identified keyword and is ready
+                #                to continue. This is the desired default state
+                #                Whenever the return code is PARSE_OK, then we should know
+                #                by now what the user wants from us. Now, we'll leave it to
+                #                another module to generate the output data of what we want
+                #                to send to the user.
+                #                The result to this post-processor will be a general success
+                #                status code and a list item, containing the messages that are
+                #                ready to be sent to the user.
+                # PARSE_ERROR  - an error has occurred. Most likely, the external
+                #                input processor was either unable to identify a
+                #                keyword from the message OR a follow-up process has
+                #                failed; e.g. the user has defined a wx keyword,
+                #                requiring the sender to supply mandatory location info
+                #                which was missing from the message. In any way, this signals
+                #                the callback function that we are unable to process the
+                #                message any further
+                # PARSE_IGNORE - The message was ok but we are being told to ignore it. This
+                #                might be the case if the user's input processor has a dupe
+                #                check that is additional to the one provided by the
+                #                core-aprs-client framework. Similar to PARSE_ERROR, we
+                #                are not permitted to process this request any further BUT
+                #                instead of sending an error message, we will simply ignore
+                #                the request. Note that the core-aprs-client framework has
+                #                already ack'ed the request at this point, thus preventing it
+                #                from getting resend by APRS-IS over and over again.
+                #
+                # Note that you should refrain from using PARSE_IGNORE whenever possible - a
+                # polite inquiry should always trigger a polite response :-) Nevertheless, there
+                # might be use cases where you simply need to ignore a (technically valid) request
+                # in your custom code.
+                #
+                #
+                if retcode == CoreAprsClientInputParserStatus.PARSE_OK:
                     # Generate the output message for the requested keyword
                     # The 'success' status is ALWAYS positive even if the
                     # message could not get processed - the inline'd error
@@ -466,7 +497,7 @@ def aprs_callback(
                 # As we only parse but never process data in that input
                 # parser, we sinply don't know what to do with the user's message
                 # and get back to him with a generic response.
-                else:
+                elif retcode == CoreAprsClientInputParserStatus.PARSE_ERROR:
                     # Dump the human readable message to the user if we have one
                     if input_parser_error_message:
                         output_message = make_pretty_aprs_messages(
