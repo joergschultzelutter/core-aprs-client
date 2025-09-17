@@ -472,7 +472,7 @@ def aprs_callback(
                         # Note: we call the function which was passed along with the
                         # callback object
                         success, output_string = generator(
-                            response_parameters=response_parameters,
+                            input_parser_response_object=response_parameters,
                             default_error_message=program_config["client_config"][
                                 "aprs_input_parser_default_error_message"
                             ],
