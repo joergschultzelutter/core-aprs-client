@@ -21,8 +21,7 @@ from enum import Enum
 
 
 class CoreAprsClientInputParserStatus(Enum):
-    PARSE_ERROR_OTHER = -2
-    PARSE_ERROR_KEYWORD_NOT_FOUND = -1
+    PARSE_ERROR = -1
     PARSE_WARNING_IGNORE = 0
     PARSE_OK = 1
 
