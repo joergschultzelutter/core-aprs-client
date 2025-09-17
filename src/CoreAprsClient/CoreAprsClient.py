@@ -55,10 +55,8 @@ from collections.abc import Callable
 class CoreAprsClient:
     config_file: str
     log_level: int
-    input_parser: Callable[
-        [str, str], Tuple[CoreAprsClientInputParserStatus, str, dict | object]
-    ]
-    output_generator: Callable[[dict | object, str], Tuple[bool, str]]
+    input_parser: types.FunctionType
+    output_generator: types.FunctionType
 
     def __init__(
         self,
