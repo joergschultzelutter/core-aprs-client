@@ -22,7 +22,7 @@ from enum import Enum
 
 class CoreAprsClientInputParserStatus(Enum):
     PARSE_ERROR = -1
-    PARSE_WARNING_IGNORE = 0
+    PARSE_IGNORE = 0
     PARSE_OK = 1
 
 
