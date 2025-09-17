@@ -429,7 +429,7 @@ def aprs_callback(
                 #
                 # parsing successful?
                 #
-                # We support three possible return codes:
+                # We support three possible return codes from the input parser:
                 # PARSE_OK     - Input processor has identified keyword and is ready
                 #                to continue. This is the desired default state
                 #                Whenever the return code is PARSE_OK, then we should know
