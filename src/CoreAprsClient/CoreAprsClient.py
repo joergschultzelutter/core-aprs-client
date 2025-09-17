@@ -48,13 +48,13 @@ from .client_aprs_communication import (
 )
 from .client_logger import logger, update_logging_level
 from .client_return_codes import CoreAprsClientInputParserStatus
-
+from typing import Callable, Tuple
 
 class CoreAprsClient:
     config_file: str
     log_level: int
-    input_parser: types.FunctionType
-    output_generator: types.FunctionType
+    input_parser: Callable
+    output_generator: Callable
 
     def __init__(
         self,
@@ -248,7 +248,7 @@ class CoreAprsClient:
                         "aprs_input_parser_default_error_message"
                     ],
                 )
-                logger.info(msg=f"Output Processor response= {success}, message:")
+                logger.info(msg=f"Output Processor response={success}, message:")
                 logger.info(msg=output_message_string)
 
                 # Generate the outgoing content, if successful
