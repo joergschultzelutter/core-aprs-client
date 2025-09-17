@@ -48,13 +48,17 @@ from .client_aprs_communication import (
 )
 from .client_logger import logger, update_logging_level
 from .client_return_codes import CoreAprsClientInputParserStatus
-from typing import Callable, Tuple
+from typing import Tuple
+from collections.abc import Callable
+
 
 class CoreAprsClient:
     config_file: str
     log_level: int
-    input_parser: Callable
-    output_generator: Callable
+    input_parser: Callable[
+        [str, str], Tuple[CoreAprsClientInputParserStatus, str, dict | object]
+    ]
+    output_generator: Callable[[dict | object, str], Tuple[bool, str]]
 
     def __init__(
         self,
