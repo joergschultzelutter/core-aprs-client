@@ -490,8 +490,7 @@ def aprs_callback(
                                     "aprs_input_parser_default_error_message"
                                 ],
                             )
-                    # darn - we failed to hail the Tripods
-                    # this is the branch where the input parser failed to understand
+                    # This is the branch where the input parser failed to understand
                     # the message. A possible reason: you sent a keyword which requires
                     # an additional parameter but failed to send that one, too.
                     # As we only parse but never process data in that input
