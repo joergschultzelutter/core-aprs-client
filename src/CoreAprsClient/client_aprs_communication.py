@@ -462,58 +462,62 @@ def aprs_callback(
                 # in your custom code.
                 #
                 #
-                if retcode == CoreAprsClientInputParserStatus.PARSE_OK:
-                    # Generate the output message for the requested keyword
-                    # The 'success' status is ALWAYS positive even if the
-                    # message could not get processed - the inline'd error
-                    # message counts as positive message content
-                    #
-                    # Note: we call the function which was passed along with the
-                    # callback object
-                    success, output_string = generator(
-                        response_parameters=response_parameters,
-                        default_error_message=program_config["client_config"][
-                            "aprs_input_parser_default_error_message"
-                        ],
-                    )
-                    if success:
-                        output_message = make_pretty_aprs_messages(
-                            message_to_add=output_string
-                        )
-                    else:
-                        # This code branch should never be reached unless there is a
-                        # discrepancy between the action determined by the input parser
-                        # and the responsive counter-action in the output processor
-                        output_message = make_pretty_aprs_messages(
-                            message_to_add=program_config["client_config"][
+                match retcode:
+                    case CoreAprsClientInputParserStatus.PARSE_OK:
+                        # Generate the output message for the requested keyword
+                        # The 'success' status is ALWAYS positive even if the
+                        # message could not get processed - the inline'd error
+                        # message counts as positive message content
+                        #
+                        # Note: we call the function which was passed along with the
+                        # callback object
+                        success, output_string = generator(
+                            response_parameters=response_parameters,
+                            default_error_message=program_config["client_config"][
                                 "aprs_input_parser_default_error_message"
                             ],
                         )
-                # darn - we failed to hail the Tripods
-                # this is the branch where the input parser failed to understand
-                # the message. A possible reason: you sent a keyword which requires
-                # an additional parameter but failed to send that one, too.
-                # As we only parse but never process data in that input
-                # parser, we sinply don't know what to do with the user's message
-                # and get back to him with a generic response.
-                elif retcode == CoreAprsClientInputParserStatus.PARSE_ERROR:
-                    # Dump the human readable message to the user if we have one
-                    if input_parser_error_message:
-                        output_message = make_pretty_aprs_messages(
-                            message_to_add=f"{input_parser_error_message}",
-                        )
-                    # If not, just dump the link to the instructions
-                    # This is the default branch which dumps generic information
-                    # to the client whenever there is no generic error text from the input parser
-                    else:
-                        output_message = make_pretty_aprs_messages(
-                            message_to_add=program_config["client_config"][
-                                "aprs_input_parser_default_error_message"
-                            ],
-                        )
-                        logger.debug(
-                            msg=f"Unable to process APRS packet {raw_aprs_packet}"
-                        )
+                        if success:
+                            output_message = make_pretty_aprs_messages(
+                                message_to_add=output_string
+                            )
+                        else:
+                            # This code branch should never be reached unless there is a
+                            # discrepancy between the action determined by the input parser
+                            # and the responsive counter-action in the output processor
+                            output_message = make_pretty_aprs_messages(
+                                message_to_add=program_config["client_config"][
+                                    "aprs_input_parser_default_error_message"
+                                ],
+                            )
+                    # darn - we failed to hail the Tripods
+                    # this is the branch where the input parser failed to understand
+                    # the message. A possible reason: you sent a keyword which requires
+                    # an additional parameter but failed to send that one, too.
+                    # As we only parse but never process data in that input
+                    # parser, we sinply don't know what to do with the user's message
+                    # and get back to him with a generic response.
+                    case CoreAprsClientInputParserStatus.PARSE_ERROR:
+                        # Dump the human readable message to the user if we have one
+                        if input_parser_error_message:
+                            output_message = make_pretty_aprs_messages(
+                                message_to_add=f"{input_parser_error_message}",
+                            )
+                        # If not, just dump the link to the instructions
+                        # This is the default branch which dumps generic information
+                        # to the client whenever there is no generic error text from the input parser
+                        else:
+                            output_message = make_pretty_aprs_messages(
+                                message_to_add=program_config["client_config"][
+                                    "aprs_input_parser_default_error_message"
+                                ],
+                            )
+                            logger.debug(
+                                msg=f"Unable to process APRS packet {raw_aprs_packet}"
+                            )
+                    # default branch for anything else, including PARSE_IGNORE
+                    case _:
+                        pass
 
                 # Ultimately, finalize the outgoing message(s) and add the message
                 # numbers if the user has requested this in his configuration
