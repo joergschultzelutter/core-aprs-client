@@ -435,10 +435,9 @@ def aprs_callback(
                 #                Whenever the return code is PARSE_OK, then we should know
                 #                by now what the user wants from us. Now, we'll leave it to
                 #                another module to generate the output data of what we want
-                #                to send to the user.
+                #                to send to the user (client_output_generatpr.py).
                 #                The result to this post-processor will be a general success
-                #                status code and a list item, containing the messages that are
-                #                ready to be sent to the user.
+                #                status code and the message that is to be sent to the user.
                 # PARSE_ERROR  - an error has occurred. Most likely, the external
                 #                input processor was either unable to identify a
                 #                keyword from the message OR a follow-up process has
