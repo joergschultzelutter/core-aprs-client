@@ -21,15 +21,19 @@ Location: `~/src/CoreAprsClient`
 
 ## Configuration files 
 
+Location: `~/sample_aprs_client`
+
 >[!NOTE]
 >Although most of these configuration files are provided with predefined default content, you do need to modify these files.
 
-| File Name                       | Usage                                                                                                                                                                                                                                                  |
-|---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `apprise.yml.TEMPLATE`          | Contains the [Apprise](https://www.github.com/caronc/apprise) configuration for `COAC`'s [crash handler](configuration_subsections/config_crash_handler.md)                                                                                            |
-| `core_aprs_client_cfg.TEMPLATE` | The program's config file. Rename the file (default file name is `core_aprs_client.cfg` and add your configuration data as described [here](configuration.md).                                                                                         |
+| File Name                       | Usage                                                                                                                                                                                                                                           |
+|---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `apprise.yml.TEMPLATE`          | Contains the [Apprise](https://www.github.com/caronc/apprise) configuration for `COAC`'s [crash handler](configuration_subsections/config_crash_handler.md). File name is referenced in the `core_aprs_client_cfg.TEMPLATE` configuration file. |
+| `core_aprs_client_cfg.TEMPLATE` | `core-aprs-client`'s master configuration file. Rename the file (default file name is `core_aprs_client.cfg` and add your configuration data as described [here](configuration.md).                                                             |
 
 ## User files
+
+Location: `~/sample_aprs_client`
 
 >[!NOTE]
 >These files are stubs which will help you to understand how `core-aprs-client` works. For production use, you need to modify these files.
