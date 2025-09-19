@@ -36,7 +36,6 @@ When it comes to the user's individual configuration settings, `core-aprs-client
 | [message_delay](configuration_subsections/config_message_delay.md)                                                                               | Configures the delays between outgoing multiple APRS-IS messages                                                                    |
 | [testing](configuration_subsections/config_testing.md)                                                                                           | Configuration settings for software and integration testing                                                                         |
 | [data_storage](configuration_subsections/config_data_storage.md)                                                                                 | Configuration settings for the storage of data files, e.g. the data file which persists the APRS message counter                    |
-| [custom_config](configuration_subsections/config_custom.md)                                                                                      | Empty. You can store your very own configuration settings in this section; `core-aprs-client` will then make these available to you |
 
 ## Configuration file sample
 
@@ -254,11 +253,6 @@ aprs_data_directory = data_files
 # This is the name of the file that will contain the program's message counter
 # If not present, then the file will be created by the program
 aprs_message_counter_file_name = core_aprs_client_message_counter.txt
-
-[custom_config]
-#
-# This section is deliberately kept empty and can be used for storing your
-# individual APRS bot's configuration settings
 ```
 
 
