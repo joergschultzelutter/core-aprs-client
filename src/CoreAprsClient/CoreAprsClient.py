@@ -243,10 +243,7 @@ class CoreAprsClient:
 
                 # (Try to) build the outgoing message string
                 success, output_message_string = self.output_generator(
-                    input_parser_response_object=response_parameters,
-                    default_error_message=program_config["client_config"][
-                        "aprs_input_parser_default_error_message"
-                    ],
+                    input_parser_response_object=response_parameters
                 )
                 logger.info(msg=f"Output Processor response={success}, message:")
                 logger.info(msg=output_message_string)
