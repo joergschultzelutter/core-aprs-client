@@ -26,6 +26,8 @@ if __name__ == '__main__':
     client.activate_client()
 ```
 
+It's as simple as that.
+
 ## Core features
 - Core APRS-IS functionality, covering both 'old' and '[new](http://www.aprs.org/aprs11/replyacks.txt)' ACK/REJ processing
 - Configurable dupe message handler
@@ -41,8 +43,11 @@ Instructions for installing the framework and sample client on your computer can
 ### Client Configuration
 The steps for modifying the client's config file are described [here](docs/configuration.md).
 
-### Running the sample client
+### Running the sample client `sample_aprs_client.py`
 The steps for starting the sample client are described [here](docs/client_start.md).
+
+### `CoreAprsClient` class description
+The class methods are described[here](docs/coreaprssclient_class.md)
 
 ### Source Code Anatomy
 A brief overview on this repositories' software modules used by the client can be found [here](docs/anatomy.md).

@@ -70,11 +70,23 @@ def get_command_line_params():
 
 
 if __name__ == "__main__":
+
+    # Get the configuration file name
     config_file = get_command_line_params()
-    coac = CoreAprsClient(
+
+    # Create the CoreAprsClient object. Supply the
+    # following parameters:
+    #
+    # - configuration file name
+    # - log level (from Python's 'logging' package)
+    # - function names for both input processor and output generator
+    #
+    client = CoreAprsClient(
         config_file=config_file,
         log_level=logging.INFO,
         input_parser=parse_input_message,
         output_generator=generate_output_message,
     )
-    coac.activate_client()
+
+    # Activate the APRS client
+    client.activate_client()

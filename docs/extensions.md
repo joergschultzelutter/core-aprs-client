@@ -3,6 +3,11 @@
 ## Basic schematics
 ![Workflow Input-Output Processing](../img/workflow_input_output_processing.svg)
 
+## Your custom code vs. the `core-aprs-client` framework
+
+[Overview](../img/file_structure.drawio.svg)
+
+
 ## General Info
 
 > [!INFO]
