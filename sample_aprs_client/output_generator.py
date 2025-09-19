@@ -27,7 +27,8 @@
 # this code according to your very own use case.
 #
 
-def __process_greetme_keyword(data_parameters: dict) -> Tuple[bool, str]:
+
+def __process_greetme_keyword(data_parameters: dict):
     """
     This is a stub which takes the sender's call sign from the input
     parameters and generates a greeting message, e.g. "Hello DF1JSL-1"
@@ -35,7 +36,7 @@ def __process_greetme_keyword(data_parameters: dict) -> Tuple[bool, str]:
     Parameters
     ==========
     data_parameters: dict
-        dictionary object, containing data from client_input_parser.py
+        dictionary object, containing data from input_parser.py
         as received by this module's generate_output_message function.
 
     Returns
@@ -55,14 +56,14 @@ def __process_greetme_keyword(data_parameters: dict) -> Tuple[bool, str]:
     return success, output_message
 
 
-def __process_sayhello_keyword(data_parameters: dict) -> Tuple[bool, str]:
+def __process_sayhello_keyword(data_parameters: dict):
     """
     This is a stub which generates a static "Hello World" message
 
     Parameters
     ==========
     data_parameters: dict
-        dictionary object, containing data from client_input_parser.py
+        dictionary object, containing data from input_parser.py
         as received by this module's generate_output_message function.
         (not used in this function)
 
@@ -82,7 +83,7 @@ def __process_sayhello_keyword(data_parameters: dict) -> Tuple[bool, str]:
     return success, output_message
 
 
-def __process_loremipsum_keyword(data_parameters: dict) -> Tuple[bool, str]:
+def __process_loremipsum_keyword(data_parameters: dict):
     """
     This is a stub which takes the sender's call sign from the input
     parameters and generates a really long "lorem ipsum" message
@@ -91,7 +92,7 @@ def __process_loremipsum_keyword(data_parameters: dict) -> Tuple[bool, str]:
     Parameters
     ==========
     data_parameters: dict
-        dictionary object, containing data from client_input_parser.py
+        dictionary object, containing data from input_parser.py
         as received by this module's generate_output_message function.
         (not used in this function)
 
@@ -119,13 +120,13 @@ def generate_output_message(
     Parameters
     ==========
     input_parser_response_object: dict | object
-        dictionary object, containing data from client_input_parser.py
+        dictionary object, containing data from input_parser.py
         Literally speaking, you will use the content from this
         dictionary in order to generate an APRS output message.
         You can (and should!) customize this dict object but ensure that
         both input_parser and output_processor use the same structure
         Note that you can also return other objects such as classes. Just ensure that
-        both client_input_parser and client_output_generator share the very same
+        both input_parser and output_generator share the very same
         structure for this variable.
 
     default_error_message: str

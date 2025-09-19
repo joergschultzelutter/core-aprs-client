@@ -55,7 +55,7 @@ def parse_input_message(aprs_message: str, from_callsign: str):
         by the 'output_generator' module for generating the APRS message.
         For this stub, that dictionary is empty.
         Note that you can also return other objects such as classes. Just ensure that
-        both client_input_parser and client_output_generator share the very same
+        both input_parser and output_generator share the very same
         structure for this variable.
     """
 
@@ -177,7 +177,11 @@ def parse_input_message(aprs_message: str, from_callsign: str):
     # polite inquiry should always trigger a polite response :-) Nevertheless, there
     # might be use cases where you simply need to ignore a (technically valid) request
     # in your custom code.
-    return_code = CoreAprsClientInputParserStatus.PARSE_OK if success else CoreAprsClientInputParserStatus.PARSE_ERROR
+    return_code = (
+        CoreAprsClientInputParserStatus.PARSE_OK
+        if success
+        else CoreAprsClientInputParserStatus.PARSE_ERROR
+    )
 
     return return_code, input_parser_error_message, input_parser_response_object
 
