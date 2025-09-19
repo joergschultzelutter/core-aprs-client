@@ -1,0 +1,5 @@
+version: 1
+
+urls:
+  # One-liner (no colon at the end); just the url as you'd expect it:
+  - tgram://1234567890:ABCDEFGHIJKLMNOPQRSTU-VWXYZabcdefgh/123456789
