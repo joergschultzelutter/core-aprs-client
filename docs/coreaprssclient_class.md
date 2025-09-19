@@ -45,7 +45,7 @@ This method is responsible for the communication between the local APRS bot and 
     # - function names for both input processor and output generator
     #
     client = CoreAprsClient(
-        config_file="core_aprs_client.cfg"",
+        config_file="core_aprs_client.cfg",
         log_level=logging.INFO,
         input_parser=parse_input_message,
         output_generator=generate_output_message,
