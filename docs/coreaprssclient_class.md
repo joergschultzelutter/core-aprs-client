@@ -70,7 +70,7 @@ Dryrun code example:
     # - function names for both input processor and output generator
     #
     client = CoreAprsClient(
-        config_file="core_aprs_client.cfg"",
+        config_file="core_aprs_client.cfg",
         log_level=logging.INFO,
         input_parser=parse_input_message,
         output_generator=generate_output_message,
@@ -165,4 +165,5 @@ Valid values:
         do some processing
         ....
 
-        return_code = CoreAprsClientInputParserStatus.PARSE_OK if no_error else CoreAprsClientInputParserStatus.PARSE_ERROR
+        return_code = CoreAprsClientInputParserStatus.PARSE_OK if there_was_no_error else CoreAprsClientInputParserStatus.PARSE_ERROR
+        return return_code
