@@ -53,7 +53,6 @@ def parse_input_message(aprs_message: str, from_callsign: str):
     input_parser_response_object: dict | object
         Dictionary object where we store the data that is required
         by the 'output_generator' module for generating the APRS message.
-        For this stub, that dictionary is empty.
         Note that you can also return other objects such as classes. Just ensure that
         both input_parser and output_generator share the very same
         structure for this variable.

@@ -111,9 +111,7 @@ def __process_loremipsum_keyword(data_parameters: dict):
     return success, output_message
 
 
-def generate_output_message(
-    input_parser_response_object: dict | object, default_error_message: str
-):
+def generate_output_message(input_parser_response_object: dict | object):
     """
     This is a stub for your custom APRS output generator
 
@@ -128,14 +126,6 @@ def generate_output_message(
         Note that you can also return other objects such as classes. Just ensure that
         both input_parser and output_generator share the very same
         structure for this variable.
-
-    default_error_message: str
-        Default message to return when an error occurs
-        The default error message can be taken from the configuration file
-        program_config["client_config"]["aprs_input_parser_default_error_message"]
-        As neither the input parser nor the output processor have access to the
-        configuration file, we need to pass this information along to both
-        functions as part of the input parameters
 
     Returns
     =======
@@ -182,7 +172,12 @@ def generate_output_message(
             )
         case _:
             # Unless properly parsed via input processor, we should never reach this code
-            return False, default_error_message
+            # If we do, then there is a discrepancy between the input_processor's "command_code"
+            # and the one that we have here.
+            # If such a case should ever arise, core_aprs_client's callback function will simply
+            # respond to the user's request with the default error message from the config file
+            # --> program_config["client_config"]["aprs_input_parser_default_error_message"]
+            return False, None
 
 
 if __name__ == "__main__":

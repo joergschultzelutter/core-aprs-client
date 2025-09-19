@@ -465,17 +465,11 @@ def aprs_callback(
                 match retcode:
                     case CoreAprsClientInputParserStatus.PARSE_OK:
                         # Generate the output message for the requested keyword
-                        # The 'success' status is ALWAYS positive even if the
-                        # message could not get processed - the inline'd error
-                        # message counts as positive message content
                         #
                         # Note: we call the function which was passed along with the
                         # callback object
                         success, output_string = generator(
-                            input_parser_response_object=response_parameters,
-                            default_error_message=program_config["client_config"][
-                                "aprs_input_parser_default_error_message"
-                            ],
+                            input_parser_response_object=response_parameters
                         )
                         if success:
                             output_message = make_pretty_aprs_messages(
@@ -484,7 +478,7 @@ def aprs_callback(
                         else:
                             # This code branch should never be reached unless there is a
                             # discrepancy between the action determined by the input parser
-                            # and the responsive counter-action in the output processor
+                            # and the responsive counter-action from the output processor
                             output_message = make_pretty_aprs_messages(
                                 message_to_add=program_config["client_config"][
                                     "aprs_input_parser_default_error_message"

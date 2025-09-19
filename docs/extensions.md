@@ -4,9 +4,13 @@
 ![Workflow Input-Output Processing](../img/workflow_input_output_processing.svg)
 
 ## General Info
+
+> [!INFO]
+> The following documentation references the files located in this repository's `sample_aprs_client` directory
+
 > [!TIP]
-> - `client_input_parser.py` digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us.
-> - `client_output_generator.py` takes the data from `client_input_parser.py` and builds the outgoing message which is later to be sent to APRS-IS.
+> - `input_parser.py` digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us.
+> - `output_generator.py` takes the data from `input_parser.py` and builds the outgoing message which is later to be sent to APRS-IS.
 
 ## Usage of the offline test option for your bot integration
 > [!TIP]
@@ -25,46 +29,77 @@ By default, `core-aprs-client`'s default installation comes with three keywords 
 Any _other_ command that is sent to `core-aprs-client` will generate the bot's _generic_ error message which is defined in the [configuration file](configuration_subsections/config_client.md).
 
 > [!TIP]
-> For demonstration purposes, both `client_input_parser.py` and `client_output_generator.py` use a _VERY_ simplified processing algorithm. For your future code, you might want to implement proper parsing (e.g. by using regular expressions) and error handling.
+> For demonstration purposes, both `input_parser.py` and `output_generator.py` use a _VERY_ simplified processing algorithm. For your future code, you might want to implement proper parsing (e.g. by using regular expressions) and error handling.
 
-## Extending the input parser `client_input_parser.py`
+## Extending the input parser `input_parser.py`
 
 ### Input processor: Inputs
 
-| Field name      | Content                                                     | Field Type |
-|-----------------|-------------------------------------------------------------|------------|
-| `from_callsign` | The call sign that has sent the incoming APRS message to us | `str`      |
-| `aprs_message`  | the actual APRS message,  up to 67 bytes in length          | `str`      |
+| Field name      | Content                                                                 | Field Type |
+|-----------------|-------------------------------------------------------------------------|------------|
+| `aprs_message`  | The actual APRS message that we have received, up to 67 bytes in length | `str`      |
+| `from_callsign` | The call sign that has sent the incoming APRS message to us             | `str`      |
 
 ### Input processor: Outputs
 
-| Field name            | Content                                                                                  | Field Type |
-|-----------------------|------------------------------------------------------------------------------------------|------------|
-| `success`             | `True` in case of no errors, otherwise `False`                                           | `boolean`  |
-| `response_parameters` | the actual APRS message; up to 67 bytes in length. Details: see section below this table | `dict`     |
+| Field name                      | Content                                                                                                                                                                                                                                                                                            | Field Type                       |
+|---------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
+| `return_code`                   | `enum` object; see valid values below                                                                                                                                                                                                                                                              | `enum`                           |
+| `input_parser_error_message`    | If `return_code` is not `PARSE_OK`, this field can contain an optional error message (e.g. context-specific errors related to the keyword that was sent to the bot). If this field is empty AND `return_code` is NOT `PARSE_OK`, then the default error message will be returned.                  | `str`                            |
+| `input_parser_response_object`  | Dictionary object where we store the data that is required by the `output_generator` module for generating the APRS message. Note that you can also return other objects such as classes. Just ensure that both input_parser and output_generator share the very same structure for this variable. | `dict` (default) or any `object` |
 
+#### `return_code` - Valid values
+
+    # We support three possible return codes from the input parser:
+    # PARSE_OK     - Input processor has identified keyword and is ready
+    #                to continue. This is the desired default state
+    #                Whenever the return code is PARSE_OK, then we should know
+    #                by now what the user wants from us. Now, we'll leave it to
+    #                another module to generate the output data of what we want
+    #                to send to the user (client_output_generatpr.py).
+    #                The result to this post-processor will be a general success
+    #                status code and the message that is to be sent to the user.
+    # PARSE_ERROR  - an error has occurred. Most likely, the external
+    #                input processor was either unable to identify a
+    #                keyword from the message OR a follow-up process has
+    #                failed; e.g. the user has defined a wx keyword,
+    #                requiring the sender to supply mandatory location info
+    #                which was missing from the message. In any way, this signals
+    #                the callback function that we are unable to process the
+    #                message any further
+    # PARSE_IGNORE - The message was ok but we are being told to ignore it. This
+    #                might be the case if the user's input processor has a dupe
+    #                check that is additional to the one provided by the
+    #                core-aprs-client framework. Similar to PARSE_ERROR, we
+    #                are not permitted to process this request any further BUT
+    #                instead of sending an error message, we will simply ignore
+    #                the request. Note that the core-aprs-client framework has
+    #                already ack'ed the request at this point, thus preventing it
+    #                from getting resend by APRS-IS over and over again.
+    #
+    # Note that you should refrain from using PARSE_IGNORE whenever possible - a
+    # polite inquiry should always trigger a polite response :-) Nevertheless, there
+    # might be use cases where you simply need to ignore a (technically valid) request
+    # in your custom code.
 
 The default `response_parameters` object comes with three fields:
 
 | Field name                   | Content                                                                                                                                                                                                                                                                                                                         | Field Type |
 |------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
 | `from_callsign`              | Same value as the input section's `from_callsign`                                                                                                                                                                                                                                                                               | `str`      |
-| `input_parser_error_message` | usually empty. If `success == False` AND this field is populated, `core-aprs-client` will output this field's value and will not generate a _default_ error message. You can use this field for generating custom error messages, e.g. for cases where your keyword expects a 2nd parameter which was not supplied by the user. | `str`      |
 | `command_code`               | contains an internal code which tells the program's output processor what it needs to do.                                                                                                                                                                                                                                       | `str`      |
 
-## Extending the output generator `client_output_generator.py`
+## Extending the output generator `output_generator.py`
 
 ### Output generator: Inputs
 
-| Field name            | Content                                                                          | Field Type |
-|-----------------------|----------------------------------------------------------------------------------|------------|
-| `response_parameters` | the actual APRS message; up to 67 bytes in length. Details: see previous chapter | `dict`     |
-
+| Field name                     | Content                                                                                                                                                                                                                                                                                            | Field Type                       |
+|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
+| `input_parser_response_object` | Dictionary object where we store the data that is required by the `output_generator` module for generating the APRS message. Note that you can also return other objects such as classes. Just ensure that both input_parser and output_generator share the very same structure for this variable. | `dict` (default) or any `object` |
+ 
 ### Output generator: Outputs
 
-| Field name         | Content                                                                                                                        | Field Type |
-|--------------------|--------------------------------------------------------------------------------------------------------------------------------|------------|
-| `success`          | `True` in case of no errors, otherwise `False`                                                                                 | `boolean`  |
-| `output_message`   | `List` object, containing 1..n `str` objects of 1..67 bytes in length. This is the content that will be sent to the APRS user. | `list`     |
-
-Any errors which may arise as part of the `output-generator` process should be part of the `output_message` field. You can still check for the `success` field's value, though.
+| Field name         | Content                                                                                                                                                                                                                                                                                                                                                               | Field Type |
+|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| `success`          | `True` in case of no errors, otherwise `False`. Note that a `False` response code automatically triggers `core-aprs-client`'s default error message. If your custom `output_processor` code has failed and you still want to return a specific message to the user, you have to set this field's value to `True` and convey your data via the `output_message` field. | `boolean`  |
+| `output_message`   | This is the content that will be sent to the APRS user. `core-aprs-client`'s callback function will take this content, convert it into data chunks of up to 6 bytes in length, and then send it to APRS-IS.                                                                                                                                                           | `str`      |
