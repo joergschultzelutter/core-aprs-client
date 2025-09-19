@@ -5,7 +5,7 @@
 
 ## Your custom code vs. the `core-aprs-client` framework
 
-[Overview](../img/file_structure.drawio.svg)
+![Overview](../img/file_structure.drawio.svg)
 
 
 ## General Info
