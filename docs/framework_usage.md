@@ -1,4 +1,4 @@
-# Extending `core-aprs-client` with your own bot processing code
+# `core-aprs-client` framework usage
 
 ## Basic schematics
 ![Workflow Input-Output Processing](../img/workflow_input_output_processing.svg)

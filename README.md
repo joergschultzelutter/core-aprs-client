@@ -52,8 +52,8 @@ The class methods are described [here](docs/coreaprssclient_class.md)
 ### Source Code Anatomy
 A brief overview on this repositories' software modules used by the client can be found [here](docs/anatomy.md).
 
-### Extending the sample client with your own bot code
-The steps for adding your own extensions to the client are described [here](docs/extensions.md).
+### Framework usage
+The steps for using the client framework are described [here](docs/framework_usage.md).
 
 ### Client schematics
 If you want to learn about the bot's basic processing structure, then have a look at [this diagram](docs/schematics.md).
