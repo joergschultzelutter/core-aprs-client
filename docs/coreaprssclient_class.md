@@ -156,14 +156,15 @@ Valid values:
 > [!NOTE]
 > `PARSE_IGNORE` should _only_ be used for cases where your custom input processor has implemented e.g. a dupe check that is _additional_ to `core-aprs-client`s dupe check and you don't want to trigger ANY response to the user's inquiry. In any other case, use `PARSE_ERROR` and return a proper response message to the user.
 
-### `input_processor` sample code
+### `input_processor` return code sample
 
     from CoreAprsClient import CoreAprsClientInputParserStatus
 
     def process_the_input():
         ....
         do some processing
+        my_data_structure = {"key" : "value}
         ....
 
         return_code = CoreAprsClientInputParserStatus.PARSE_OK if there_was_no_error else CoreAprsClientInputParserStatus.PARSE_ERROR
-        return return_code
+        return return_code, my_data_structure
