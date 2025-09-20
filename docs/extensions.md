@@ -17,6 +17,8 @@
 > - `input_parser.py` digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us.
 > - `output_generator.py` takes the data from `input_parser.py` and builds the outgoing message which is later to be sent to APRS-IS.
 
+`input_parser.py` and `output_generator.py` rely on exchanging data through a mutually equal data structure. That data structure can be defined by the user and is passed through between both user functions; the `core-aprs-client` framework does *not* use this data element in any way. Just ensure that both custom code modules share the same data structure. 
+
 ## Usage of the offline test option for your bot integration
 > [!TIP]
 > - You can use the framework's[`dryrun_testcall`](coreaprssclient_class.md#dryrun_testcall-method) method for a 100% offline testing option which does not connect to APRS-IS. `dryrun_testcall` will route a user's call sign and APRS message through both input parser and output generator modules.
@@ -55,6 +57,9 @@ Any _other_ command that is sent to `core-aprs-client` will generate the bot's _
 
 #### `return_code` - Valid values
 
+> [!INFO]
+> The return codes are defined in the [CoreAprsClientInputParserStatus](coreaprssclient_class.md#input_processor-return-codes)
+
     # We support three possible return codes from the input parser:
     # PARSE_OK     - Input processor has identified keyword and is ready
     #                to continue. This is the desired default state
@@ -87,7 +92,7 @@ Any _other_ command that is sent to `core-aprs-client` will generate the bot's _
     # might be use cases where you simply need to ignore a (technically valid) request
     # in your custom code.
 
-The default `response_parameters` object comes with three fields:
+The default `input_parser_response_object` object (as provided with the sample code) comes with two fields:
 
 | Field name                   | Content                                                                                                                                                                                                                                                                                                                         | Field Type |
 |------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
