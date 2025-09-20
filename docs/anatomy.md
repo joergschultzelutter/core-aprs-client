@@ -61,8 +61,8 @@ Location: `~/sample_aprs_client`
 >[!NOTE]
 >These files are stubs which will help you to understand how `core-aprs-client` works. For production use, you need to modify these files.
 
-| File Name               | Usage                                                                                                                                                                                                                                    |
-|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| File Name               | Usage                                                                                                                                                                                                                                         |
+|-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `input_parser.py`       | Parses ingress APRS data and tries to understand what the APRS user wants us to do. Prepares the command data for `output_generator.py`. See [the documentation on extending](framework_usage.md) `core-aprs-client` for further information. |
 | `output_generator.py`   | Takes the command data from `input_parser.py` and builds the future output message for the APRS-IS user. See [the documentation on extending](framework_usage.md) `core-aprs-client` for further information.                                 |
-| `sample_aprs_client.py` | APRS demo client, based on `core-aprs_client`. Uses `input_parser.py` `output_generator.py` for data processing                                                                                                                          |
+| `sample_aprs_client.py` | APRS demo client, based on `core-aprs_client`. Uses `input_parser.py` `output_generator.py` for data processing                                                                                                                               |
