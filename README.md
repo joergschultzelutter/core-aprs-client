@@ -10,7 +10,7 @@ This is where _you_ step in. Add your bot-specific code to the client's APRS fra
 
 ## Sample APRS Client
 
-The following example illustrates a fully functional APRS bot. All you need to do is a modification of the input parser and the output processor. Everything else will be handled by the `core-aprs-client` framework.
+The following example illustrates a fully functional APRS bot. You will provide the APRS message input parser code and the generator responsible for the outgoing APRS message content. Everything else will be handled by the `core-aprs-client` framework.
 
 ```
 from CoreAprsClient import CoreAprsClient
