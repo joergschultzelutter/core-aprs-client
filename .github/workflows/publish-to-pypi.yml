@@ -1,0 +1,196 @@
+# Workflow: Extract version from Python file, verify version against release tag, generate PyPi package and
+#           upload content to PyPi Test / Prod
+#           Will only be executed when a new release is being published
+# Author  : Joerg Schultze-Lutter, 2022
+#
+##
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+##
+#
+# This Github Action consists of 2 jobs:
+#
+# Job 1 will read the Python file which contains the version data, extract it,
+# verify if this is a tagged release, verify that release's tag version info
+# against the data that was extracted from the Python file and in case all
+# previous steps were successful, the version information is passed on to the next step.
+#
+# Job 2 will build and distribute the PyPi package to PyPi Test and (if Test deployment
+# was successful) also to Prod
+#
+# External dependencies: 
+# - setup.py from repo's root folder
+# - PROD_PYPI_API_TOKEN and TEST_PYPI_API_TOKEN as Github Secrets (Settings > Secrets > Actions)
+#
+# Configuration settings: 
+# - SOURCE_FILE environment variable: path.to.your.Python.file
+# - REGEX_PATTERN: change this if your version info in the Python file uses
+#                  a different pattern. Default behavior assumes that
+#                  the version information in your file looks something like this:
+#                  __version__ = "1.2.3"
+# - PYTHON_VERSION: Python version which is used for building the package
+
+name: Upload Python Package 
+
+# Note: This job will be triggered for both releases and prereleases
+# Releases will be pushed to both PyPi Test AND Prod whereas
+# prereleases will only be pushed to PyPi Test
+# Github Actions offers only ONE trigger for releases, meaning that
+# the decision on to which site will be uploaded to will be made at
+# the respective sub branch.
+
+on:
+  release:
+    types: [published]
+    branches: [master]
+
+# 
+# Configuration section - change values if necessary
+#
+env:
+
+  # relative path to your file, e.g.
+  # ./MyLib/MyLib.py
+  SOURCE_FILE: ./src/CoreAprsClient/CoreAprsClient.py
+
+  # Regex pattern used for extracting the version data from your file
+  # (usually, this does not need to be changed)
+  REGEX_PATTERN:  __version__\s*=\s*"(.*)"
+  
+  # Python version used for building the package
+  PYTHON_VERSION: '3.11'
+
+#
+# Job section
+#
+jobs:
+  # 
+  # BEGIN of Job 1
+  #
+  # Get version from Python file. Check if source file is actually a
+  # new release. Check if Github release version is equal to the one
+  # extracted from the Python file. Ultimately, forward version information
+  # to next Github Actions job in line.
+  get-python-version-info:
+    runs-on: ubuntu-latest
+    permissions: write-all
+
+    # Output which is passed to the PyPi publication job
+    outputs: 
+      my-program-version: ${{ steps.regex.outputs.group1 }}
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v5
+
+      # Read source file
+      - name: Read source file
+        id: reader
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ${{ env.SOURCE_FILE }}
+      # Run regex on content and try to get the version data
+      - name: get version via regex
+        id: regex
+        uses: kaisugi/action-regex-match@v1.0.1
+        with:
+          regex: ${{ env.REGEX_PATTERN }}
+          flags: 'gim'
+          text: '${{ steps.reader.outputs.content }}'
+      # Cancel current build if we did not get a match. Note:
+      # Cancellation will have no immediate effect!!!
+      - name: Cancel build if version not found
+        if: ${{ steps.regex.outputs.match == '' }}
+        uses: andymckay/cancel-action@0.5
+      # Execute sleep if cancellation was triggered
+      - name: Sleep if build was cancelled
+        if: ${{ steps.regex.outputs.match == '' }}
+        run: sleep 60s
+        shell: bash
+      # Cancel current build if github reference is not equal to 'tag'
+      # e.g. 'master' for regular non-tagged releases. This is automatically
+      # assigned by Github; only if you tag a release, this value will be 'tag'
+      - name: Cancel build if Github reference is not equal to tag
+        if: ${{ github.ref_type != 'tag' }}
+        uses: andymckay/cancel-action@0.5
+      # Execute sleep if cancellation was triggered
+      - name: Sleep if build was cancelled
+        if: ${{ github.ref_type != 'tag' }}
+        run: sleep 60s
+        shell: bash
+      # Check if Repo tag version is the same as the version from the Github file
+      # Cancel the work flow if assessment is not true
+      - name: Cancel build if Github refname is not equal to Python version
+        if: ${{ github.ref_name != steps.regex.outputs.group1 }}
+        uses: andymckay/cancel-action@0.5
+      # Execute sleep if cancellation was triggered
+      - name: Sleep if build was cancelled
+        if: ${{ github.ref_name != steps.regex.outputs.group1 }}
+        run: sleep 60s
+        shell: bash
+
+  #
+  # END of Job 1
+  # 
+  # If you have reached this point in time, then the workflow was
+  # able to detect and extract the version info from your Python file
+  #
+
+  # 
+  # BEGIN of Job 2
+  #
+  # This section will create the PyPi package and first deploy it to PyPi test.
+  # If successful, it will also try to issue a PyPi Prod deployment afterwards
+  #
+  deploy-to-pypi:
+    runs-on: ubuntu-latest
+    needs: get-python-version-info
+
+    steps:
+
+    - uses: actions/checkout@v5
+    # Set up Python environment
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '${{ env.PYTHON_VERSION }}'
+        
+    # Install all dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build
+    # Build the package. The export MUST be part of THIS step
+    # Otherwise, the Python setup job will not see this information
+    - name: Build package
+      run: export GITHUB_PROGRAM_VERSION='${{ needs.get-python-version-info.outputs.my-program-version }}';python -m build
+    # Publish everything to Test PyPi
+    # Unlike for the Prod branch, we will push both releases and prerelease to PyPi Test
+    - name: Publish package to Test PyPi
+      if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        repository_url: https://test.pypi.org/legacy/
+    # Publish everything to Prod PyPi but only if it is not a prerelease
+    - name: Publish package to Prod PyPi
+      if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags') && !github.event.release.prerelease
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PROD_PYPI_API_TOKEN }}
+  #
+  # END of Job 2
+  #

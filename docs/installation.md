@@ -12,9 +12,3 @@ Although `core-aprs-client` is provided as a Python package, you should follow t
 - run the `sample_aprs_client.py`
 - Send an APRS message to the bot's callsign
 - Enjoy
-
-Whenever necessary, you can install work-in-progress packages straight via GitHub:
-
-```
-git+https://github.com/joergschultzelutter/core-aprs-client@this-is-my-branch-name#egg=core-aprs-client
-```
