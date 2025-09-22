@@ -38,7 +38,7 @@ It's as simple as that.
 ## Installation and Configuration
 
 ### Installation instructions
-Instructions for installing the framework and sample client on your computer can be found [here](docs/installation.md).
+Instructions for installing the framework and its sample APRS client on your computer can be found [here](docs/installation.md).
 
 ### Client Configuration
 The steps for modifying the client's config file are described [here](docs/configuration.md).
