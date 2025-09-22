@@ -1,6 +1,8 @@
 # `CoreAprsClient` class
 
-The `CoreAprsClient` class is responsible for the communication between the local APRS bot and APRS-IS. Import the class via
+The `CoreAprsClient` class is responsible for the communication between the local APRS bot and APRS-IS. Additionally, it also provides a 'dry-run' method, allowing you to test your custom `input_parser`/`output_generator` code offline without any interaction with APRS-IS. 
+
+Import the class via
 
     from CoreAprsClient import CoreAprsClient
 
