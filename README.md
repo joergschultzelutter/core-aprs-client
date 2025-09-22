@@ -47,7 +47,7 @@ The steps for modifying the client's config file are described [here](docs/confi
 The steps for starting the sample client are described [here](docs/client_start.md).
 
 ### `CoreAprsClient` class description
-The class methods are described [here](docs/coreaprssclient_class.md)
+The framework's class functions are described [here](docs/coreaprssclient_class.md)
 
 ### Source Code Anatomy
 A brief overview on this repositories' software modules used by the client can be found [here](docs/anatomy.md).
