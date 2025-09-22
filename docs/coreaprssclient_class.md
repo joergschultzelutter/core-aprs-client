@@ -60,7 +60,7 @@ This function is responsible for the communication between the local APRS bot an
 
 This function can be used for offline testing. There will be no data exchange between APRS-IS and the bot.
 
-Note that this function will not generate actual APRS response messages but will 'only' generate the outgoing message und split it up into 1..n message chunks of up to 67 bytes in length.
+Note that this function will not generate actual APRS response messages but rather generates the outgoing message and splits it up into 1..n message chunks of up to 67 bytes in length.
 
 Dryrun code example:
 
