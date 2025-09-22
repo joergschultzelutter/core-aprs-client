@@ -1,6 +1,6 @@
 # `CoreAprsClient` class
 
-The `CoreAprsClient` class is responsible for the communication between the local APRS bot and APRS-IS. Additionally, it also provides a 'dry-run' method, allowing you to test your custom `input_parser`/`output_generator` code offline without any interaction with APRS-IS. 
+The `CoreAprsClient` class is responsible for the communication between the local APRS bot and APRS-IS. Additionally, it also provides a 'dry-run' function, allowing you to test your custom `input_parser`/`output_generator` code offline without any interaction with APRS-IS. 
 
 Import the class via
 
@@ -33,9 +33,9 @@ class CoreAprsClient:
 | `output_generator` | function name of the external output generator                                              | `function` |
 | `log_level`        | Log level from Python's `logging` function. Default: `logging.INFO`                         | `enum`     |
 
-## `activate_client` method
+## `activate_client` function
 
-This method is responsible for the communication between the local APRS bot and APRS-IS. It has no parameters. Full APRS bot client example:
+This function is responsible for the communication between the local APRS bot and APRS-IS. It has no parameters. Full APRS bot client example:
 
     from CoreAprsClient import CoreAprsClient
     
@@ -56,9 +56,11 @@ This method is responsible for the communication between the local APRS bot and 
     # Activate the APRS client
     client.activate_client()
 
-## `dryrun_testcall` method
+## `dryrun_testcall` function
 
-This method can be used for offline testing. There will be no data exchange between APRS-IS and the bot.
+This function can be used for offline testing. There will be no data exchange between APRS-IS and the bot.
+
+Note that this function will not generate actual APRS response messages but will 'only' generate the outgoing message und split it up into 1..n message chunks of up to 67 bytes in length.
 
 Dryrun code example:
 
