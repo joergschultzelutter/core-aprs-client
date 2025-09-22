@@ -167,7 +167,7 @@ Valid values:
     def process_the_input():
         ....
         do some processing
-        my_data_structure = {"key" : "value}
+        my_data_structure = {"key" : "value"}
         ....
 
         return_code = CoreAprsClientInputParserStatus.PARSE_OK if there_was_no_error else CoreAprsClientInputParserStatus.PARSE_ERROR
