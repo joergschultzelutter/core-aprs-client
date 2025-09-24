@@ -22,7 +22,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 from expiringdict import ExpiringDict
-from client_logger import logger
+from .client_logger import logger
 
 #
 # This is our (future) global variable for the expiring dictionary

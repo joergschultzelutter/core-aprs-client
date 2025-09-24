@@ -172,8 +172,5 @@ cython_debug/
 .DS_Store
 core_aprs_client.cfg
 apprise.yml
-blah*
-blub*
-cfg.py
 data_files
 *drawio.bkp

@@ -3,9 +3,9 @@
 # APRS input parser stub
 # Author: Joerg Schultze-Lutter, 2025
 #
-# This is the module where you check the incoming APRS message and
+# This is a stub forwhere you check the incoming APRS message and
 # determine which actions the user wants you to do
-# Currently, this is just a stub which you need to populate
+#
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
+from CoreAprsClient import CoreAprsClientInputParserStatus
+
 
 def parse_input_message(aprs_message: str, from_callsign: str):
     """
@@ -35,15 +37,25 @@ def parse_input_message(aprs_message: str, from_callsign: str):
         the user wants you to do.
     from_callsign: str
         Ham radio callsign that sent the message to us.
+        Might be required by the input processor e.g. in case you
+        have to determine the from_callsign's latitude/longitude.
 
     Returns
     =======
-    success: bool
-        True if everything is fine, False otherwise.
-    response_parameters: dict
+    return_code: enum
+        Appropriate return code value, originating from the
+        CoreAprsClientInputParserStatus class
+    input_parser_error_message: str
+        if return_code is not PARSE_OK, this field can contain an optional
+        error message (e.g. context-specific errors related to the
+        keyword that was sent to the bot). If this field is empty AND
+        return_code is NOT PARSE_OK, then the default error message will be returned.
+    input_parser_response_object: dict | object
         Dictionary object where we store the data that is required
         by the 'output_generator' module for generating the APRS message.
-        For this stub, that dictionary is empty.
+        Note that you can also return other objects such as classes. Just ensure that
+        both input_parser and output_generator share the very same
+        structure for this variable.
     """
 
     # Let's build a very simple command line parser. Our parser will support
@@ -125,13 +137,52 @@ def parse_input_message(aprs_message: str, from_callsign: str):
 
     # our target dictionary that is going to be used by the output processor
     # for further processing.
-    response_parameters = {
+    # You can (and have to) amend this dict object so that it contains all fields
+    # relevant for output processing. Ensure that both input parser and output processor
+    # use the same dictionary structure.
+    input_parser_response_object = {
         "from_callsign": from_callsign,
-        "input_parser_error_message": input_parser_error_message,
         "command_code": command_code,
     }
 
-    return success, response_parameters
+    # We support three possible return codes from the input parser:
+    # PARSE_OK     - Input processor has identified keyword and is ready
+    #                to continue. This is the desired default state
+    #                Whenever the return code is PARSE_OK, then we should know
+    #                by now what the user wants from us. Now, we'll leave it to
+    #                another module to generate the output data of what we want
+    #                to send to the user (client_output_generatpr.py).
+    #                The result to this post-processor will be a general success
+    #                status code and the message that is to be sent to the user.
+    # PARSE_ERROR  - an error has occurred. Most likely, the external
+    #                input processor was either unable to identify a
+    #                keyword from the message OR a follow-up process has
+    #                failed; e.g. the user has defined a wx keyword,
+    #                requiring the sender to supply mandatory location info
+    #                which was missing from the message. In any way, this signals
+    #                the callback function that we are unable to process the
+    #                message any further
+    # PARSE_IGNORE - The message was ok but we are being told to ignore it. This
+    #                might be the case if the user's input processor has a dupe
+    #                check that is additional to the one provided by the
+    #                core-aprs-client framework. Similar to PARSE_ERROR, we
+    #                are not permitted to process this request any further BUT
+    #                instead of sending an error message, we will simply ignore
+    #                the request. Note that the core-aprs-client framework has
+    #                already ack'ed the request at this point, thus preventing it
+    #                from getting resend by APRS-IS over and over again.
+    #
+    # Note that you should refrain from using PARSE_IGNORE whenever possible - a
+    # polite inquiry should always trigger a polite response :-) Nevertheless, there
+    # might be use cases where you simply need to ignore a (technically valid) request
+    # in your custom code.
+    return_code = (
+        CoreAprsClientInputParserStatus.PARSE_OK
+        if success
+        else CoreAprsClientInputParserStatus.PARSE_ERROR
+    )
+
+    return return_code, input_parser_error_message, input_parser_response_object
 
 
 if __name__ == "__main__":

@@ -19,20 +19,21 @@
 #
 
 import time
-from client_configuration import program_config
-from client_utils import (
+import types
+
+from .client_configuration import program_config
+from .client_utils import (
     make_pretty_aprs_messages,
     get_aprs_message_from_cache,
     add_aprs_message_to_cache,
     parse_bulletin_data,
     finalize_pretty_aprs_messages,
 )
-from _version import __version__
-from client_input_parser import parse_input_message
-from client_output_generator import generate_output_message
-from client_aprsobject import APRSISObject
-import client_shared
-from client_logger import logger
+from ._version import __version__
+from .client_aprsobject import APRSISObject
+from . import client_shared
+from .client_logger import logger
+from .client_return_codes import CoreAprsClientInputParserStatus
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers import base as apbase
 
@@ -312,13 +313,19 @@ def send_bulletin_messages(
 # APRSlib callback
 # Extract the fields from the APRS message, start the parsing process,
 # execute the command and send the command output back to the user
-def aprs_callback(raw_aprs_packet: dict):
+def aprs_callback(
+    raw_aprs_packet: dict, parser: types.FunctionType, generator: types.FunctionType
+):
     """
     aprslib callback; this is the core process that takes care of everything
     Parameters
     ==========
     raw_aprs_packet: dict
         dict object, containing the raw APRS data
+    parser: types.FunctionType
+        input parser function
+    generator: types.FunctionType
+        output generator function
     Returns
     =======
     """
@@ -406,67 +413,104 @@ def aprs_callback(raw_aprs_packet: dict):
                 # contains the parser's error message if 'success' != True)
                 # input parameters: the actual message, the user's call sign and
                 # the aprs.fi API access key for location lookups
-                success, response_parameters = parse_input_message(
+                #
+                # Note: we call the function which was passed along with the
+                # callback object
+                retcode, input_parser_error_message, response_parameters = parser(
                     aprs_message=message_text_string,
                     from_callsign=from_callsign,
                 )
-                logger.debug(msg=f"Input parser result: {success}")
+                logger.debug(msg=f"Input parser result: {retcode}")
                 logger.debug(msg=response_parameters)
-                #
-                # If the 'success' parameter is True, then we should know
-                # by now what the user wants from us. Now, we'll leave it to
-                # another module to generate the output data of what we want
-                # to send to the user.
-                # The result to this post-processor will be a general success
-                # status code and a list item, containing the messages that are
-                # ready to be sent to the user.
+
+                # this is our future output message object
+                output_message = []
+
                 #
                 # parsing successful?
-                if success:
-                    # Generate the output message for the requested keyword
-                    # The 'success' status is ALWAYS positive even if the
-                    # message could not get processed - the inline'd error
-                    # message counts as positive message content
-                    success, output_message = generate_output_message(
-                        response_parameters=response_parameters,
-                    )
-                    # This code branch should never be reached unless there is a
-                    # discrepancy between the action determined by the input parser
-                    # and the responsive counter-action in the output processor
-                    if not success:
-                        output_message = make_pretty_aprs_messages(
-                            message_to_add=program_config["client_config"][
-                                "aprs_input_parser_default_error_message"
-                            ],
+                #
+                # We support three possible return codes from the input parser:
+                # PARSE_OK     - Input processor has identified keyword and is ready
+                #                to continue. This is the desired default state
+                #                Whenever the return code is PARSE_OK, then we should know
+                #                by now what the user wants from us. Now, we'll leave it to
+                #                another module to generate the output data of what we want
+                #                to send to the user (client_output_generatpr.py).
+                #                The result to this post-processor will be a general success
+                #                status code and the message that is to be sent to the user.
+                # PARSE_ERROR  - an error has occurred. Most likely, the external
+                #                input processor was either unable to identify a
+                #                keyword from the message OR a follow-up process has
+                #                failed; e.g. the user has defined a wx keyword,
+                #                requiring the sender to supply mandatory location info
+                #                which was missing from the message. In any way, this signals
+                #                the callback function that we are unable to process the
+                #                message any further
+                # PARSE_IGNORE - The message was ok but we are being told to ignore it. This
+                #                might be the case if the user's input processor has a dupe
+                #                check that is additional to the one provided by the
+                #                core-aprs-client framework. Similar to PARSE_ERROR, we
+                #                are not permitted to process this request any further BUT
+                #                instead of sending an error message, we will simply ignore
+                #                the request. Note that the core-aprs-client framework has
+                #                already ack'ed the request at this point, thus preventing it
+                #                from getting resend by APRS-IS over and over again.
+                #
+                # Note that you should refrain from using PARSE_IGNORE whenever possible - a
+                # polite inquiry should always trigger a polite response :-) Nevertheless, there
+                # might be use cases where you simply need to ignore a (technically valid) request
+                # in your custom code.
+                #
+                #
+                match retcode:
+                    case CoreAprsClientInputParserStatus.PARSE_OK:
+                        # Generate the output message for the requested keyword
+                        #
+                        # Note: we call the function which was passed along with the
+                        # callback object
+                        success, output_string = generator(
+                            input_parser_response_object=response_parameters
                         )
-                # darn - we failed to hail the Tripods
-                # this is the branch where the input parser failed to understand
-                # the message. A possible reason: you sent a keyword which requires
-                # an additional parameter but failed to send that one, too.
-                # As we only parse but never process data in that input
-                # parser, we sinply don't know what to do with the user's message
-                # and get back to him with a generic response.
-                else:
-                    input_parser_error_message = response_parameters[
-                        "input_parser_error_message"
-                    ]
-                    # Dump the human readable message to the user if we have one
-                    if input_parser_error_message:
-                        output_message = make_pretty_aprs_messages(
-                            message_to_add=f"{input_parser_error_message}",
-                        )
-                    # If not, just dump the link to the instructions
-                    # This is the default branch which dumps generic information
-                    # to the client whenever there is no generic error text from the input parser
-                    else:
-                        output_message = make_pretty_aprs_messages(
-                            message_to_add=program_config["client_config"][
-                                "aprs_input_parser_default_error_message"
-                            ],
-                        )
-                        logger.debug(
-                            msg=f"Unable to process APRS packet {raw_aprs_packet}"
-                        )
+                        if success:
+                            output_message = make_pretty_aprs_messages(
+                                message_to_add=output_string
+                            )
+                        else:
+                            # This code branch should never be reached unless there is a
+                            # discrepancy between the action determined by the input parser
+                            # and the responsive counter-action from the output processor
+                            output_message = make_pretty_aprs_messages(
+                                message_to_add=program_config["client_config"][
+                                    "aprs_input_parser_default_error_message"
+                                ],
+                            )
+                    # This is the branch where the input parser failed to understand
+                    # the message. A possible reason: you sent a keyword which requires
+                    # an additional parameter but failed to send that one, too.
+                    # As we only parse but never process data in that input
+                    # parser, we sinply don't know what to do with the user's message
+                    # and get back to him with a generic response.
+                    case CoreAprsClientInputParserStatus.PARSE_ERROR:
+                        # Dump the human readable message to the user if we have one
+                        if input_parser_error_message:
+                            output_message = make_pretty_aprs_messages(
+                                message_to_add=f"{input_parser_error_message}",
+                            )
+                        # If not, just dump the link to the instructions
+                        # This is the default branch which dumps generic information
+                        # to the client whenever there is no generic error text from the input parser
+                        else:
+                            output_message = make_pretty_aprs_messages(
+                                message_to_add=program_config["client_config"][
+                                    "aprs_input_parser_default_error_message"
+                                ],
+                            )
+                            logger.debug(
+                                msg=f"Unable to process APRS packet {raw_aprs_packet}"
+                            )
+                    # default branch for anything else, including PARSE_IGNORE
+                    case _:
+                        pass
 
                 # Ultimately, finalize the outgoing message(s) and add the message
                 # numbers if the user has requested this in his configuration

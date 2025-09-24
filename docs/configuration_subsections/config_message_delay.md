@@ -1,7 +1,7 @@
 # Message Delay Configuration
 
 > [!TIP]
-> These settings simply configire artificial delays after a message has been sent. With the exception of the 'acknoledgment' delay, all other delays are ONLY applied if more than one message has to be sent out to the user.
+> These settings simply configire artificial delays after a message has been sent. Except for the 'acknoledgment' delay, all other delays are ONLY applied if more than one message has to be sent out to the user.
 
 | Config variable             | Type    | Default value        | Description                                                                                                                                                                                                   |
 |-----------------------------|---------|----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

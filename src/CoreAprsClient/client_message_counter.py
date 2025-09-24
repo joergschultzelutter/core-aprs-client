@@ -21,8 +21,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-from client_logger import logger
-from client_utils import build_full_pathname
+from .client_logger import logger
+from .client_utils import build_full_pathname
 
 
 class APRSMessageCounter:

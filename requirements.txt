@@ -3,3 +3,4 @@ apprise
 expiringdict
 unidecode
 apscheduler
+setuptools

@@ -32,5 +32,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def update_logging_level(logging_level: int):
+    logger.setLevel(logging_level)
+    for handler in logger.handlers:
+        handler.setLevel(logging_level)
+
+
 if __name__ == "__main__":
     pass
