@@ -36,10 +36,10 @@ class CoreAprsClient:
 ### Supported class methods
 
 Currently, this class supports two methods:
-- [`activate_client`](coreaprssclient_class.md#activate_client-class-method) connects to [APRS-IS](https://aprs-is.net/) and exchanges data with the APRS network
-- [`dryrun_testcall`](coreaprssclient_class.md#dryrun_testcall-class-method) can be used for offline testing. When triggered, it will run a simulated and freely configurable APRS input message through the `input_processor` code and, whereas applicable, uses the `output_generator` code in order to create the outgoing message content.
+- [`activate_client`](coreaprsclient_class.md#activate_client-class-method) connects to [APRS-IS](https://aprs-is.net/) and exchanges data with the APRS network
+- [`dryrun_testcall`](coreaprsclient_class.md#dryrun_testcall-class-method) can be used for offline testing. When triggered, it will run a simulated and freely configurable APRS input message through the `input_processor` code and, whereas applicable, uses the `output_generator` code in order to create the outgoing message content.
 
-Additionally, a [set of specific return codes](coreaprssclient_class.md#input_processor-return-codes) have to be imported by the `input_parser` function. 
+Additionally, a [set of specific return codes](coreaprsclient_class.md#input_processor-return-codes) have to be imported by the `input_parser` function. 
 
 ### Your responsibilities 
 

@@ -1,3 +1,3 @@
 # Sample APRS Client
 
-This directory contains a very basic sample APRS client which uses the `core-aprs-client` framework for connecting with APRS-IS. Developers interested in using the framework can use the `input_parser.py` and `output_generator.py` stubs in order to become acquainted with the code. For further details, please refer to the [`CoreAprsClient class description`](/docs/coreaprsclient_class.md) and the documentation on the [framework usage](/docs/framework_usage).
+This directory contains a very basic sample APRS client which uses the `core-aprs-client` framework for connecting with APRS-IS. Developers interested in using the framework can use the `input_parser.py` and `output_generator.py` stubs in order to become acquainted with the code. For further details, please refer to the [`CoreAprsClient class description`](/docs/coreaprsclient_class.md) and the documentation on the [framework usage](/docs/framework_usage.md).
