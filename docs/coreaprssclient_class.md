@@ -1,6 +1,6 @@
 # `CoreAprsClient` class
 
-The `CoreAprsClient` class is responsible for the communication between the local APRS bot and APRS-IS. Additionally, it also provides a 'dry-run' function, allowing you to test your custom `input_parser`/`output_generator` code offline without any interaction with APRS-IS. 
+The `CoreAprsClient` class is responsible for the communication between the local APRS bot and [APRS-IS](https://aprs-is.net/). Additionally, it also provides a 'dry-run' function, allowing you to test your custom `input_parser`/`output_generator` code offline without any interaction with APRS-IS. 
 
 Import the class via
 
@@ -26,18 +26,32 @@ class CoreAprsClient:
 
 ### Parameter
 
-| Field Name         | Description                                                                                 | Field Type |
-|--------------------|---------------------------------------------------------------------------------------------|------------|
-| `config_file`      | `core_aprs_client`'s configuration file; see [this documentation section](configuration.md) | `str`      |
-| `input_parser`     | function name of the external input processor                                               | `function` |
-| `output_generator` | function name of the external output generator                                              | `function` |
-| `log_level`        | Log level from Python's `logging` function. Default: `logging.INFO`                         | `enum`     |
+| Field Name         | Description                                                                                                                                                                                                                                     | Field Type |
+|--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| `config_file`      | `core_aprs_client`'s configuration file; see [this documentation section](configuration.md)                                                                                                                                                     | `str`      |
+| `input_parser`     | Function name of the external input processor which parses incoming APRS messages and tries to figure out what the user wants us to do.                                                                                                         | `function` |
+| `output_generator` | Function name of the external output generator. Based on the `input_parser`'s feedback, this code is responsible for generating the output message - which will then be transformed by the `core-aprs-client` framework into 1..n APRS messages | `function` |
+| `log_level`        | Log level from Python's `logging` function. Default value: `logging.INFO`                                                                                                                                                                       | `enum`     |
+
+### Supported class methods
+
+Currently, this class supports two methods:
+- [`activate_client`](coreaprssclient_class.md#activate_client-class-method) connects to [APRS-IS](https://aprs-is.net/) and exchanges data with the APRS network
+- [`dryrun_testcall`](coreaprssclient_class.md#dryrun_testcall-class-method) can be used for offline testing. When triggered, it will run a simulated and freely configurable APRS input message through the `input_processor` code and, whereas applicable, uses the `output_generator` code in order to create the outgoing message content.
+
+Additionally, a [set of specific return codes](coreaprssclient_class.md#input_processor-return-codes) have to be imported by the `input_parser` function. 
+
+### Your responsibilities 
+
+You are responsible for designing the functions associated with the `input_parser` and `output_generator` parameters. Check the [Framework Usage](framework_usage.md) help pages for further details. 
 
 ## `activate_client` class method
 
-This class method is responsible for the communication between the local APRS bot and APRS-IS. It has no parameters. Full APRS bot client example:
+This class method is responsible for the communication between the local APRS bot and [APRS-IS](https://aprs-is.net/). It has no parameters. Full APRS bot client example:
 
     from CoreAprsClient import CoreAprsClient
+    from input_parser import parse_input_message
+    from output_generator import generate_output_message
     
     # Create the CoreAprsClient object. Supply the
     # following parameters:
@@ -58,13 +72,15 @@ This class method is responsible for the communication between the local APRS bo
 
 ## `dryrun_testcall` class method
 
-This class method can be used for offline testing. There will be no data exchange between APRS-IS and the bot.
+This class method can be used for offline testing. There will be no data exchange between [APRS-IS](https://aprs-is.net/) and the bot.
 
 Note that this class method will not generate actual APRS response messages but rather generates the outgoing message and splits it up into 1..n message chunks of up to 67 bytes in length.
 
 Dryrun code example:
 
     from CoreAprsClient import CoreAprsClient
+    from input_parser import parse_input_message
+    from output_generator import generate_output_message
     
     # Create the CoreAprsClient object. Supply the
     # following parameters:
@@ -119,7 +135,7 @@ This is the sample output for the `lorem` keyword from the `sample_aprs_client` 
 
 ## `input_processor` return codes
 
-Unlike the `output_generator` which either provides a success/failure scenario, the `input_processor` supports _three_ return codes. Your custom `input_processor` code needs to import those via
+Unlike the `output_generator` which either provides a success/failure scenario, the `input_processor` supports _**three**_ return codes. Your custom `input_processor` code needs to import those via
 
     from CoreAprsClient import CoreAprsClientInputParserStatus
 

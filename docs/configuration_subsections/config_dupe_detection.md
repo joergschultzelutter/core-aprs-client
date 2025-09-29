@@ -1,7 +1,7 @@
 # Dupe Detection Configuration
 
 > [!TIP]
-> This section of the configuration file sets the APRS-IS dupe detection parameters. Both parameters do not require any modification. Do not apply changes to these settings unless you are aware of the consequences.
+> This section of the configuration file sets the [APRS-IS](https://aprs-is.net/) dupe detection parameters. Both parameters do not require any modification. Do not apply changes to these settings unless you are aware of the consequences.
 
 Due to the nature of APRS, we might receive the same APRS message as a resubmission. In order to avoid processing that same message again, `core-aprs-client` provides you with a duplicate message detection. Whenever an ingress APRS message is processed, `core-aprs-client` will first check if that message wasn't already processed within a given time span (`msg_cache_time_to_live`). When still present in that dictionary, such a message is identified as a duplicate and will not get processed again. 
 

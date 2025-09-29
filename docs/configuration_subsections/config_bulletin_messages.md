@@ -13,7 +13,7 @@ By default, `core-aprs-client` comes with a predefined set of 10 bulletin messag
 > - Duplicate key entries (e.g. `bln0` occurs more than once) will cause a program error. Garbage in, garbage out.
 > - Bulletins with content longer than 67 characters will be ignored.
 > - Bulletins use ASCII-7 character set only
-> - Entries with no message content will be ignored and not broadcasted to APRS-IS. There is no need for you to delete unpopulated entries from the config file.
+> - Entries with no message content will be ignored and not broadcasted to [APRS-IS](https://aprs-is.net/). There is no need for you to delete unpopulated entries from the config file.
 
 | Config variable  | Type  | Default value                                    | Description            |
 |------------------|-------|--------------------------------------------------|------------------------|

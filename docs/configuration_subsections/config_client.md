@@ -5,7 +5,7 @@
 
 > [!CAUTION]
 > This configuration file section requires individual configuration. You HAVE to make these changes in order to install `core-aprs-client` properly.
-> Keep in mind that the call signs from both `aprsis_server_filter` (see [Network Configuration](config_network.md)) AND `aprsis_callsign` need to match. If you change `aprsis_callsign` to e.g. `ABCD`, then the setting for `aprsis_server_filter` has be set to `g/ABCD` - otherwise, the APRS-IS filter will still listen for its 'old' call sign.
+> Keep in mind that the call signs from both `aprsis_server_filter` (see [Network Configuration](config_network.md)) AND `aprsis_callsign` need to match. If you change `aprsis_callsign` to e.g. `ABCD`, then the setting for `aprsis_server_filter` has be set to `g/ABCD` - otherwise, the [APRS-IS](https://aprs-is.net/) filter will still listen for its 'old' call sign.
 
 
 You _*need*_ to modify the following values:

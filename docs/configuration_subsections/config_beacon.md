@@ -3,7 +3,7 @@
 > [!TIP]
 > This section of the configuration file allows you to enable APRS beaconing (default: no beaconing). If you enable beaconing, configure parameters such as latitude/longitude, altitude, ... to your needs.
 
-APRS Beaconing enables your `core-aprs-client` instance to appear on [aprs.fi](http://www.aprs.fi). By default, beaconing is disabled `aprsis_broadcast_beacon` = `false`, meaning that even though your bot is accessible via its call sign (`aprsis_call_sign`) in the configuration file's [client section](config_client.md), it will not announce its location data and existence to [aprs.fi](http://www.aprs.fi). `aprsis_broadcast_beacon = true` enables beaconing - and it will announce its position data, altitude, and designation to APRS-IS.
+APRS Beaconing enables your `core-aprs-client` instance to appear on [aprs.fi](http://www.aprs.fi). By default, beaconing is disabled `aprsis_broadcast_beacon` = `false`, meaning that even though your bot is accessible via its call sign (`aprsis_call_sign`) in the configuration file's [client section](config_client.md), it will not announce its location data and existence to [aprs.fi](http://www.aprs.fi). `aprsis_broadcast_beacon = true` enables beaconing - and it will announce its position data, altitude, and designation to [APRS-IS](https://aprs-is.net/).
 
 
 | Config variable                  | Type      | Default value     | Description                                                                                                                                                                                                                                                                                                                                                    |
