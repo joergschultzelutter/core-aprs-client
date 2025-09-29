@@ -2,44 +2,76 @@
 
 from setuptools import setup, find_packages
 import os
+import re
+
+# source path for the class' package. Amend if necessary
+PACKAGE_SOURCE_DIR = "src/CoreAprsClient"
+
+# Amend this section with your custom data
+PACKAGE_NAME="core-aprs-client"
+DESCRIPTION = "Extensible APRS bot framework with dupe detection, beacon/bulletin support and other nice features. Just add your custom APRS bot functions - the APRS bot framework will take care of the rest."
+AUTHOR = "Joerg Schultze-Lutter"
+AUTHOR_EMAIL = "joerg.schultze.lutter@gmail.com"
+URL = "https://github.com/joergschultzelutter/core-aprs-client"
+# https://pypi.org/classifiers/
+CLASSIFIERS = [
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+]
+INSTALL_REQUIRES=[
+    "aprslib>=0.7.2", 
+    "apprise>=1.9.4",
+    "expiringdict>=1.2.2",
+    "unidecode>=1.4.0",
+    "apscheduler>=3.11.0"
+]
+KEYWORDS=[
+    "Ham Radio", 
+    "Amateur Radio", 
+    "APRS"
+]
+LICENSE="GNU General Public License v3 (GPLv3)"
+
+def running_in_a_github_action():
+    return os.getenv("GITHUB_ACTIONS") == "true"
 
 if __name__ == "__main__":
+    # get README and use it as long description
     with open("README.md", "r") as fh:
-        long_description = fh.read()
+        LONG_DESCRIPTION = fh.read()
 
-    VERSION = os.getenv("GITHUB_PROGRAM_VERSION")
-    if not VERSION:
-        raise ValueError("Did not receive version info from GitHub")
-
+    GITHUB_PROGRAM_VERSION = ""
+    
+    if running_in_a_github_action():
+        # Only run this branch if we are part of a Github action. Otherwise, just skip
+        # it as we won't be able to get the version info from Github anyway
+        #
+        # get VERSION value from Github workflow and terminate workflow if value is None
+        GITHUB_PROGRAM_VERSION = os.getenv("GITHUB_PROGRAM_VERSION")
+        if not GITHUB_PROGRAM_VERSION:
+            raise ValueError("Did not receive release label version info from GitHub")
+    else:
+        if len(GITHUB_PROGRAM_VERSION == 0):
+            raise ValueError("Manual run requires a manually set GITHUB_PROGRAM_VERSION; change setup.py accordingly")
+    
+    # Main setup branch
     setup(
-        name="core-aprs-client",
-        version=VERSION,
-        description="Core APRS Client framework",
-        long_description=long_description,
+        name=PACKAGE_NAME,
+        version=GITHUB_PROGRAM_VERSION,
+        description=DESCRIPTION,
+        long_description=LONG_DESCRIPTION,
         long_description_content_type="text/markdown",
-        author="Joerg Schultze-Lutter",
-        author_email="joerg.schultze.lutter@gmail.com",
-        url="https://github.com/joergschultzelutter/core-aprs-client",
-        packages=find_packages(where="src"),
-        package_dir={"": "src"},
+        author=AUTHOR,
+        author_email=AUTHOR_EMAIL,
+        url=URL,
+        packages=find_packages(where=PACKAGE_SOURCE_DIR),
         include_package_data=True,
-        classifiers=[
-            "Intended Audience :: Developers",
-            "Programming Language :: Python :: 3",
-            "Natural Language :: English",
-            "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-            "Operating System :: OS Independent",
-            "Development Status :: 4 - Beta",
-            "Topic :: Software Development",
-            "Topic :: Communications :: Ham Radio",
-        ],
-        license="GNU General Public License v3 (GPLv3)",
-        install_requires=[
-            "aprslib>=0.7.2",
-            "apprise>=1.9.4",
-            "expiringdict>=1.2.2",
-            "unidecode>=1.4.0",
-            "apscheduler>=3.11.0",
-        ],
-        keywords=["Ham Radio", "Amateur Radio", "APRS"],
+        classifiers=CLASSIFIERS,
+        license=LICENSE,
+        install_requires=INSTALL_REQUIRES,
+        keywords=KEYWORDS,
     )
