@@ -14,7 +14,7 @@
 > The following documentation references the files located in this repository's `sample_aprs_client` directory
 
 > [!TIP]
-> - `input_parser.py` digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us.
+> - `input_parser.py` digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us. If successful, the desired action is identified and returned back to the `core-aprs-client` framework - which will then forward it to the `output_generator.py` function.
 > - `output_generator.py` takes the data from `input_parser.py` and builds the outgoing message which is later to be sent to APRS-IS.
 
 `input_parser.py` and `output_generator.py` rely on exchanging data through a mutually equal data structure. That data structure can be defined by the user and is passed through between both user functions; the `core-aprs-client` framework does *not* use this data element in any way. Just ensure that both custom code modules share the same data structure. 
