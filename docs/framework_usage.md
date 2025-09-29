@@ -24,7 +24,7 @@
 > - You can use the framework's[`dryrun_testcall`](coreaprssclient_class.md#dryrun_testcall-function) method for a 100% offline testing option which does not connect to APRS-IS. `dryrun_testcall` will route a user's call sign and APRS message through both input parser and output generator modules.
 
 ## Implemented APRS Command Stubs
-By default, `core-aprs-client`'s default installation comes with three keywords that you can send to its associated APRS call sign. Once the client is up and running, it will process these keywords:
+By default, `core-aprs-client`'s default installation comes with three keywords that you can send to its associated APRS call sign. In its default demonstration setup, the framework accepts these keywords:
 
 | APRS Command Code | Purpose                                                                                                                                                                                                                                                                                                                                                   |
 |-------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -49,16 +49,19 @@ Any _other_ command that is sent to `core-aprs-client` will generate the bot's _
 
 ### Input processor: Outputs
 
-| Field name                      | Content                                                                                                                                                                                                                                                                                            | Field Type                       |
-|---------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
-| `return_code`                   | `enum` object; see valid values below                                                                                                                                                                                                                                                              | `enum`                           |
-| `input_parser_error_message`    | If `return_code` is not `PARSE_OK`, this field can contain an optional error message (e.g. context-specific errors related to the keyword that was sent to the bot). If this field is empty AND `return_code` is NOT `PARSE_OK`, then the default error message will be returned.                  | `str`                            |
-| `input_parser_response_object`  | Dictionary object where we store the data that is required by the `output_generator` module for generating the APRS message. Note that you can also return other objects such as classes. Just ensure that both input_parser and output_generator share the very same structure for this variable. | `dict` (default) or any `object` |
+| Field name                      | Content                                                                                                                                                                                                                                                                                                | Field Type                       |
+|---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
+| `return_code`                   | Predefined `enum` object; see valid values in the [next chapter](framework_usage.md#return_code---valid-values)                                                                                                                                                                                        | `enum`                           |
+| `input_parser_error_message`    | If `return_code` is not `PARSE_OK`, this field can contain an optional error message (e.g. context-specific errors related to the keyword that was sent to the bot). If this field is empty AND `return_code` is NOT `PARSE_OK`, then the default error message will be returned.                      | `str`                            |
+| `input_parser_response_object`  | Dictionary object where we store the data that is required by the `output_generator` module for generating the APRS message. Note that you can also return other objects such as classes. Just ensure that both `input_parser` and `output_generator` share the very same structure for this variable. | `dict` (default) or any `object` |
 
 #### `return_code` - Valid values
 
-> [!INFO]
-> The return codes are defined in the [CoreAprsClientInputParserStatus](coreaprssclient_class.md#input_processor-return-codes)
+The return codes are defined in the [CoreAprsClientInputParserStatus](coreaprssclient_class.md#input_processor-return-codes) class. Import via
+```
+from CoreAprsClient import CoreAprsClientInputParserStatus
+```
+Return code details:
 
     # We support three possible return codes from the input parser:
     # PARSE_OK     - Input processor has identified keyword and is ready
@@ -103,9 +106,9 @@ The default `input_parser_response_object` object (as provided with the sample c
 
 ### Output generator: Inputs
 
-| Field name                     | Content                                                                                                                                                                                                                                                                                            | Field Type                       |
-|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
-| `input_parser_response_object` | Dictionary object where we store the data that is required by the `output_generator` module for generating the APRS message. Note that you can also return other objects such as classes. Just ensure that both input_parser and output_generator share the very same structure for this variable. | `dict` (default) or any `object` |
+| Field name                     | Content                                                                                                                                                                                                                                                                                                | Field Type                       |
+|--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
+| `input_parser_response_object` | Dictionary object where we store the data that is required by the `output_generator` module for generating the APRS message. Note that you can also return other objects such as classes. Just ensure that both `input_parser` and `output_generator` share the very same structure for this variable. | `dict` (default) or any `object` |
  
 ### Output generator: Outputs
 
