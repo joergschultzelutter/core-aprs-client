@@ -1,12 +1,12 @@
 # Network Configuration
 
 > [!TIP]
-> This section configures basic content related to your personal `core-aprs-client` installation, such as your [APRS-IS](https://aprs-is.net/) passcode and the [APRS-IS](https://aprs-is.net/) message filter. Other defaults might not require individual configuration.
+> This section configures basic content related to your personal `core-aprs-client` installation, such as your [APRS-IS](https://aprs-is.net/) passcode and the [APRS-IS](https://aprs-is.net/) message [filter](https://aprs-is.net/javAPRSFilter.aspx). Other defaults might not require individual configuration.
 
 > [!CAUTION]
 > This configuration file section requires individual configuration.
 > For a minimum valid configuration, at least the settings for `aprsis_passcode` and `aprsis_server_filter` need to get configured. 
-> Keep in mind that the call signs from both `aprsis_server_filter` AND `aprsis_callsign` (see [Client Configuration](config_client.md)) need to match. If you change `aprsis_callsign` to e.g. `ABCD`, then the setting for `aprsis_server_filter` has be set to `g/ABCD` - otherwise, the [APRS-IS](https://aprs-is.net/) filter will still listen for its 'old' call sign.
+> Keep in mind that the call signs from both `aprsis_server_filter` AND `aprsis_callsign` (see [Client Configuration](config_client.md)) __NEED__ to match. If you change `aprsis_callsign` to e.g. `ABCD`, then the setting for `aprsis_server_filter` has be set to `g/ABCD` - otherwise, the [APRS-IS](https://aprs-is.net/) filter will still listen for its 'old' call sign.
 
 | Config variable        | Type  | Default value    | Description                                                                                                                                                                                                                                                                                           |
 |------------------------|-------|------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
