@@ -60,9 +60,9 @@ on:
 #
 env:
 
-  # relative path to your file, e.g.
+  # relative path to the file containing your version info, e.g.
   # ./MyLib/MyLib.py
-  SOURCE_FILE: ./src/CoreAprsClient/CoreAprsClient.py
+  SOURCE_FILE: ./src/CoreAprsClient/_version.py
 
   # Regex pattern used for extracting the version data from your file
   # (usually, this does not need to be changed)
@@ -94,13 +94,13 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v5
 
-      # Read source file
+      # Read source file with version info
       - name: Read source file
         id: reader
         uses: juliangruber/read-file-action@v1
         with:
           path: ${{ env.SOURCE_FILE }}
-      # Run regex on content and try to get the version data
+      # Run regex on file content and try to get the version data
       - name: get version via regex
         id: regex
         uses: kaisugi/action-regex-match@v1.0.1
@@ -171,10 +171,16 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install build
+
+    # Export the program version; content will be picked up by the setup.py script
+    - name: Export program version
+      run: echo GITHUB_PROGRAM_VERSION='${{ needs.get-python-version-info.outputs.my-program-version }}' >> $GITHUB_ENV
+      
     # Build the package. The export MUST be part of THIS step
     # Otherwise, the Python setup job will not see this information
     - name: Build package
-      run: export GITHUB_PROGRAM_VERSION='${{ needs.get-python-version-info.outputs.my-program-version }}';python -m build
+      run: python -m build
+      
     # Publish everything to Test PyPi
     # Unlike for the Prod branch, we will push both releases and prerelease to PyPi Test
     - name: Publish package to Test PyPi
@@ -183,7 +189,8 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        repository_url: https://test.pypi.org/legacy/
+        repository-url: https://test.pypi.org/legacy/
+        
     # Publish everything to Prod PyPi but only if it is not a prerelease
     - name: Publish package to Prod PyPi
       if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags') && !github.event.release.prerelease
