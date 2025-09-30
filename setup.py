@@ -64,7 +64,6 @@ if __name__ == "__main__":
         author=AUTHOR,
         author_email=AUTHOR_EMAIL,
         url=URL,
-        packages=find_packages(),
         include_package_data=True,
         classifiers=CLASSIFIERS,
         license=LICENSE,
