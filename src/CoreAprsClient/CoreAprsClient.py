@@ -68,7 +68,6 @@ class CoreAprsClient:
         self.config_file = config_file
         self.input_parser = input_parser
         self.output_generator = output_generator
-        a = type(input_parser)
         self.log_level = log_level
 
         # Update the log level (if needed)
