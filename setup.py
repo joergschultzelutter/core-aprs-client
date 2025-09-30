@@ -4,6 +4,7 @@ from setuptools import setup, find_packages
 import os
 
 # Amend this section with your custom data
+PACKAGE_SOURCE_DIR = "src"
 PACKAGE_NAME = "core-aprs-client"
 DESCRIPTION = "Extensible APRS bot framework with dupe detection, beacon/bulletin support and other nice features. Just add your custom APRS bot functions - the APRS bot framework will take care of the rest."
 AUTHOR = "Joerg Schultze-Lutter"
@@ -30,10 +31,12 @@ KEYWORDS=[
     "Amateur Radio", 
     "APRS"
 ]
-LICENSE="GNU General Public License v3 (GPLv3)"
+LICENSE = "GNU General Public License v3 (GPLv3)"
+
 
 def running_in_a_github_action():
     return os.getenv("GITHUB_ACTIONS") == "true"
+
 
 if __name__ == "__main__":
     # get README and use it as long description
@@ -64,7 +67,8 @@ if __name__ == "__main__":
         author=AUTHOR,
         author_email=AUTHOR_EMAIL,
         url=URL,
-        packages=find_packages(),
+        packages=find_packages(where=PACKAGE_SOURCE_DIR),
+        package_dir={"": PACKAGE_SOURCE_DIR},
         include_package_data=True,
         classifiers=CLASSIFIERS,
         license=LICENSE,
