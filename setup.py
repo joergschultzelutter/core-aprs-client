@@ -5,10 +5,10 @@ import os
 import re
 
 # source path for the class' package. Amend if necessary
-PACKAGE_SOURCE_DIR = "src/CoreAprsClient"
+PACKAGE_SOURCE_DIR = "src"
 
 # Amend this section with your custom data
-PACKAGE_NAME="core-aprs-client"
+PACKAGE_NAME = "core-aprs-client"
 DESCRIPTION = "Extensible APRS bot framework with dupe detection, beacon/bulletin support and other nice features. Just add your custom APRS bot functions - the APRS bot framework will take care of the rest."
 AUTHOR = "Joerg Schultze-Lutter"
 AUTHOR_EMAIL = "joerg.schultze.lutter@gmail.com"
