@@ -5,7 +5,7 @@ import os
 import re
 
 # source path for the class' package. Amend if necessary
-PACKAGE_SOURCE_DIR = "src"
+PACKAGE_SOURCE_DIR = "src/CoreAprsClient"
 
 # Amend this section with your custom data
 PACKAGE_NAME = "core-aprs-client"
