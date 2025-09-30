@@ -26,6 +26,8 @@ import types
 from functools import partial
 import logging
 from pprint import pformat
+from collections.abc import Callable
+from typing import Any
 
 from . import client_shared
 from .client_utils import (
@@ -66,6 +68,7 @@ class CoreAprsClient:
         self.config_file = config_file
         self.input_parser = input_parser
         self.output_generator = output_generator
+        a = type(input_parser)
         self.log_level = log_level
 
         # Update the log level (if needed)
