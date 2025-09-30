@@ -3,9 +3,6 @@
 from setuptools import setup, find_packages
 import os
 
-# source path
-PACKAGE_SOURCE_DIR = "src"
-
 # Amend this section with your custom data
 PACKAGE_NAME = "core-aprs-client"
 DESCRIPTION = "Extensible APRS bot framework with dupe detection, beacon/bulletin support and other nice features. Just add your custom APRS bot functions - the APRS bot framework will take care of the rest."
@@ -67,8 +64,7 @@ if __name__ == "__main__":
         author=AUTHOR,
         author_email=AUTHOR_EMAIL,
         url=URL,
-        packages=find_packages(where=PACKAGE_SOURCE_DIR),
-        package_dir={"": PACKAGE_SOURCE_DIR},
+        packages=find_packages(),
         include_package_data=True,
         classifiers=CLASSIFIERS,
         license=LICENSE,
