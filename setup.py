@@ -68,6 +68,7 @@ if __name__ == "__main__":
         author_email=AUTHOR_EMAIL,
         url=URL,
         packages=find_packages(where=PACKAGE_SOURCE_DIR),
+        package_dir={"": PACKAGE_SOURCE_DIR},
         include_package_data=True,
         classifiers=CLASSIFIERS,
         license=LICENSE,
