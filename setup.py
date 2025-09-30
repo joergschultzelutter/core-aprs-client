@@ -44,7 +44,7 @@ if __name__ == "__main__":
     with open("README.md", "r") as fh:
         LONG_DESCRIPTION = fh.read()
 
-    GITHUB_PROGRAM_VERSION = ""
+    GITHUB_PROGRAM_VERSION = "0.0.1"
     
     if running_in_a_github_action():
         # Only run this branch if we are part of a Github action. Otherwise, just skip
