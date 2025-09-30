@@ -2,7 +2,6 @@
 
 from setuptools import setup, find_packages
 import os
-import re
 
 # source path for the class' package. Amend if necessary
 PACKAGE_SOURCE_DIR = "src/CoreAprsClient"
@@ -57,7 +56,7 @@ if __name__ == "__main__":
     else:
         if len(GITHUB_PROGRAM_VERSION) == 0:
             raise ValueError("Manual run requires a manually set GITHUB_PROGRAM_VERSION; change setup.py accordingly")
-    
+
     # Main setup branch
     setup(
         name=PACKAGE_NAME,
