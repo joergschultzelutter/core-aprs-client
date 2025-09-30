@@ -55,7 +55,7 @@ if __name__ == "__main__":
         if not GITHUB_PROGRAM_VERSION:
             raise ValueError("Did not receive release label version info from GitHub")
     else:
-        if len(GITHUB_PROGRAM_VERSION == 0):
+        if len(GITHUB_PROGRAM_VERSION) == 0:
             raise ValueError("Manual run requires a manually set GITHUB_PROGRAM_VERSION; change setup.py accordingly")
     
     # Main setup branch
