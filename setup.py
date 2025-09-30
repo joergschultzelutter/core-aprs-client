@@ -3,8 +3,8 @@
 from setuptools import setup, find_packages
 import os
 
-# source path for the class' package. Amend if necessary
-PACKAGE_SOURCE_DIR = "src/CoreAprsClient"
+# source path
+PACKAGE_SOURCE_DIR = "src"
 
 # Amend this section with your custom data
 PACKAGE_NAME = "core-aprs-client"
@@ -67,8 +67,8 @@ if __name__ == "__main__":
         author=AUTHOR,
         author_email=AUTHOR_EMAIL,
         url=URL,
-#        packages=find_packages(where=PACKAGE_SOURCE_DIR),
-#        package_dir={"": PACKAGE_SOURCE_DIR},
+        packages=find_packages(where=PACKAGE_SOURCE_DIR),
+        package_dir={"": PACKAGE_SOURCE_DIR},
         include_package_data=True,
         classifiers=CLASSIFIERS,
         license=LICENSE,
