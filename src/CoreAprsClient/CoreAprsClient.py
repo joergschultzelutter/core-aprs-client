@@ -55,14 +55,14 @@ from .client_return_codes import CoreAprsClientInputParserStatus
 class CoreAprsClient:
     config_file: str
     log_level: int
-    input_parser: types.FunctionType
-    output_generator: types.FunctionType
+    input_parser: Callable[..., Any]
+    output_generator: Callable[..., Any]
 
     def __init__(
         self,
         config_file: str,
-        input_parser: types.FunctionType,
-        output_generator: types.FunctionType,
+        input_parser: Callable[..., Any],
+        output_generator: Callable[..., Any],
         log_level: int = logging.INFO,
     ):
         self.config_file = config_file
