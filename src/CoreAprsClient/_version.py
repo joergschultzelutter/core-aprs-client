@@ -1,2 +1,2 @@
 # Program version
-__version__ = "0.30.8"
+__version__ = "0.40"
