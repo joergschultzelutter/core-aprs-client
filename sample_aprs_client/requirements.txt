@@ -1,1 +1,2 @@
-git+https://github.com/joergschultzelutter/core-aprs-client@23-implement-functoolspartial#egg=core-aprs-client
+#git+https://github.com/joergschultzelutter/core-aprs-client@23-implement-functoolspartial#egg=core-aprs-client
+core-aprs-client
