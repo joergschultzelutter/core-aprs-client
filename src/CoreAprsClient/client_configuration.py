@@ -31,7 +31,7 @@ program_config = {}
 def load_config(config_file: str = "core_aprs_client.cfg"):
     """
     Loads the program configuration from the config file
-    Returs the program configuration as a dictionary
+    Returns the program configuration as a dictionary
     If the config file does not exist, the dictionary will be empty
 
     Parameters

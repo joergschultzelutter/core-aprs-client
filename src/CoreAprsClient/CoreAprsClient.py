@@ -74,6 +74,21 @@ class CoreAprsClient:
         update_logging_level(logging_level=self.log_level)
 
     def activate_client(self):
+        """
+        This function is responsible for setting up the communication
+        with APRS-IS. It reads the configuration file and establishes
+        the network communication with the APRS-IS server. Finally, the
+        aprslib's callback function gets triggered.
+
+        Parameters
+        ==========
+        none
+
+        Returns
+        =======
+        none
+        """
+
         # load the program config from our external config file
         load_config(config_file=self.config_file)
         if len(program_config) == 0:
@@ -211,6 +226,21 @@ class CoreAprsClient:
         pass
 
     def dryrun_testcall(self, message_text: str, from_callsign: str):
+        """
+        This function can be used for 100% offline testing. It does trigger
+        the standard input parser and output generator.
+
+        Parameters
+        ==========
+        message_text: str
+            The (simulated) APRS input message; sent to us by "from_callsign"
+        from_callsign: str
+            The callsign that the message was sent from
+
+        Returns
+        =======
+        none
+        """
         logger.info("Activating dryrun testcall...")
 
         # load the program config from our external config file
