@@ -1,10 +1,9 @@
 #
 # Core APRS Client
-# Sample APRS Client stum
+# Sample APRS Client stub, using the core-aprs-client framework
 # Author: Joerg Schultze-Lutter, 2025
 #
-# This is a stub forwhere you check the incoming APRS message and
-# determine which actions the user wants you to do
+# This is a demo client which shows you how to connect to APRS-IS
 #
 #
 # This program is free software; you can redistribute it and/or modify
@@ -88,5 +87,8 @@ if __name__ == "__main__":
         output_generator=generate_output_message,
     )
 
-    # Activate the APRS client
+    # Activate the APRS client and connect to APRS-IS
     client.activate_client()
+
+    # Demo code for a dryrun testcall
+    #client.dryrun_testcall(message_text="lorem", from_callsign="DF1JSL-1")
