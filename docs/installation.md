@@ -2,9 +2,9 @@
 
 # Introduction
 
-Although `core-aprs-client` is provided as a Python package, you should follow the steps below to familiarize yourself with the program:
+Although `core-aprs-client` is provided [as a Python package](https://pypi.org/project/core-aprs-client/), you should follow the steps below to familiarize yourself with the framework and run first tests with the `sample_aprs_client`:
 
-- Clone repository
+- Clone this repository
 - Install a Python 3.11+ virtual environment and activate it
 - `cd sample_aprs_client`
 - `pip install -r requirements.txt` (this will install the sample client's required Python packages)
