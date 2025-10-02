@@ -44,7 +44,7 @@ Instructions for installing the framework and its sample APRS client on your com
 The steps for modifying the client's config file are described [here](docs/configuration.md).
 
 ### Running the sample client `sample_aprs_client.py`
-The steps for starting the sample client are described [here](docs/client_start.md).
+The steps for starting the sample client are described [here](docs/client_start.md). This directory also contains the templates for the framework's configuration files.
 
 ### `CoreAprsClient` class description
 The framework's class methods are described [here](docs/coreaprsclient_class.md)
