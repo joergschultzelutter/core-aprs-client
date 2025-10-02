@@ -1,6 +1,6 @@
 # core-aprs-client
 
-![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![PyPi version](https://img.shields.io/pypi/v/core-aprs-client.svg)](https://pypi.python.org/pypi/core-aprs-client)
 
 Core APRS client framework with dupe detection, bulletin/beaconing support, and other APRS-IS related stuff.
 

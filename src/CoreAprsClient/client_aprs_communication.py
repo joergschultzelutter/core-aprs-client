@@ -1,7 +1,7 @@
 #
 # Core APRS Client
 # Various APRS communication routines
-# Author: Joerg Schultze-Lutter, 2022
+# Author: Joerg Schultze-Lutter, 2025
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

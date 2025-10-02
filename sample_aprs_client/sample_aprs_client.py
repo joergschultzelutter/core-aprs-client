@@ -91,4 +91,7 @@ if __name__ == "__main__":
     client.activate_client()
 
     # Demo code for a dryrun testcall
-    #client.dryrun_testcall(message_text="lorem", from_callsign="DF1JSL-1")
+    # Remove the 'activate_client' statement and uncomment the statement
+    # below for 100% offline testing. The preconfigured example assumes that
+    # callsign "DF1JSL-1" has sent the APRS message text "lorem" to your bot.
+    # client.dryrun_testcall(message_text="lorem", from_callsign="DF1JSL-1")

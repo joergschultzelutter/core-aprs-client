@@ -38,14 +38,18 @@ Any _other_ command that is sent to `core-aprs-client` will generate the bot's _
 > [!TIP]
 > For demonstration purposes, both `input_parser.py` and `output_generator.py` use a _VERY_ simplified processing algorithm. For your future code, you might want to implement proper parsing (e.g. by using regular expressions) and error handling.
 
+> [!INFO]
+> - All input parameters for `input_parser.py` and `output_generator.py` are mandatory parameters
+> - Internally, all input parameters are treated as named parameters.
+
 ## Extending the input parser `input_parser.py`
 
 ### Input processor: Inputs
 
-| Field name      | Content                                                                 | Field Type |
-|-----------------|-------------------------------------------------------------------------|------------|
-| `aprs_message`  | The actual APRS message that we have received, up to 67 bytes in length | `str`      |
-| `from_callsign` | The call sign that has sent the incoming APRS message to us             | `str`      |
+| Field name      | Content                                                            | Field Type |
+|-----------------|--------------------------------------------------------------------|------------|
+| `aprs_message`  | The actual APRS message that we have received from `from_callsign` | `str`      |
+| `from_callsign` | The call sign that has sent the incoming APRS message to us        | `str`      |
 
 ### Input processor: Outputs
 
@@ -104,11 +108,14 @@ The default `input_parser_response_object` object (as provided with the sample c
 
 ## Extending the output generator `output_generator.py`
 
+The output processor has only one input parameter: the input parser's response object.
+
+
 ### Output generator: Inputs
 
-| Field name                     | Content                                                                                                                                                                                                                                                                                                | Field Type                       |
-|--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
-| `input_parser_response_object` | Dictionary object where we store the data that is required by the `output_generator` module for generating the APRS message. Note that you can also return other objects such as classes. Just ensure that both `input_parser` and `output_generator` share the very same structure for this variable. | `dict` (default) or any `object` |
+| Field name                     | Content                                                                                                                                                                                                                                                                                                  | Field Type                       |
+|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
+| `input_parser_response_object` | (Dictionary) object where we store the data that is required by the `output_generator` module for generating the APRS message. Note that you can also return other objects such as classes. Just ensure that both `input_parser` and `output_generator` share the very same structure for this variable. | `dict` (default) or any `object` |
  
 ### Output generator: Outputs
 
