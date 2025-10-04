@@ -27,7 +27,8 @@ from functools import partial
 import logging
 from pprint import pformat
 from collections.abc import Callable
-from typing import Any
+from typing import Dict, Any
+import threading
 
 from . import client_shared
 from .client_utils import (
@@ -69,6 +70,8 @@ class CoreAprsClient:
         self.input_parser = input_parser
         self.output_generator = output_generator
         self.log_level = log_level
+        self._dynamic_aprs_bulletins: Dict[str, Any] = {}
+        self._lock = threading.Lock()
 
         # Update the log level (if needed)
         update_logging_level(logging_level=self.log_level)
@@ -330,3 +333,13 @@ class CoreAprsClient:
 
                 logger.info(pformat(output_message))
                 logger.info(msg=pformat(response_parameters))
+
+    @property
+    def dynamic_aprs_bulletins(self) -> Dict[str, Any]:
+        with self._lock:
+            return dict(self._dynamic_aprs_bulletins)
+
+    @dynamic_aprs_bulletins.setter
+    def dynamic_aprs_bulletins(self, new_dict: Dict[str, Any]) -> None:
+        with self._lock:
+            self._dynamic_aprs_bulletins = dict(new_dict)

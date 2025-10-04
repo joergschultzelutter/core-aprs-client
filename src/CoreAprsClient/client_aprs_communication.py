@@ -653,6 +653,8 @@ def init_scheduler_jobs():
                     aprs_beacon_messages,
                     program_config["testing"]["aprsis_simulate_send"],
                 ],
+                max_instances=1,
+                coalesce=True,
             )
 
         if program_config["bulletin_config"]["aprsis_broadcast_bulletins"]:
@@ -674,6 +676,8 @@ def init_scheduler_jobs():
                     aprs_bulletin_messages,
                     program_config["testing"]["aprsis_simulate_send"],
                 ],
+                max_instances=1,
+                coalesce=True,
             )
 
         # Ultimately, start the scheduler
