@@ -10,7 +10,7 @@
 
 ## General Info
 
-> [!INFO]
+> [!NOTE]
 > The following documentation references the files located in this repository's [`sample_aprs_client`](/sample_aprs_client) directory
 
 > [!TIP]
@@ -38,7 +38,7 @@ Any _other_ command that is sent to `core-aprs-client` will generate the bot's _
 > [!TIP]
 > For demonstration purposes, both `input_parser.py` and `output_generator.py` use a _VERY_ simplified processing algorithm. For your future code, you might want to implement proper parsing (e.g. by using regular expressions) and error handling.
 
-> [!INFO]
+> [!NOTE]
 > - All input parameters for `input_parser.py` and `output_generator.py` are mandatory parameters
 > - Internally, all input parameters are treated as named parameters.
 

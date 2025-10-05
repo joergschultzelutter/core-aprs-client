@@ -172,7 +172,7 @@ Valid values:
     # might be use cases where you simply need to ignore a (technically valid) request
     # in your custom code.
 
-> [!NOTE]
+> [!IMPORTANT]
 > `PARSE_IGNORE` should _only_ be used for cases where your custom input processor has implemented e.g. a dupe check that is _additional_ to `core-aprs-client`s dupe check and you don't want to trigger ANY response to the user's inquiry. In any other case, use `PARSE_ERROR` and return a proper response message to the user.
 
 ### `input_processor` return code sample
@@ -191,14 +191,15 @@ Valid values:
 
 ## Use of dynamic content for APRS bulletins additional to static bulletin content
 
-> [!INFO]
+> [!NOTE]
 > Optional extension; in most cases, you will not need to use this function.
 
 As [described in the framework documentation](configuration_subsections/config_bulletin.md), `core-aprs-framework` can send to the [APRS-IS](https://aprs-is.net/) framework at the user's request. The associated bulletin messages are stored as static content [in the configuration file](configuration_subsections/config_bulletin_messages.md). 
 
 In addition to the static bulletin messages configured in the `core-aprs-client`'s configuration file, it is also possible to send dynamic bulletin messages. These could be, for example, special weather data that is only determined during the runtime of the bot. [mpad](https://www.github.com/joergschultzelutter/mpad) uses this, for example, to send out [hazard warnings from the local German weather service](https://github.com/joergschultzelutter/mpad/blob/master/docs/INSTALLATION.md#program-configuration).
 
-The ability to send this dynamic data is provided by a variable of type ‘dict’. :heavy_exclamation_mark:**The associated dictionary within the class must always be replaced in its _entirety_**, as thread safety has only been implemented for this method. :heavy_exclamation_mark:
+> [!IMPORTANT]
+> The ability to send this dynamic data is provided by a variable of type ‘dict’. :heavy_exclamation_mark:**The associated dictionary within the class must always be replaced in its _entirety_**, as thread safety has only been implemented for this method. :heavy_exclamation_mark:
 
 The following conditions apply:
 
