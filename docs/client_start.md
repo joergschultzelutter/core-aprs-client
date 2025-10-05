@@ -4,7 +4,7 @@ The sample APRS client can be accessed [here](https://github.com/joergschultzelu
 
 Every configuration setting is stored in the program's config file - see the documentation on [the program's configuration file](configuration.md). Therefore, the only command line option that can be specified is the name of the configuration file.
 
-```
+```python
 usage: sample_aprs_client.py [-h] [--configfile CONFIGFILE]
 
 options:

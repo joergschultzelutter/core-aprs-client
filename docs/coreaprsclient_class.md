@@ -4,11 +4,13 @@ The `CoreAprsClient` class is responsible for the communication between the loca
 
 Import the class via
 
-    from CoreAprsClient import CoreAprsClient
+```python
+from CoreAprsClient import CoreAprsClient
+```
 
 ## Class Constructor
 
-```
+```python
 class CoreAprsClient:
     config_file: str
     log_level: int
@@ -48,27 +50,29 @@ You are responsible for designing the functions associated with the `input_parse
 
 This class method is responsible for the communication between the local APRS bot and [APRS-IS](https://aprs-is.net/). It has no parameters. Full APRS bot client example:
 
-    from CoreAprsClient import CoreAprsClient
-    from input_parser import parse_input_message
-    from output_generator import generate_output_message
+```python
+from CoreAprsClient import CoreAprsClient
+from input_parser import parse_input_message
+from output_generator import generate_output_message
+
+# Create the CoreAprsClient object. Supply the
+# following parameters:
+#
+# - configuration file name
+# - log level (from Python's 'logging' package)
+# - function names for both input processor and output generator
+#
+client = CoreAprsClient(
+    config_file="core_aprs_client.cfg",
+    log_level=logging.INFO,
+    input_parser=parse_input_message,
+    output_generator=generate_output_message,
+)
+
+# Activate the APRS client
+client.activate_client()
+```
     
-    # Create the CoreAprsClient object. Supply the
-    # following parameters:
-    #
-    # - configuration file name
-    # - log level (from Python's 'logging' package)
-    # - function names for both input processor and output generator
-    #
-    client = CoreAprsClient(
-        config_file="core_aprs_client.cfg",
-        log_level=logging.INFO,
-        input_parser=parse_input_message,
-        output_generator=generate_output_message,
-    )
-
-    # Activate the APRS client
-    client.activate_client()
-
 ## `dryrun_testcall` class method
 
 This class method can be used for offline testing. There will be no data exchange between [APRS-IS](https://aprs-is.net/) and the bot.
@@ -77,26 +81,28 @@ Note that this class method will not generate actual APRS response messages but 
 
 Dryrun code example:
 
-    from CoreAprsClient import CoreAprsClient
-    from input_parser import parse_input_message
-    from output_generator import generate_output_message
-    
-    # Create the CoreAprsClient object. Supply the
-    # following parameters:
-    #
-    # - configuration file name
-    # - log level (from Python's 'logging' package)
-    # - function names for both input processor and output generator
-    #
-    client = CoreAprsClient(
-        config_file="core_aprs_client.cfg",
-        log_level=logging.INFO,
-        input_parser=parse_input_message,
-        output_generator=generate_output_message,
-    )
+```python
+from CoreAprsClient import CoreAprsClient
+from input_parser import parse_input_message
+from output_generator import generate_output_message
 
-    # Activate the dryrun call
-    client.dryrun_testcall(message_text="lorem", from_callsign="DF1JSL-1")
+# Create the CoreAprsClient object. Supply the
+# following parameters:
+#
+# - configuration file name
+# - log level (from Python's 'logging' package)
+# - function names for both input processor and output generator
+#
+client = CoreAprsClient(
+    config_file="core_aprs_client.cfg",
+    log_level=logging.INFO,
+    input_parser=parse_input_message,
+    output_generator=generate_output_message,
+)
+
+# Activate the dryrun call
+client.dryrun_testcall(message_text="lorem", from_callsign="DF1JSL-1")
+```
 
 ### Parameter
 
@@ -109,7 +115,7 @@ Dryrun code example:
 
 This is the sample output for the `lorem` keyword from the `sample_aprs_client` provided with this repository:
 
-```
+``` python
 2025-09-19 22:13:12,419 - CoreAprsClient -INFO - Activating dryrun testcall...
 2025-09-19 22:13:12,420 - CoreAprsClient -INFO - parsing message 'lorem' for callsign 'DF1JSL-1'
 2025-09-19 22:13:12,420 - CoreAprsClient -INFO - Parsed message:
@@ -136,58 +142,64 @@ This is the sample output for the `lorem` keyword from the `sample_aprs_client` 
 
 Unlike the `output_generator` which either provides a success/failure scenario, the `input_processor` supports _**three**_ return codes. Your custom `input_processor` code needs to import those via
 
-    from CoreAprsClient import CoreAprsClientInputParserStatus
+```python
+from CoreAprsClient import CoreAprsClientInputParserStatus
+```
 
 Valid values:
 
-    # We support three possible return codes from the input parser:
-    # PARSE_OK     - Input processor has identified keyword and is ready
-    #                to continue. This is the desired default state
-    #                Whenever the return code is PARSE_OK, then we should know
-    #                by now what the user wants from us. Now, we'll leave it to
-    #                another module to generate the output data of what we want
-    #                to send to the user (client_output_generatpr.py).
-    #                The result to this post-processor will be a general success
-    #                status code and the message that is to be sent to the user.
-    # PARSE_ERROR  - an error has occurred. Most likely, the external
-    #                input processor was either unable to identify a
-    #                keyword from the message OR a follow-up process has
-    #                failed; e.g. the user has defined a wx keyword,
-    #                requiring the sender to supply mandatory location info
-    #                which was missing from the message. In any way, this signals
-    #                the callback function that we are unable to process the
-    #                message any further
-    # PARSE_IGNORE - The message was ok but we are being told to ignore it. This
-    #                might be the case if the user's input processor has a dupe
-    #                check that is additional to the one provided by the
-    #                core-aprs-client framework. Similar to PARSE_ERROR, we
-    #                are not permitted to process this request any further BUT
-    #                instead of sending an error message, we will simply ignore
-    #                the request. Note that the core-aprs-client framework has
-    #                already ack'ed the request at this point, thus preventing it
-    #                from getting resend by APRS-IS over and over again.
-    #
-    # Note that you should refrain from using PARSE_IGNORE whenever possible - a
-    # polite inquiry should always trigger a polite response :-) Nevertheless, there
-    # might be use cases where you simply need to ignore a (technically valid) request
-    # in your custom code.
-
+```python
+# We support three possible return codes from the input parser:
+# PARSE_OK     - Input processor has identified keyword and is ready
+#                to continue. This is the desired default state
+#                Whenever the return code is PARSE_OK, then we should know
+#                by now what the user wants from us. Now, we'll leave it to
+#                another module to generate the output data of what we want
+#                to send to the user (client_output_generatpr.py).
+#                The result to this post-processor will be a general success
+#                status code and the message that is to be sent to the user.
+# PARSE_ERROR  - an error has occurred. Most likely, the external
+#                input processor was either unable to identify a
+#                keyword from the message OR a follow-up process has
+#                failed; e.g. the user has defined a wx keyword,
+#                requiring the sender to supply mandatory location info
+#                which was missing from the message. In any way, this signals
+#                the callback function that we are unable to process the
+#                message any further
+# PARSE_IGNORE - The message was ok but we are being told to ignore it. This
+#                might be the case if the user's input processor has a dupe
+#                check that is additional to the one provided by the
+#                core-aprs-client framework. Similar to PARSE_ERROR, we
+#                are not permitted to process this request any further BUT
+#                instead of sending an error message, we will simply ignore
+#                the request. Note that the core-aprs-client framework has
+#                already ack'ed the request at this point, thus preventing it
+#                from getting resend by APRS-IS over and over again.
+#
+# Note that you should refrain from using PARSE_IGNORE whenever possible - a
+# polite inquiry should always trigger a polite response :-) Nevertheless, there
+# might be use cases where you simply need to ignore a (technically valid) request
+# in your custom code.
+```
+    
 > [!IMPORTANT]
 > `PARSE_IGNORE` should _only_ be used for cases where your custom input processor has implemented e.g. a dupe check that is _additional_ to `core-aprs-client`s dupe check and you don't want to trigger ANY response to the user's inquiry. In any other case, use `PARSE_ERROR` and return a proper response message to the user.
 
 ### `input_processor` return code sample
 
-    from CoreAprsClient import CoreAprsClientInputParserStatus
+```python
+from CoreAprsClient import CoreAprsClientInputParserStatus
 
-    def process_the_input():
-        ....
-        do some processing
-        input_parser_response_object = {"key" : "value"}
-        ....
+def process_the_input():
+    ....
+    do some processing
+    input_parser_response_object = {"key" : "value"}
+    ....
 
-        return_code = CoreAprsClientInputParserStatus.PARSE_OK if there_was_no_error else CoreAprsClientInputParserStatus.PARSE_ERROR
-        input_parser_error_message = "my_custom_error_message" if there_was_no_error else ""
-        return return_code, input_parser_error_message, input_parser_response_object
+    return_code = CoreAprsClientInputParserStatus.PARSE_OK if there_was_no_error else CoreAprsClientInputParserStatus.PARSE_ERROR
+    input_parser_error_message = "my_custom_error_message" if there_was_no_error else ""
+    return return_code, input_parser_error_message, input_parser_response_object
+```
 
 ## Use of dynamic content for APRS bulletins additional to static bulletin content
 

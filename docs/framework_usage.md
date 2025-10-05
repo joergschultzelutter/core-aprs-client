@@ -44,6 +44,13 @@ Any _other_ command that is sent to `core-aprs-client` will generate the bot's _
 
 ## Extending the input parser `input_parser.py`
 
+```python
+def parse_input_message(aprs_message: str, from_callsign: str):
+    ....
+    return return_code, input_parser_error_message, input_parser_response_object
+```
+
+
 ### Input processor: Inputs
 
 | Field name      | Content                                                            | Field Type |
@@ -62,7 +69,7 @@ Any _other_ command that is sent to `core-aprs-client` will generate the bot's _
 #### `return_code` - Valid values
 
 The return codes are defined in the [CoreAprsClientInputParserStatus](coreaprsclient_class.md#input_processor-return-codes) class. Import via
-```
+```python
 from CoreAprsClient import CoreAprsClientInputParserStatus
 ```
 Return code details:
@@ -107,6 +114,14 @@ The default `input_parser_response_object` object (as provided with the sample c
 | `command_code`               | contains an internal code which tells the program's output processor what it needs to do.                                                                                                                                                                                                                                       | `str`      |
 
 ## Extending the output generator `output_generator.py`
+
+```python
+def generate_output_message(
+    input_parser_response_object: dict | object, default_error_message: str
+):
+    ...
+    return success, output_message
+```
 
 The output processor has only one input parameter: the input parser's response object.
 
