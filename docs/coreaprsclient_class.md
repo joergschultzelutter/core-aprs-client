@@ -52,6 +52,8 @@ This class method is responsible for the communication between the local APRS bo
 
 ```python
 from CoreAprsClient import CoreAprsClient
+
+# Your custom input parser and output generator code
 from input_parser import parse_input_message
 from output_generator import generate_output_message
 
@@ -83,6 +85,8 @@ Dryrun code example:
 
 ```python
 from CoreAprsClient import CoreAprsClient
+
+# Your custom input parser and output generator code
 from input_parser import parse_input_message
 from output_generator import generate_output_message
 
