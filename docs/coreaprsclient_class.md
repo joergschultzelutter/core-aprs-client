@@ -39,8 +39,7 @@ Currently, this class supports two methods:
 - [`activate_client`](coreaprsclient_class.md#activate_client-class-method) connects to [APRS-IS](https://aprs-is.net/) and exchanges data with the APRS network
 - [`dryrun_testcall`](coreaprsclient_class.md#dryrun_testcall-class-method) can be used for offline testing. When triggered, it will run a simulated and freely configurable APRS input message through the `input_processor` code and, whereas applicable, uses the `output_generator` code in order to create the outgoing message content.
 
-Additionally, a [set of specific return codes](coreaprsclient_class.md#input_processor-return-codes) have to be imported by the `input_parser` function. 
-
+Additionally, a [set of specific return codes](coreaprsclient_class.md#input_processor-return-codes) have to be imported by the `input_parser` function. Finally, an optional `dict` attribute allows users to send additional dynamic APRS bulletins in addition to the statically configured bulletins. 
 ### Your responsibilities 
 
 You are responsible for designing the functions associated with the `input_parser` and `output_generator` parameters. Check the [Framework Usage](framework_usage.md) help pages for further details. 
@@ -189,3 +188,24 @@ Valid values:
         return_code = CoreAprsClientInputParserStatus.PARSE_OK if there_was_no_error else CoreAprsClientInputParserStatus.PARSE_ERROR
         input_parser_error_message = "my_custom_error_message" if there_was_no_error else ""
         return return_code, input_parser_error_message, input_parser_response_object
+
+## Use of dynamic content for APRS bulletins additional to static bulletin content
+
+> [!INFO]
+> Optional extension; in most cases, you will not need to use this function.
+
+As [described in the framework documentation](configuration_subsections/config_bulletin.md), `core-aprs-framework` can send to the [APRS-IS](https://aprs-is.net/) framework at the user's request. The associated bulletin messages are stored as static content [in the configuration file](configuration_subsections/config_bulletin_messages.md). 
+
+In addition to the static bulletin messages configured in the `core-aprs-client`'s configuration file, it is also possible to send dynamic bulletin messages. These could be, for example, special weather data that is only determined during the runtime of the bot. [mpad](https://www.github.com/joergschultzelutter/mpad) uses this, for example, to send out [hazard warnings from the local German weather service](https://github.com/joergschultzelutter/mpad/blob/master/docs/INSTALLATION.md#program-configuration).
+
+The ability to send this dynamic data is provided by a variable of type ‘dict’. :heavy_exclamation_mark:**The associated dictionary within the class must always be replaced in its entirety**, as thread safety has only been implemented for this method.:heavy_exclamation_mark:
+
+The following conditions apply:
+
+* The default value of this separate variable is an empty ‘dict’ object; i.e., no dynamic bulletins are available
+* To send dynamic bulletins, the function for sending static bulletins (i.e., the contents of the configuration file) must be activated (`aprsis_broadcast_bulletins` = `true`). It is generally possible not to preassign the static contents of the bulletins and to use only dynamic contents.
+* Like static bulletins, dynamic bulletins must meet the requirements of the APRS specification, which are defined [in Chapter 14 of the APRS specifications](https://github.com/wb2osz/aprsspec) (_Messages, Bulletins, and Announcements_).
+  * Bulletins begin with the prefix `BLN` or `NWS` and follow the format specifications of the APRS specifications, depending on the selected prefix. 
+  * The text content uses ASCII-7 bit and is up to 67 characters long per bulletin. When transferring longer content, a `ValueError` exception is thrown. 
+  * Special characters {}|~ are automatically removed from the outgoing message by `core-aprs-client`. 
+  * Garbage in, garbage out. With great power comes great responsibility.
