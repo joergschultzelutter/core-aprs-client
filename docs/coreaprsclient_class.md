@@ -215,7 +215,8 @@ As [described in the framework documentation](configuration_subsections/config_b
 In addition to the static bulletin messages configured in the `core-aprs-client`'s configuration file, it is also possible to send dynamic bulletin messages. These could be, for example, special weather data that is only determined during the runtime of the bot. [mpad](https://www.github.com/joergschultzelutter/mpad) uses this, for example, to send out [hazard warnings from the local German weather service](https://github.com/joergschultzelutter/mpad/blob/master/docs/INSTALLATION.md#program-configuration).
 
 > [!IMPORTANT]
-> The ability to send this dynamic data is provided by a variable of type ‘dict’. :heavy_exclamation_mark:**The associated dictionary within the class must always be replaced in its _entirety_**, as thread safety has only been implemented for this method. :heavy_exclamation_mark:
+> The ability to send this dynamic data is provided by a variable of type ‘dict’
+> :heavy_exclamation_mark:**The associated dictionary within the class must always be replaced _in its entirety_**, as thread safety has only been implemented for this method.:heavy_exclamation_mark:
 
 The following conditions apply:
 
