@@ -21,8 +21,11 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 from CoreAprsClient import CoreAprsClient
+
+# Your custom input parser and output generator code
 from input_parser import parse_input_message
 from output_generator import generate_output_message
+
 import argparse
 import os
 import sys
