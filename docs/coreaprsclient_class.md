@@ -14,14 +14,14 @@ from CoreAprsClient import CoreAprsClient
 class CoreAprsClient:
     config_file: str
     log_level: int
-    input_parser: types.FunctionType
-    output_generator: types.FunctionType
+    input_parser: Callable[..., Any]
+    output_generator: Callable[..., Any]
 
     def __init__(
         self,
         config_file: str,
-        input_parser: types.FunctionType,
-        output_generator: types.FunctionType,
+        input_parser: Callable[..., Any],
+        output_generator: Callable[..., Any],
         log_level: int = logging.INFO,
     ):
 ```
