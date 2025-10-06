@@ -194,7 +194,7 @@ Valid values:
 ```python
 from CoreAprsClient import CoreAprsClientInputParserStatus
 
-def process_the_input():
+def parse_input_message(aprs_message: str, from_callsign: str):
     ....
     do some processing
     input_parser_response_object = {"key" : "value"}
@@ -206,7 +206,9 @@ def process_the_input():
     input_parser_error_message = "my_custom_error_message"
         if there_was_an_error
         else ""
-    return return_code, input_parser_error_message, input_parser_response_object
+    return  return_code, 
+            input_parser_error_message,
+            input_parser_response_object
 ```
 
 ## Use of dynamic content for APRS bulletins additional to static bulletin content
