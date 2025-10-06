@@ -215,14 +215,14 @@ As [described in the framework documentation](configuration_subsections/config_b
 In addition to the static bulletin messages configured in the `core-aprs-client`'s configuration file, it is also possible to send dynamic bulletin messages. These could be, for example, special weather data that is only determined during the runtime of the bot. [mpad](https://www.github.com/joergschultzelutter/mpad) uses this, for example, to send out [hazard warnings from the local German weather service](https://github.com/joergschultzelutter/mpad/blob/master/docs/INSTALLATION.md#program-configuration).
 
 > [!IMPORTANT]
-> The ability to send this dynamic data is provided by a variable of type ‘dict’ :heavy_exclamation_mark:**The associated dictionary within the class must always be replaced _in its entirety_**, as thread safety has only been implemented for this method. :heavy_exclamation_mark:
+> The ability to send this dynamic data is provided by a variable of type ‘dict’ :heavy_exclamation_mark:**The associated dictionary within the class must always be replaced _in its entirety_**, as thread safety has only been implemented for this data exchange method. :heavy_exclamation_mark:
 
 The following conditions apply:
 
-* The default value of this separate variable is an empty ‘dict’ object; i.e., no dynamic bulletins are available
+* The default value of this separate variable is an empty `dict` object; i.e., no dynamic bulletins are available
 * To send dynamic bulletins, the function for sending static bulletins (i.e., the contents of the configuration file) must be activated (`aprsis_broadcast_bulletins` = `true`). It is generally possible not to preassign the static contents of the bulletins and to use only dynamic contents.
 * Like static bulletins, dynamic bulletins must meet the requirements of the APRS specification, which are defined [in Chapter 14 of the APRS specifications](https://github.com/wb2osz/aprsspec) (_Messages, Bulletins, and Announcements_).
   * Dynamic Bulletins begin with the prefix `BLN` or `NWS` and follow the format specifications of the APRS specifications, depending on the selected prefix. 
-  * The text content uses ASCII-7 bit and is up to 67 characters long per bulletin. When transferring longer content, a `ValueError` exception is thrown. 
+  * The text content uses ASCII-7 bit and is up to 67 characters long per bulletin. When trying to transfer longer content, a `ValueError` exception is thrown. Note that this deliberately different from the static bulletins' behavior where longer content is ignored.
   * Special characters `{}|~` are automatically removed from the outgoing message by `core-aprs-client`. 
   * Garbage in, garbage out. With great power comes great responsibility.
