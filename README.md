@@ -12,7 +12,7 @@ This is where _you_ step in. Add your bot-specific code to the client's APRS fra
 
 The following example illustrates a fully functional APRS bot. You will provide the APRS message input parser code and the generator responsible for the outgoing APRS message content. Everything else will be handled by the `core-aprs-client` framework.
 
-```
+```python
 from CoreAprsClient import CoreAprsClient
 from input_parser import parse_input_message
 from output_generator import generate_output_message
