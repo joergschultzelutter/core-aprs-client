@@ -31,8 +31,8 @@ class CoreAprsClient:
 | Field Name         | Description                                                                                                                                                                                                                                     | Field Type |
 |--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
 | `config_file`      | `core_aprs_client`'s configuration file; see [this documentation section](configuration.md)                                                                                                                                                     | `str`      |
-| `input_parser`     | Function name of the external input processor which parses incoming APRS messages and tries to figure out what the user wants us to do.                                                                                                         | `function` |
-| `output_generator` | Function name of the external output generator. Based on the `input_parser`'s feedback, this code is responsible for generating the output message - which will then be transformed by the `core-aprs-client` framework into 1..n APRS messages | `function` |
+| `input_parser`     | Function name of the external input processor which parses incoming APRS messages and tries to figure out what the user wants us to do.                                                                                                         | `Callable` |
+| `output_generator` | Function name of the external output generator. Based on the `input_parser`'s feedback, this code is responsible for generating the output message - which will then be transformed by the `core-aprs-client` framework into 1..n APRS messages | `Callable` |
 | `log_level`        | Log level from Python's `logging` function. Default value: `logging.INFO`                                                                                                                                                                       | `enum`     |
 
 ### Supported class methods
@@ -200,8 +200,12 @@ def process_the_input():
     input_parser_response_object = {"key" : "value"}
     ....
 
-    return_code = CoreAprsClientInputParserStatus.PARSE_OK if there_was_no_error else CoreAprsClientInputParserStatus.PARSE_ERROR
-    input_parser_error_message = "my_custom_error_message" if there_was_no_error else ""
+    return_code = CoreAprsClientInputParserStatus.PARSE_OK
+        if there_was_no_error
+        else CoreAprsClientInputParserStatus.PARSE_ERROR
+    input_parser_error_message = "my_custom_error_message"
+        if there_was_an_error
+        else ""
     return return_code, input_parser_error_message, input_parser_response_object
 ```
 
