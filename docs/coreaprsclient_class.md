@@ -200,8 +200,12 @@ def process_the_input():
     input_parser_response_object = {"key" : "value"}
     ....
 
-    return_code = CoreAprsClientInputParserStatus.PARSE_OK if there_was_no_error else CoreAprsClientInputParserStatus.PARSE_ERROR
-    input_parser_error_message = "my_custom_error_message" if there_was_no_error else ""
+    return_code = CoreAprsClientInputParserStatus.PARSE_OK
+        if there_was_no_error
+        else CoreAprsClientInputParserStatus.PARSE_ERROR
+    input_parser_error_message = "my_custom_error_message"
+        if there_was_an_error
+        else ""
     return return_code, input_parser_error_message, input_parser_response_object
 ```
 
