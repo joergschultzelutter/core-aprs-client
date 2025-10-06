@@ -211,7 +211,7 @@ def get_alphanumeric_counter_value(numeric_counter: int):
 
 
 def send_beacon_and_status_msg(
-    main_class: object,
+    class_instance: object,
     myaprsis: APRSISObject,
     aprs_beacon_messages: list,
     simulate_send: bool = True,
@@ -222,7 +222,7 @@ def send_beacon_and_status_msg(
 
     Parameters
     ==========
-    main_class: object
+    class_instance: object
         Instance of the main class
     myaprsis: APRSISObject
         Our aprslib object that we will use for the communication part
@@ -265,7 +265,7 @@ def send_beacon_and_status_msg(
 
 
 def send_bulletin_messages(
-    main_class: object,
+    class_instance: object,
     myaprsis: APRSISObject,
     bulletin_dict: dict,
     simulate_send: bool = True,
@@ -278,7 +278,7 @@ def send_bulletin_messages(
 
     Parameters
     ==========
-    main_class: object
+    class_instance: object
         Instance of the main class
     myaprsis: APRSISObject
         Our aprslib object that we will use for the communication part
@@ -563,7 +563,7 @@ def aprs_callback(
                 )
 
 
-def init_scheduler_jobs(main_class: object):
+def init_scheduler_jobs(class_instance: object):
     """
     Initializes the scheduler jobs for APRS bulletins and / or beacons.
 
@@ -659,7 +659,7 @@ def init_scheduler_jobs(main_class: object):
                     "aprsis_beacon_interval_minutes"
                 ],
                 args=[
-                    main_class,
+                    class_instance,
                     client_shared.AIS,
                     aprs_beacon_messages,
                     program_config["testing"]["aprsis_simulate_send"],
@@ -683,7 +683,7 @@ def init_scheduler_jobs(main_class: object):
                     "aprsis_bulletin_interval_minutes"
                 ],
                 args=[
-                    main_class,
+                    class_instance,
                     client_shared.AIS,
                     aprs_bulletin_messages,
                     program_config["testing"]["aprsis_simulate_send"],
