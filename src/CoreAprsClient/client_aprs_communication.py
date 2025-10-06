@@ -211,7 +211,10 @@ def get_alphanumeric_counter_value(numeric_counter: int):
 
 
 def send_beacon_and_status_msg(
-    myaprsis: APRSISObject, aprs_beacon_messages: list, simulate_send: bool = True
+    main_class: object,
+    myaprsis: APRSISObject,
+    aprs_beacon_messages: list,
+    simulate_send: bool = True,
 ):
     """
     Send beacon message list to APRS_IS
@@ -219,6 +222,8 @@ def send_beacon_and_status_msg(
 
     Parameters
     ==========
+    main_class: object
+        Instance of the main class
     myaprsis: APRSISObject
         Our aprslib object that we will use for the communication part
     aprs_beacon_messages: list
@@ -260,7 +265,10 @@ def send_beacon_and_status_msg(
 
 
 def send_bulletin_messages(
-    myaprsis: APRSISObject, bulletin_dict: dict, simulate_send: bool = True
+    main_class: object,
+    myaprsis: APRSISObject,
+    bulletin_dict: dict,
+    simulate_send: bool = True,
 ):
     """
     Sends bulletin message list to APRS_IS
@@ -270,6 +278,8 @@ def send_bulletin_messages(
 
     Parameters
     ==========
+    main_class: object
+        Instance of the main class
     myaprsis: APRSISObject
         Our aprslib object that we will use for the communication part
     bulletin_dict: dict
@@ -553,7 +563,7 @@ def aprs_callback(
                 )
 
 
-def init_scheduler_jobs():
+def init_scheduler_jobs(main_class: object):
     """
     Initializes the scheduler jobs for APRS bulletins and / or beacons.
 
@@ -649,6 +659,7 @@ def init_scheduler_jobs():
                     "aprsis_beacon_interval_minutes"
                 ],
                 args=[
+                    main_class,
                     client_shared.AIS,
                     aprs_beacon_messages,
                     program_config["testing"]["aprsis_simulate_send"],
@@ -672,6 +683,7 @@ def init_scheduler_jobs():
                     "aprsis_bulletin_interval_minutes"
                 ],
                 args=[
+                    main_class,
                     client_shared.AIS,
                     aprs_bulletin_messages,
                     program_config["testing"]["aprsis_simulate_send"],

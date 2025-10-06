@@ -167,7 +167,7 @@ class CoreAprsClient:
                     # Install the APRS-IS beacon / bulletin schedulers if
                     # activated in the program's configuration file
                     # Otherwise, this field's value will be 'None'
-                    aprs_scheduler = init_scheduler_jobs()
+                    aprs_scheduler = init_scheduler_jobs(self)
 
                     # create the partial object for our callback
                     enhanced_callback = partial(
