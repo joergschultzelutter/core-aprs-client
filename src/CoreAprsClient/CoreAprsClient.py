@@ -22,7 +22,6 @@ import signal
 import time
 import atexit
 import os
-import types
 from functools import partial
 import logging
 from pprint import pformat
