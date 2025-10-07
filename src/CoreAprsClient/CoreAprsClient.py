@@ -86,11 +86,10 @@ class CoreAprsClient:
 
         Parameters
         ==========
-        none
 
         Returns
         =======
-        none
+
         """
 
         # load the program config from our external config file
