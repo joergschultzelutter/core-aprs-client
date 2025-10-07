@@ -27,8 +27,10 @@ from functools import partial
 import logging
 from pprint import pformat
 from collections.abc import Callable
-from typing import Dict, Any
+from typing import Dict, Any, Mapping
 import threading
+import copy
+from types import MappingProxyType
 
 from . import client_shared
 from .client_utils import (
@@ -335,11 +337,11 @@ class CoreAprsClient:
                 logger.info(msg=pformat(response_parameters))
 
     @property
-    def dynamic_aprs_bulletins(self) -> Dict[str, Any]:
+    def dynamic_aprs_bulletins(self) -> Mapping[str, Any]:
         with self._lock:
-            return dict(self._dynamic_aprs_bulletins)
+            return MappingProxyType(self._dynamic_aprs_bulletins)
 
     @dynamic_aprs_bulletins.setter
     def dynamic_aprs_bulletins(self, new_dict: Dict[str, Any]) -> None:
         with self._lock:
-            self._dynamic_aprs_bulletins = dict(new_dict)
+            self._dynamic_aprs_bulletins = copy.deepcopy(new_dict)
