@@ -237,6 +237,9 @@ def send_beacon_and_status_msg(
     """
     logger.debug(msg="Reached beacon interval; sending beacons")
 
+    logger.debug(class_instance.dynamic_aprs_bulletins)
+
+
     # Generate some local variables because the 'black' beautifier seems
     # to choke on multi-dimensional dictionaries
     _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
@@ -643,7 +646,7 @@ def init_scheduler_jobs(class_instance: object):
             # and store it in a list item
             aprs_beacon_messages: list = [_beacon]
 
-            # Ultimately, send the beacon
+            # Ultimately, send the initial beacon message
             send_beacon_and_status_msg(
                 class_instance=class_instance,
                 myaprsis=client_shared.AIS,
@@ -651,7 +654,7 @@ def init_scheduler_jobs(class_instance: object):
                 simulate_send=program_config["testing"]["aprsis_simulate_send"],
             )
 
-            # Add position beaconing to scheduler
+            # Now let's add position beaconing to scheduler
             my_scheduler.add_job(
                 send_beacon_and_status_msg,
                 "interval",
