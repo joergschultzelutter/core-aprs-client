@@ -645,6 +645,7 @@ def init_scheduler_jobs(class_instance: object):
 
             # Ultimately, send the beacon
             send_beacon_and_status_msg(
+                class_instance=class_instance,
                 myaprsis=client_shared.AIS,
                 aprs_beacon_messages=aprs_beacon_messages,
                 simulate_send=program_config["testing"]["aprsis_simulate_send"],
