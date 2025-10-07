@@ -179,7 +179,7 @@ class CoreAprsClient:
                     #
                     # We are now ready to initiate the actual processing
                     # Start the consumer thread
-                    logger.debug(msg="Starting callback consumer")
+                    logger.info(msg="Starting APRS-IS callback consumer")
                     client_shared.AIS.ais_start_consumer(enhanced_callback)
 
                     #
