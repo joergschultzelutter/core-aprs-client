@@ -36,6 +36,10 @@ from .client_logger import logger
 from .client_return_codes import CoreAprsClientInputParserStatus
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers import base as apbase
+import copy
+import re
+
+APRS_MSG_LEN_NOTRAILING = 67
 
 
 def send_ack(
@@ -237,9 +241,6 @@ def send_beacon_and_status_msg(
     """
     logger.debug(msg="Reached beacon interval; sending beacons")
 
-    logger.debug(class_instance.dynamic_aprs_bulletins)
-
-
     # Generate some local variables because the 'black' beautifier seems
     # to choke on multi-dimensional dictionaries
     _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
@@ -296,13 +297,58 @@ def send_bulletin_messages(
     """
     logger.debug(msg="reached bulletin interval; sending bulletins")
 
+    # create our target dictionary which may contain both static
+    # and dynamic bulletin messages. First, copy the content from the static
+    # bulletin settings - we don't need to check this data again.
+    target_dict = copy.deepcopy(bulletin_dict)
+
+    if type(class_instance.dynamic_aprs_bulletins) is dict:
+        # Get the key and value from our configuration file's bulletin messages section
+        for key, value in class_instance.dynamic_aprs_bulletins.items():
+            # Message populated and less than max APRS message length?
+            # note: we do not use message enumeration for bulletins
+            # therefore, the max length requirement is always fixed (67 bytes)
+            if 0 < len(value) <= APRS_MSG_LEN_NOTRAILING:
+                # Check if the identifier follows these APRS requirements:
+                # 1) must start with fixed "BLN" string OR "NWS-" string
+                # 2) needs to be followed by 1..6 (NWS: 1..5) ASCII-7 characters and/or digits
+                # We do not need to look for "finalized" entries, read: the dictionary's key is
+                # not required to have keys with 9 chars in total length
+                match = re.match(
+                    pattern=r"^(bln[a-z0-9]{1,6})|(nws-[a-z0-9]{1,5})$",
+                    string=key,
+                    flags=re.IGNORECASE,
+                )
+                if match:
+                    # We found a match. As a precaution, let's check if the user has
+                    # used characters in the actual message which are special to APRS
+                    match = re.findall(r"[{}|~]+", value)
+                    if match:
+                        logger.debug(
+                            msg=f"APRS dynamic bulletin message '{key}': removing special APRS characters from 'value' setting"
+                        )
+                        # Let's get rid of those control characters from the message
+                        value = re.sub(r"[{}|~]+", "", value)
+                    # Convert the bulletin identifier to upperkey
+                    key = key.upper()
+                    # and add it to our dictionary in case it does not exist
+                    # and its lenght (after potential character replacements)
+                    # is still greater than zero
+                    if key not in target_dict and len(value) > 0:
+                        target_dict[key] = value
+            else:
+                logger.debug(
+                    f"Ignoring dynamic bulletin setting for '{key}'; value is either empty or exceeds {APRS_MSG_LEN_NOTRAILING} characters. Check your input data"
+                )
+
     # Generate some local variables because the 'black' beautifier seems
     # to choke on multi-dimensional dictionaries
     _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
     _aprsis_tocall = program_config["client_config"]["aprsis_tocall"]
 
     # Build and send the list of bulletins
-    for index, (recipient_id, bln) in enumerate(bulletin_dict.items(), start=1):
+    # Note that we iterate over the unified dictionary of APRS bulletins
+    for index, (recipient_id, bln) in enumerate(target_dict.items(), start=1):
         # build the bulletin string
         stringtosend = f"{_aprsis_callsign}>{_aprsis_tocall}::{recipient_id:9}:{bln}"
         # simulate sending yes/no
