@@ -228,7 +228,7 @@ Class property: `CoreAprsClient.dynamic_aprs_bulletins`
 
 As [described in the framework documentation](configuration_subsections/config_bulletin.md), `core-aprs-framework` can send to the [APRS-IS](https://aprs-is.net/) framework at the user's request. The associated bulletin messages are stored as static content [in the configuration file](configuration_subsections/config_bulletin_messages.md). 
 
-In addition to the static bulletin messages configured in the `core-aprs-client`'s configuration file, it is also possible to send dynamic bulletin messages. These could be, for example, special weather data that is only determined during the runtime of the bot. [mpad](https://www.github.com/joergschultzelutter/mpad) uses this, for example, to send out [hazard warnings from the local German weather service](https://github.com/joergschultzelutter/mpad/blob/master/docs/INSTALLATION.md#program-configuration).
+In addition to the static bulletin messages configured in the `core-aprs-client`'s configuration file, it is also possible to send dynamic bulletin messages. These could be, for example, special weather data that is only determined during the runtime of the bot. [mpad](https://www.github.com/joergschultzelutter/mpad) uses this, for example, to send out [hazard warnings from the local German weather service](https://github.com/joergschultzelutter/mpad/blob/master/docs/INSTALLATION.md#program-configuration). In a nutshell: a separate background job will fetch the data and feed it to the class instance which will then include it in the APRS bulletin data. By doing so, static APRS bulletins (taken from the configuration file) and dynamic APRS bulletins (generated during runtime) will be taken into account.
 
 ### Terms and conditions
 
