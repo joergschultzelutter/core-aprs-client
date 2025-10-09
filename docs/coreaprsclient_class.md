@@ -48,7 +48,7 @@ You are responsible for designing the functions associated with the `input_parse
 
 ## `activate_client` class method
 
-[`demo_aprs_client.py`](/framework_examples/demo_aprs_client.py)
+Sample code: [`demo_aprs_client.py`](/framework_examples/demo_aprs_client.py)
 
 This class method is responsible for the communication between the local APRS bot and [APRS-IS](https://aprs-is.net/). It has no parameters. Full APRS bot client example:
 
@@ -79,7 +79,7 @@ client.activate_client()
     
 ## `dryrun_testcall` class method
 
-[`demo_dryrun.py`](/framework_examples/demo_dryrun.py)
+Sample_code: [`demo_dryrun.py`](/framework_examples/demo_dryrun.py)
 
 This class method can be used for offline testing. There will be no data exchange between [APRS-IS](https://aprs-is.net/) and the bot.
 
@@ -121,7 +121,7 @@ client.dryrun_testcall(message_text="lorem", from_callsign="DF1JSL-1")
 
 ### Sample output
 
-This is the sample output for the `lorem` keyword from the [`demo_dryrun.py`](../framework_examples/demo_dryrun.py) sample code provided [with this repository](../framework_examples):
+This is the sample output for the `lorem` keyword from the [`demo_dryrun.py`](/framework_examples/demo_dryrun.py) sample code provided [with this repository](/framework_examples):
 
 ``` python
 2025-09-19 22:13:12,419 - CoreAprsClient -INFO - Activating dryrun testcall...
