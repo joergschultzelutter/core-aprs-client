@@ -296,7 +296,7 @@ if __name__ == "__main__":
 
 #### Scheduler function
 
-Every 240 minutes, this demo scheduler function will create a dictionary with the static content 
+Every 90 minutes, this demo scheduler function will create a dictionary with the static content 
 
 - `key` = `BLN0DEMO`
 - `value` = `Hello World`
