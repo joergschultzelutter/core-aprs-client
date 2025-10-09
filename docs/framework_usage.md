@@ -42,7 +42,7 @@ Any _other_ command that is sent to `core-aprs-client` will generate the bot's _
 > - All input parameters for `input_parser.py` and `output_generator.py` are mandatory parameters
 > - Internally, all input parameters are treated as named parameters.
 
-## Extending the input parser `input_parser.py`
+## Extending the input parser [`input_parser.py`](/framework_examples/input_parser.py)
 
 ```python
 def parse_input_message(aprs_message: str, from_callsign: str):
@@ -113,7 +113,7 @@ The default `input_parser_response_object` object (as provided with the sample c
 | `from_callsign`              | Same value as the input section's `from_callsign`                                                                                                                                                                                                                                                                               | `str`      |
 | `command_code`               | contains an internal code which tells the program's output processor what it needs to do.                                                                                                                                                                                                                                       | `str`      |
 
-## Extending the output generator `output_generator.py`
+## Extending the output generator [`output_generator.py`](/framework_examples/output_generator.py)
 
 ```python
 def generate_output_message(

@@ -13,7 +13,7 @@ When it comes to the user's individual configuration settings, `core-aprs-client
 > Except for the first two configuration sections, all other configuration sections are _optional_ and have been pre-configured. If you are happy with the default settings, modify those parts of the config file which _do_ require modifications (e.g. call sign, passcode) — and you're good to go.
 
 > [!TIP]
-> Complete sample file templates for both the configuration file and the Apprise configuration file can be found in the [`framework_examples`](../framework_examples) directory.
+> Complete sample file templates for both [the configuration file](/framework_examples/core_aprs_client.cfg.TEMPLATE) and the [Apprise configuration file](/framework_examples/apprise.yml.TEMPLATE) can be found in the [`framework_examples`](/framework_examples) directory.
 
 ## Mandatory configuration file sections
 
@@ -38,6 +38,8 @@ When it comes to the user's individual configuration settings, `core-aprs-client
 | [data_storage](configuration_subsections/config_data_storage.md)                                                                                 | Configuration settings for the storage of data files, e.g. the data file which persists the APRS message counter    |
 
 ## Configuration file sample
+
+The following chapter illustrates a sample of a complete configuration file.
 
 ```
 # Core APRS Client (COAC) configuration file
