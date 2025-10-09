@@ -217,24 +217,105 @@ def parse_input_message(aprs_message: str, from_callsign: str):
 
 ## Use of dynamic content for APRS bulletins additional to static bulletin content
 
+Sample code: [`demo_aprs_client_with_dynamic_bulletins.py`](/framework_examples/demo_aprs_client_with_dynamic_bulletins.py)
+
+Class property: `CoreAprsClient.dynamic_aprs_bulletins`
+
+### Introduction
+
 > [!NOTE]
-> Optional extension; in most cases, you will not need to use this function.
+> This is an optional extension; in most cases, you will not need to use this function.
 
 As [described in the framework documentation](configuration_subsections/config_bulletin.md), `core-aprs-framework` can send to the [APRS-IS](https://aprs-is.net/) framework at the user's request. The associated bulletin messages are stored as static content [in the configuration file](configuration_subsections/config_bulletin_messages.md). 
 
 In addition to the static bulletin messages configured in the `core-aprs-client`'s configuration file, it is also possible to send dynamic bulletin messages. These could be, for example, special weather data that is only determined during the runtime of the bot. [mpad](https://www.github.com/joergschultzelutter/mpad) uses this, for example, to send out [hazard warnings from the local German weather service](https://github.com/joergschultzelutter/mpad/blob/master/docs/INSTALLATION.md#program-configuration).
 
+### Terms and conditions
+
 > [!IMPORTANT]
-> The ability to send this dynamic data is provided by a variable of type ‘dict’ :heavy_exclamation_mark:**The associated dictionary within the class must always be replaced _in its entirety_**, as thread safety has only been implemented for this data exchange method. :heavy_exclamation_mark:
+> The ability to send this dynamic data is achieved by assigning a variable of type “dict” to a property of the instantiated class. Adding or changing individual elements of this property is not implemented. 
 
 The following conditions apply:
 
-* The default value of this separate variable is an empty `dict` object; i.e., no dynamic bulletins are available
-* The complete list of bulletins (consisting of static and, if available, dynamic bulletins) is regenerated at each interval of the bulletin routine.
-* To send dynamic bulletins, the function for sending static bulletins (i.e., the contents of the configuration file) [must be activated](configuration_subsections/config_bulletin.md) (`aprsis_broadcast_bulletins` = `true`). It is generally possible not to preassign the static contents of the bulletins and to use only dynamic contents.
+* The default value of this separate property is an empty `dict` object; i.e., no dynamic bulletins are configured
+* The complete list of bulletins (consisting of static and, if available, dynamic bulletins) is regenerated at each interval of the bulletin routine. Changes that have been made to the property of the instantiated class in the meantime are thus always taken into account.
+* To send dynamic bulletins, the function for sending static bulletins (i.e., the contents of the configuration file) [must be activated](configuration_subsections/config_bulletin.md) (`aprsis_broadcast_bulletins` = `true`). It is generally possible _not_ to preassign the static contents of the bulletins and to use only dynamic contents.
 * Like static bulletins, dynamic bulletins must meet the requirements of the APRS specification, which are defined [in Chapter 14 of the APRS specifications](https://github.com/wb2osz/aprsspec) (_Messages, Bulletins, and Announcements_).
   * `core-aprs-client` supports dynamic Bulletins beginning with the prefix `BLN` or `NWS` and follows the format specifications of the APRS specifications, depending on the selected prefix. 
   * The text content uses ASCII-7 bit and is up to 67 characters long per bulletin. When attempting to transfer longer content or empty content, the corresponding entries are ignored in the same way as static bulletins. A corresponding message is also issued as a warning with `logging.DEBUG` level.
   * Dynamic bulletins are only added to the list of outgoing bulletins if their keys are not part of the static bulletins. If there is a `BLN0` entry in both the static and dynamic data, the static entry always takes precedence, as this data is sent out first.
   * Special characters `{}|~` are automatically removed from the outgoing message by `core-aprs-client` in the same way as static bulletins.
   * Garbage in, garbage out. With great power comes great responsibility.
+
+### Using the dynamic bulletins option
+
+Pseudo code; for a detailed example, please see [demo_aprs_client_with_dynamic_bulletins.py](/framework_examples/demo_aprs_client_with_dynamic_bulletins.py).
+
+
+#### Main function
+```python
+if __name__ == "__main__":
+    client = CoreAprsClient(
+        config_file=configfile,
+        log_level=logging.DEBUG,
+        input_parser=parse_input_message,
+        output_generator=generate_output_message,
+    )
+
+    # Create the scheduler object which will handle the updates to our
+    # class' dictionary item
+    my_scheduler = BackgroundScheduler()
+
+    # Add the scheduler job.
+    my_scheduler.add_job(
+        make_demo_beacon,
+        "interval",
+        id="beacondemo",
+        minutes=90,
+        args=[
+            client,
+        ],
+        max_instances=1,
+        coalesce=True,
+    )
+
+    # start the scheduler
+    my_scheduler.start()
+
+    # As we safely want to remove the scheduler in case of ctrl-c or server shutdown,
+    # let's add an exception handler
+    try:
+        # Activate the APRS client and connect to APRS-IS
+        client.activate_client()
+    except (KeyboardInterrupt, SystemExit):
+
+        # Pause the scheduler and remove all jobs afterwards.
+        my_scheduler.pause()
+        my_scheduler.remove_all_jobs()
+```
+
+#### Scheduler function
+
+Every 240 minutes, this demo scheduler function will create a dictionary with the static content 
+
+- `key` = `BLN0DEMO`
+- `value` = `Hello World`
+
+and pass that data to the class instance's property. Amend this function and add your dynamic bulletin content in a similar manner. For a detailed example, please see [demo_aprs_client_with_dynamic_bulletins.py](/framework_examples/demo_aprs_client_with_dynamic_bulletins.py).
+
+```python
+def make_demo_beacon(myclient: CoreAprsClient):
+    """
+    This is a simple "setter" method which will first generate a dictionary
+    with random bulletins and then add them to the target dictionary. It gets called
+    by the main program's scheduler job.
+
+    Parameters
+    ==========
+
+    Returns
+    =======
+
+    """
+    myclient.dynamic_aprs_bulletins = {"BLN0DEMO": "Hello World"}
+```
