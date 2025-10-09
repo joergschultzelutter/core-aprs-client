@@ -303,6 +303,8 @@ def send_bulletin_messages(
     target_dict = copy.deepcopy(bulletin_dict)
 
     if type(class_instance.dynamic_aprs_bulletins) is dict:
+        logger.debug("ENTERING LOOP")
+        logger.debug(class_instance.dynamic_aprs_bulletins)
         # Get the key and value from our configuration file's bulletin messages section
         for key, value in class_instance.dynamic_aprs_bulletins.items():
             # Message populated and less than max APRS message length?
@@ -340,6 +342,9 @@ def send_bulletin_messages(
                 logger.debug(
                     f"Ignoring dynamic bulletin setting for '{key}'; value is either empty or exceeds {APRS_MSG_LEN_NOTRAILING} characters. Check your input data"
                 )
+
+    logger.debug("EXIT LOOP")
+    logger.debug(target_dict)
 
     # Generate some local variables because the 'black' beautifier seems
     # to choke on multi-dimensional dictionaries

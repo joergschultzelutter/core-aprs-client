@@ -226,7 +226,6 @@ class CoreAprsClient:
             if client_shared.AIS.ais_is_connected():
                 client_shared.AIS.ais_close()
 
-        pass
 
     def dryrun_testcall(self, message_text: str, from_callsign: str):
         """
