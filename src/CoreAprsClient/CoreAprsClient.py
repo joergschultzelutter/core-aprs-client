@@ -22,12 +22,14 @@ import signal
 import time
 import atexit
 import os
-import types
 from functools import partial
 import logging
 from pprint import pformat
 from collections.abc import Callable
-from typing import Any
+from typing import Dict, Any, Mapping
+import threading
+import copy
+from types import MappingProxyType
 
 from . import client_shared
 from .client_utils import (
@@ -69,6 +71,8 @@ class CoreAprsClient:
         self.input_parser = input_parser
         self.output_generator = output_generator
         self.log_level = log_level
+        self._dynamic_aprs_bulletins: Dict[str, Any] = {}
+        self._lock = threading.Lock()
 
         # Update the log level (if needed)
         update_logging_level(logging_level=self.log_level)
@@ -82,11 +86,10 @@ class CoreAprsClient:
 
         Parameters
         ==========
-        none
 
         Returns
         =======
-        none
+
         """
 
         # load the program config from our external config file
@@ -164,7 +167,7 @@ class CoreAprsClient:
                     # Install the APRS-IS beacon / bulletin schedulers if
                     # activated in the program's configuration file
                     # Otherwise, this field's value will be 'None'
-                    aprs_scheduler = init_scheduler_jobs()
+                    aprs_scheduler = init_scheduler_jobs(class_instance=self)
 
                     # create the partial object for our callback
                     enhanced_callback = partial(
@@ -176,7 +179,7 @@ class CoreAprsClient:
                     #
                     # We are now ready to initiate the actual processing
                     # Start the consumer thread
-                    logger.debug(msg="Starting callback consumer")
+                    logger.info(msg="Starting APRS-IS callback consumer")
                     client_shared.AIS.ais_start_consumer(enhanced_callback)
 
                     #
@@ -223,7 +226,6 @@ class CoreAprsClient:
             if client_shared.AIS.ais_is_connected():
                 client_shared.AIS.ais_close()
 
-        pass
 
     def dryrun_testcall(self, message_text: str, from_callsign: str):
         """
@@ -330,3 +332,13 @@ class CoreAprsClient:
 
                 logger.info(pformat(output_message))
                 logger.info(msg=pformat(response_parameters))
+
+    @property
+    def dynamic_aprs_bulletins(self) -> Mapping[str, Any]:
+        with self._lock:
+            return MappingProxyType(self._dynamic_aprs_bulletins)
+
+    @dynamic_aprs_bulletins.setter
+    def dynamic_aprs_bulletins(self, new_dict: Dict[str, Any]) -> None:
+        with self._lock:
+            self._dynamic_aprs_bulletins = copy.deepcopy(new_dict)

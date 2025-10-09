@@ -4,7 +4,7 @@
 
 Core APRS client framework with dupe detection, bulletin/beaconing support, and other APRS-IS related stuff.
 
-```core-aprs-client``` is a modernized version of [mpad](https://github.com/joergschultzelutter/mpad)'s APRS functions which can be used for building your very own APRS client / bot. Its framework supports all of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS messaging functions, such as connecting to APRS-IS, message dupe detection, ACK handling, and other functionality such as APRS bulletins and beacons. However, ```core-aprs-client``` deliberately lacks any _specific_ APRS bot functions such as WX reporting etc. 
+```core-aprs-client``` is a modernized version of [mpad](https://github.com/joergschultzelutter/mpad)'s APRS functions which can be used for building your very own APRS client / bot. Its framework supports all of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS messaging functions, such as connecting to APRS-IS, message dupe detection, ACK handling, and other functionality such as APRS bulletins (supporting both static and dynamic contents) and APRS beaconing. However, ```core-aprs-client``` deliberately lacks any _specific_ APRS bot functions such as WX reporting etc. 
 
 This is where _you_ step in. Add your bot-specific code to the client's APRS framework code. Everything else related to APRS messaging and communication with APRS-IS will be covered by the ```core-aprs-client``` framework.
 
@@ -12,10 +12,13 @@ This is where _you_ step in. Add your bot-specific code to the client's APRS fra
 
 The following example illustrates a fully functional APRS bot. You will provide the APRS message input parser code and the generator responsible for the outgoing APRS message content. Everything else will be handled by the `core-aprs-client` framework.
 
-```
+```python
 from CoreAprsClient import CoreAprsClient
+
+# Your custom input parser and output generator code
 from input_parser import parse_input_message
 from output_generator import generate_output_message
+
 import logging
 
 if __name__ == '__main__':
@@ -43,8 +46,8 @@ Instructions for installing the framework and its sample APRS client on your com
 ### Client Configuration
 The steps for modifying the client's config file are described [here](docs/configuration.md).
 
-### Running the sample client `sample_aprs_client.py`
-The steps for starting the sample client are described [here](docs/client_start.md). This directory also contains the templates for the framework's configuration files.
+### Framework examples 
+[This directory](framework_examples) contains sample program code; it also contains the ready-to-use templates for the framework's configuration files.
 
 ### `CoreAprsClient` class description
 The framework's class methods are described [here](docs/coreaprsclient_class.md)

@@ -1,0 +1,3 @@
+#git+https://github.com/joergschultzelutter/core-aprs-client@dynamic-bulletins#egg=core-aprs-client
+core-aprs-client
+apscheduler

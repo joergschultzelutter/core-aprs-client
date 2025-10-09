@@ -3,8 +3,8 @@
 # Sample APRS Client stub, using the core-aprs-client framework
 # Author: Joerg Schultze-Lutter, 2025
 #
-# This is a demo client which shows you how to connect to APRS-IS
-#
+# This demo client imports the input parser and output processor
+# functions and establishes a live connection to APRS-IS
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,8 +21,11 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 from CoreAprsClient import CoreAprsClient
+
+# Your custom input parser and output generator code
 from input_parser import parse_input_message
 from output_generator import generate_output_message
+
 import argparse
 import os
 import sys
@@ -44,7 +47,7 @@ def get_command_line_params():
 
     Returns
     =======
-    configfile: str
+    cfg: str
         name of the configuration file
     """
 
@@ -59,19 +62,21 @@ def get_command_line_params():
 
     args = parser.parse_args()
 
-    configfile = args.configfile.name
+    cfg = args.configfile.name
 
-    if not os.path.isfile(configfile):
+    if not os.path.isfile(cfg):
         print("Config file does not exist; exiting")
         sys.exit(0)
 
-    return configfile
+    return cfg
 
 
 if __name__ == "__main__":
+    logger.info(msg=f"Starting demo module: APRS bot")
+    logger.info(msg="This is a demo APRS client which connects to APRS-IS")
 
     # Get the configuration file name
-    config_file = get_command_line_params()
+    configfile = get_command_line_params()
 
     # Create the CoreAprsClient object. Supply the
     # following parameters:
@@ -81,17 +86,11 @@ if __name__ == "__main__":
     # - function names for both input processor and output generator
     #
     client = CoreAprsClient(
-        config_file=config_file,
-        log_level=logging.INFO,
+        config_file=configfile,
+        log_level=logging.DEBUG,
         input_parser=parse_input_message,
         output_generator=generate_output_message,
     )
 
     # Activate the APRS client and connect to APRS-IS
     client.activate_client()
-
-    # Demo code for a dryrun testcall
-    # Remove the 'activate_client' statement and uncomment the statement
-    # below for 100% offline testing. The preconfigured example assumes that
-    # callsign "DF1JSL-1" has sent the APRS message text "lorem" to your bot.
-    # client.dryrun_testcall(message_text="lorem", from_callsign="DF1JSL-1")

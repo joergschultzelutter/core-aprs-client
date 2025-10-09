@@ -3,12 +3,14 @@
 Brief overview of `core-aprs-client`'s source files. 
 
 ```
-├── sample_aprs_client
+├── framework_examples
 │   ├── apprise.yml.TEMPLATE
 │   ├── core_aprs_client.cfg.TEMPLATE
+│   ├── demo_aprs_client.py
+│   ├── demo_aprs_client_with_dynamic_bulletins.py
+│   ├── demo_dryrun.py
 │   ├── input_parser.py
-│   ├── output_generator.py
-│   └── sample_aprs_client.py
+│   └── output_generator.py
 └── src
     └── CoreAprsClient
         ├── CoreAprsClient.py
@@ -44,7 +46,7 @@ Location: `~/src/CoreAprsClient`
 
 ## Configuration files 
 
-Location: `~/sample_aprs_client`
+Location: `~/framework_examples`
 
 >[!NOTE]
 >Although most of these configuration files are provided with predefined default content, you do need to modify these files.
@@ -56,13 +58,14 @@ Location: `~/sample_aprs_client`
 
 ## User files
 
-Location: `~/sample_aprs_client`
+Location: `~/framework_examples`
 
 >[!NOTE]
 >These files are stubs which will help you to understand how `core-aprs-client` works. For production use, you need to modify these files.
 
-| File Name               | Usage                                                                                                                                                                                                                                         |
-|-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `input_parser.py`       | Parses ingress APRS data and tries to understand what the APRS user wants us to do. Prepares the command data for `output_generator.py`. See [the documentation on extending](framework_usage.md) `core-aprs-client` for further information. |
-| `output_generator.py`   | Takes the command data from `input_parser.py` and builds the future output message for the [APRS-IS](https://aprs-is.net/) user. See [the documentation on extending](framework_usage.md) `core-aprs-client` for further information.         |
-| `sample_aprs_client.py` | APRS demo client, based on the `core-aprs_client` framework. Uses `input_parser.py` `output_generator.py` for data processing. Demonstrates online connections to [APRS-IS](https://aprs-is.net/) and offline parser testing.                 |
+| File Name                                    | Usage                                                                                                                                                                                                                                                                                         |
+|----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `input_parser.py`                            | Parses ingress APRS data and tries to understand what the APRS user wants us to do. Prepares the command data for `output_generator.py`. See [the documentation on extending](/docs/framework_usage.md#extending-the-input-parser-input_parserpy) `core-aprs-client` for further information. |
+| `output_generator.py`                        | Takes the command data from `input_parser.py` and builds the future output message for the [APRS-IS](https://aprs-is.net/) user. See [the documentation on extending](/docs/framework_usage.md#extending-the-output-generator-output_generatorpy) `core-aprs-client` for further information. |
+| `demo_aprs_client.py`                        | APRS demo client, based on the `core-aprs_client` framework. Uses `input_parser.py` `output_generator.py` for data processing. Demonstrates online connections to [APRS-IS](https://aprs-is.net/) and offline parser testing.                                                                 |
+| `demo_aprs_client_with_dynamic_bulletins.py` | Same as `demo_aprs_client.py`, but with a demonstration of [dynamic bulletins support](coreaprsclient_class.md#use-of-dynamic-content-for-aprs-bulletins-additional-to-static-bulletin-content)                                                                                               |

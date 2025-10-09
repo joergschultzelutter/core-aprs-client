@@ -1,21 +1,21 @@
 # `core-aprs-client` framework usage
 
 ## Basic schematics
-![Workflow Input-Output Processing](../img/workflow_input_output_processing.svg)
+![Workflow Input-Output Processing](/img/workflow_input_output_processing.svg)
 
 ## Your custom code vs. the `core-aprs-client` framework
 
-![Overview](../img/file_structure.drawio.svg)
+![Overview](/img/file_structure.drawio.svg)
 
 
 ## General Info
 
-> [!INFO]
-> The following documentation references the files located in this repository's [`sample_aprs_client`](/sample_aprs_client) directory
+> [!NOTE]
+> The following documentation references the files located in this repository's [`framework_examples`](/framework_examples) directory
 
 > [!TIP]
-> - [`input_parser.py`](/sample_aprs_client/input_parser.py) digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us. If successful, the desired action is identified and returned back to the `core-aprs-client` framework - which will then forward it to the `output_generator.py` function.
-> - [`output_generator.py`](/sample_aprs_client/output_generator.py) takes the data from [`input_parser.py`](/sample_aprs_client/input_parser.py) and builds the outgoing message which is later to be sent to APRS-IS. Note that this function is only responsible for generating the outgoing _content_ whereas `core-aprs-client` will take that data and split it up into 1...n APRS messages.
+> - [`input_parser.py`](/framework_examples/input_parser.py) digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us. If successful, the desired action is identified and returned back to the `core-aprs-client` framework - which will then forward it to the `output_generator.py` function.
+> - [`output_generator.py`](/framework_examples/output_generator.py) takes the data from [`input_parser.py`](/framework_examples/input_parser.py) and builds the outgoing message which is later to be sent to APRS-IS. Note that this function is only responsible for generating the outgoing _content_ whereas `core-aprs-client` will take that data and split it up into 1...n APRS messages.
 
 `input_parser.py` and `output_generator.py` rely on exchanging data through a mutually equal data structure. That data structure can be defined by the user and is passed through between both user functions; the `core-aprs-client` framework itself does *not* use contents from this data element (`input_parser_response_object`) _in any way_. Just ensure that both custom code modules `input_parser.py` and `output_generator.py` share the same data exchange structure. 
 
@@ -38,11 +38,18 @@ Any _other_ command that is sent to `core-aprs-client` will generate the bot's _
 > [!TIP]
 > For demonstration purposes, both `input_parser.py` and `output_generator.py` use a _VERY_ simplified processing algorithm. For your future code, you might want to implement proper parsing (e.g. by using regular expressions) and error handling.
 
-> [!INFO]
+> [!NOTE]
 > - All input parameters for `input_parser.py` and `output_generator.py` are mandatory parameters
 > - Internally, all input parameters are treated as named parameters.
 
-## Extending the input parser `input_parser.py`
+## Extending the input parser [`input_parser.py`](/framework_examples/input_parser.py)
+
+```python
+def parse_input_message(aprs_message: str, from_callsign: str):
+    ....
+    return return_code, input_parser_error_message, input_parser_response_object
+```
+
 
 ### Input processor: Inputs
 
@@ -62,7 +69,7 @@ Any _other_ command that is sent to `core-aprs-client` will generate the bot's _
 #### `return_code` - Valid values
 
 The return codes are defined in the [CoreAprsClientInputParserStatus](coreaprsclient_class.md#input_processor-return-codes) class. Import via
-```
+```python
 from CoreAprsClient import CoreAprsClientInputParserStatus
 ```
 Return code details:
@@ -106,7 +113,15 @@ The default `input_parser_response_object` object (as provided with the sample c
 | `from_callsign`              | Same value as the input section's `from_callsign`                                                                                                                                                                                                                                                                               | `str`      |
 | `command_code`               | contains an internal code which tells the program's output processor what it needs to do.                                                                                                                                                                                                                                       | `str`      |
 
-## Extending the output generator `output_generator.py`
+## Extending the output generator [`output_generator.py`](/framework_examples/output_generator.py)
+
+```python
+def generate_output_message(
+    input_parser_response_object: dict | object, default_error_message: str
+):
+    ...
+    return success, output_message
+```
 
 The output processor has only one input parameter: the input parser's response object.
 

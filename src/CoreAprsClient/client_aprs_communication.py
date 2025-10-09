@@ -36,6 +36,10 @@ from .client_logger import logger
 from .client_return_codes import CoreAprsClientInputParserStatus
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers import base as apbase
+import copy
+import re
+
+APRS_MSG_LEN_NOTRAILING = 67
 
 
 def send_ack(
@@ -211,7 +215,10 @@ def get_alphanumeric_counter_value(numeric_counter: int):
 
 
 def send_beacon_and_status_msg(
-    myaprsis: APRSISObject, aprs_beacon_messages: list, simulate_send: bool = True
+    class_instance: object,
+    myaprsis: APRSISObject,
+    aprs_beacon_messages: list,
+    simulate_send: bool = True,
 ):
     """
     Send beacon message list to APRS_IS
@@ -219,6 +226,8 @@ def send_beacon_and_status_msg(
 
     Parameters
     ==========
+    class_instance: object
+        Instance of the main class
     myaprsis: APRSISObject
         Our aprslib object that we will use for the communication part
     aprs_beacon_messages: list
@@ -260,7 +269,10 @@ def send_beacon_and_status_msg(
 
 
 def send_bulletin_messages(
-    myaprsis: APRSISObject, bulletin_dict: dict, simulate_send: bool = True
+    class_instance: object,
+    myaprsis: APRSISObject,
+    bulletin_dict: dict,
+    simulate_send: bool = True,
 ):
     """
     Sends bulletin message list to APRS_IS
@@ -270,6 +282,8 @@ def send_bulletin_messages(
 
     Parameters
     ==========
+    class_instance: object
+        Instance of the main class
     myaprsis: APRSISObject
         Our aprslib object that we will use for the communication part
     bulletin_dict: dict
@@ -283,13 +297,63 @@ def send_bulletin_messages(
     """
     logger.debug(msg="reached bulletin interval; sending bulletins")
 
+    # create our target dictionary which may contain both static
+    # and dynamic bulletin messages. First, copy the content from the static
+    # bulletin settings - we don't need to check this data again.
+    target_dict = copy.deepcopy(bulletin_dict)
+
+    if type(class_instance.dynamic_aprs_bulletins) is types.MappingProxyType:
+        logger.debug("ENTERING LOOP")
+        logger.debug(class_instance.dynamic_aprs_bulletins)
+        # Get the key and value from our configuration file's bulletin messages section
+        for key, value in class_instance.dynamic_aprs_bulletins.items():
+            # Message populated and less than max APRS message length?
+            # note: we do not use message enumeration for bulletins
+            # therefore, the max length requirement is always fixed (67 bytes)
+            if 0 < len(value) <= APRS_MSG_LEN_NOTRAILING:
+                # Check if the identifier follows these APRS requirements:
+                # 1) must start with fixed "BLN" string OR "NWS-" string
+                # 2) needs to be followed by 1..6 (NWS: 1..5) ASCII-7 characters and/or digits
+                # We do not need to look for "finalized" entries, read: the dictionary's key is
+                # not required to have keys with 9 chars in total length
+                match = re.match(
+                    pattern=r"^(bln[a-z0-9]{1,6})|(nws-[a-z0-9]{1,5})$",
+                    string=key,
+                    flags=re.IGNORECASE,
+                )
+                if match:
+                    # We found a match. As a precaution, let's check if the user has
+                    # used characters in the actual message which are special to APRS
+                    match = re.findall(r"[{}|~]+", value)
+                    if match:
+                        logger.debug(
+                            msg=f"APRS dynamic bulletin message '{key}': removing special APRS characters from 'value' setting"
+                        )
+                        # Let's get rid of those control characters from the message
+                        value = re.sub(r"[{}|~]+", "", value)
+                    # Convert the bulletin identifier to upperkey
+                    key = key.upper()
+                    # and add it to our dictionary in case it does not exist
+                    # and its lenght (after potential character replacements)
+                    # is still greater than zero
+                    if key not in target_dict and len(value) > 0:
+                        target_dict[key] = value
+            else:
+                logger.debug(
+                    f"Ignoring dynamic bulletin setting for '{key}'; value is either empty or exceeds {APRS_MSG_LEN_NOTRAILING} characters. Check your input data"
+                )
+
+    logger.debug("EXIT LOOP")
+    logger.debug(target_dict)
+
     # Generate some local variables because the 'black' beautifier seems
     # to choke on multi-dimensional dictionaries
     _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
     _aprsis_tocall = program_config["client_config"]["aprsis_tocall"]
 
     # Build and send the list of bulletins
-    for index, (recipient_id, bln) in enumerate(bulletin_dict.items(), start=1):
+    # Note that we iterate over the unified dictionary of APRS bulletins
+    for index, (recipient_id, bln) in enumerate(target_dict.items(), start=1):
         # build the bulletin string
         stringtosend = f"{_aprsis_callsign}>{_aprsis_tocall}::{recipient_id:9}:{bln}"
         # simulate sending yes/no
@@ -553,7 +617,7 @@ def aprs_callback(
                 )
 
 
-def init_scheduler_jobs():
+def init_scheduler_jobs(class_instance: object):
     """
     Initializes the scheduler jobs for APRS bulletins and / or beacons.
 
@@ -633,14 +697,15 @@ def init_scheduler_jobs():
             # and store it in a list item
             aprs_beacon_messages: list = [_beacon]
 
-            # Ultimately, send the beacon
+            # Ultimately, send the initial beacon message
             send_beacon_and_status_msg(
+                class_instance=class_instance,
                 myaprsis=client_shared.AIS,
                 aprs_beacon_messages=aprs_beacon_messages,
                 simulate_send=program_config["testing"]["aprsis_simulate_send"],
             )
 
-            # Add position beaconing to scheduler
+            # Now let's add position beaconing to scheduler
             my_scheduler.add_job(
                 send_beacon_and_status_msg,
                 "interval",
@@ -649,10 +714,13 @@ def init_scheduler_jobs():
                     "aprsis_beacon_interval_minutes"
                 ],
                 args=[
+                    class_instance,
                     client_shared.AIS,
                     aprs_beacon_messages,
                     program_config["testing"]["aprsis_simulate_send"],
                 ],
+                max_instances=1,
+                coalesce=True,
             )
 
         if program_config["bulletin_config"]["aprsis_broadcast_bulletins"]:
@@ -670,10 +738,13 @@ def init_scheduler_jobs():
                     "aprsis_bulletin_interval_minutes"
                 ],
                 args=[
+                    class_instance,
                     client_shared.AIS,
                     aprs_bulletin_messages,
                     program_config["testing"]["aprsis_simulate_send"],
                 ],
+                max_instances=1,
+                coalesce=True,
             )
 
         # Ultimately, start the scheduler

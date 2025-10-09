@@ -657,6 +657,9 @@ def parse_bulletin_data(core_config: dict):
                 # used characters in the actual message which are special to APRS
                 match = re.findall(r"[{}|~]+", value)
                 if match:
+                    # Yes, we could remove those characters straight away but the
+                    # idea behind this two-fold approach is to inform the user that
+                    # ideally, the config file needs to get updated
                     logger.debug(
                         msg=f"APRS bulletin message '{key}': removing special APRS characters from 'value' setting; check your configuration file"
                     )
@@ -670,9 +673,15 @@ def parse_bulletin_data(core_config: dict):
                 if key not in aprs_bulletin_messages and len(value) > 0:
                     aprs_bulletin_messages[key] = value
         else:
-            logger.debug(
-                f"Ignoring bulletin setting for '{key}'; value is either empty or exceeds {APRS_MSG_LEN_NOTRAILING} characters. Check your configuration file"
-            )
+            # return some clarification to the user on why we have decided to
+            # ignore this particular configuration setting
+            if len(key) > APRS_MSG_LEN_NOTRAILING:
+                logger.debug(
+                    f"Ignoring bulletin setting for '{key}'; value exceeds {APRS_MSG_LEN_NOTRAILING} characters. Check your configuration file"
+                )
+            else:
+                logger.debug(f"Ignoring bulletin setting for '{key}'; value is empty")
+
     return aprs_bulletin_messages
 
 
