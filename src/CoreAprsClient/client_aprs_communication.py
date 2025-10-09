@@ -302,7 +302,7 @@ def send_bulletin_messages(
     # bulletin settings - we don't need to check this data again.
     target_dict = copy.deepcopy(bulletin_dict)
 
-    if type(class_instance.dynamic_aprs_bulletins) in dict:
+    if type(class_instance.dynamic_aprs_bulletins) is types.MappingProxyType:
         logger.debug("ENTERING LOOP")
         logger.debug(class_instance.dynamic_aprs_bulletins)
         # Get the key and value from our configuration file's bulletin messages section
