@@ -117,7 +117,7 @@ client.dryrun_testcall(message_text="lorem", from_callsign="DF1JSL-1")
 
 ### Sample output
 
-This is the sample output for the `lorem` keyword from the `sample_aprs_client` provided with this repository:
+This is the sample output for the `lorem` keyword from the [`demo_dryrun.py`](../framework_examples/demo_dryrun.py) sample code provided [with this repository](../framework_examples):
 
 ``` python
 2025-09-19 22:13:12,419 - CoreAprsClient -INFO - Activating dryrun testcall...

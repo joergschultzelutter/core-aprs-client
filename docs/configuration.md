@@ -13,7 +13,7 @@ When it comes to the user's individual configuration settings, `core-aprs-client
 > Except for the first two configuration sections, all other configuration sections are _optional_ and have been pre-configured. If you are happy with the default settings, modify those parts of the config file which _do_ require modifications (e.g. call sign, passcode) — and you're good to go.
 
 > [!TIP]
-> Complete sample file templates for both the configuration file and the Apprise configuration file can be found in the `sample_aprs_client` directory.
+> Complete sample file templates for both the configuration file and the Apprise configuration file can be found in the [`framework_examples`](../framework_examples) directory.
 
 ## Mandatory configuration file sections
 

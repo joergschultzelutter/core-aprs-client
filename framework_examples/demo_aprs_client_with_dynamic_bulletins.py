@@ -3,7 +3,8 @@
 # Sample APRS Client stub, using the core-aprs-client framework
 # Author: Joerg Schultze-Lutter, 2025
 #
-# This is a demo client which shows you how to connect to APRS-IS
+# This demo client imports the input parser and output processor
+# functions and establishes a live connection to APRS-IS
 #
 #
 # This program is free software; you can redistribute it and/or modify
@@ -71,7 +72,10 @@ def get_command_line_params():
     return configfile
 
 
-def connect_to_aprsis_example(config_file: str):
+if __name__ == "__main__":
+    # Get the configuration file name
+    configfile = get_command_line_params()
+
     # Create the CoreAprsClient object. Supply the
     # following parameters:
     #
@@ -80,7 +84,7 @@ def connect_to_aprsis_example(config_file: str):
     # - function names for both input processor and output generator
     #
     client = CoreAprsClient(
-        config_file=config_file,
+        config_file=configfile,
         log_level=logging.INFO,
         input_parser=parse_input_message,
         output_generator=generate_output_message,
@@ -88,31 +92,3 @@ def connect_to_aprsis_example(config_file: str):
 
     # Activate the APRS client and connect to APRS-IS
     client.activate_client()
-
-
-def dryrun_example(config_file: str):
-    # Create the CoreAprsClient object. Supply the
-    # following parameters:
-    #
-    # - configuration file name
-    # - log level (from Python's 'logging' package)
-    # - function names for both input processor and output generator
-    #
-    client = CoreAprsClient(
-        config_file=config_file,
-        log_level=logging.INFO,
-        input_parser=parse_input_message,
-        output_generator=generate_output_message,
-    )
-
-    # The preconfigured example assumes that callsign "DF1JSL-1"
-    # has sent the APRS message text "lorem" to your bot.
-    #
-    client.dryrun_testcall(message_text="lorem", from_callsign="DF1JSL-1")
-
-
-if __name__ == "__main__":
-    # Get the configuration file name
-    configfile = get_command_line_params()
-
-    dryrun_example(configfile)
