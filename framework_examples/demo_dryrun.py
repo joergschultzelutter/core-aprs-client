@@ -48,7 +48,7 @@ def get_command_line_params():
 
     Returns
     =======
-    configfile: str
+    cfg: str
         name of the configuration file
     """
 
@@ -63,16 +63,21 @@ def get_command_line_params():
 
     args = parser.parse_args()
 
-    configfile = args.configfile.name
+    cfg = args.configfile.name
 
-    if not os.path.isfile(configfile):
+    if not os.path.isfile(cfg):
         print("Config file does not exist; exiting")
         sys.exit(0)
 
-    return configfile
+    return cfg
 
 
 if __name__ == "__main__":
+    logger.info(msg=f"Starting {__name__}")
+    logger.info(
+        msg="This is a demo APRS client which performs an offline dry-run on a given APRS message/APRS callsign combination."
+    )
+
     # Get the configuration file name
     configfile = get_command_line_params()
 
@@ -85,7 +90,7 @@ if __name__ == "__main__":
     #
     client = CoreAprsClient(
         config_file=configfile,
-        log_level=logging.INFO,
+        log_level=logging.DEBUG,
         input_parser=parse_input_message,
         output_generator=generate_output_message,
     )
