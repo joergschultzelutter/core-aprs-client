@@ -233,7 +233,7 @@ In addition to the static bulletin messages configured in the `core-aprs-client`
 ### Terms and conditions
 
 > [!IMPORTANT]
-> The ability to send this dynamic data is achieved by assigning a variable of type “dict” to a property of the instantiated class. Adding or changing individual elements of this property is not implemented. 
+> The ability to send this dynamic data is achieved by assigning a variable of `dict` object to a property of the instantiated class. Adding or changing individual elements of this property is _not_ implemented. Always replace that property's value in full.
 
 The following conditions apply:
 
@@ -241,7 +241,7 @@ The following conditions apply:
 * The complete list of bulletins (consisting of static and, if available, dynamic bulletins) is regenerated at each interval of the bulletin routine. Changes that have been made to the property of the instantiated class in the meantime are thus always taken into account.
 * To send dynamic bulletins, the function for sending static bulletins (i.e., the contents of the configuration file) [must be activated](configuration_subsections/config_bulletin.md) (`aprsis_broadcast_bulletins` = `true`). It is generally possible _not_ to preassign the static contents of the bulletins and to use only dynamic contents.
 * Like static bulletins, dynamic bulletins must meet the requirements of the APRS specification, which are defined [in Chapter 14 of the APRS specifications](https://github.com/wb2osz/aprsspec) (_Messages, Bulletins, and Announcements_).
-  * `core-aprs-client` supports dynamic Bulletins beginning with the prefix `BLN` or `NWS` and follows the format specifications of the APRS specifications, depending on the selected prefix. 
+  * `core-aprs-client` supports dynamic bulletins beginning with the prefix `BLN` or `NWS` and follows the format specifications of the APRS specifications, depending on the selected prefix. 
   * The text content uses ASCII-7 bit and is up to 67 characters long per bulletin. When attempting to transfer longer content or empty content, the corresponding entries are ignored in the same way as static bulletins. A corresponding message is also issued as a warning with `logging.DEBUG` level.
   * Dynamic bulletins are only added to the list of outgoing bulletins if their keys are not part of the static bulletins. If there is a `BLN0` entry in both the static and dynamic data, the static entry always takes precedence, as this data is sent out first.
   * Special characters `{}|~` are automatically removed from the outgoing message by `core-aprs-client` in the same way as static bulletins.
