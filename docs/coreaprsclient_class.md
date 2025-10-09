@@ -48,6 +48,8 @@ You are responsible for designing the functions associated with the `input_parse
 
 ## `activate_client` class method
 
+[`demo_aprs_client.py`](/framework_examples/demo_aprs_client.py)
+
 This class method is responsible for the communication between the local APRS bot and [APRS-IS](https://aprs-is.net/). It has no parameters. Full APRS bot client example:
 
 ```python
@@ -76,6 +78,8 @@ client.activate_client()
 ```
     
 ## `dryrun_testcall` class method
+
+[`demo_dryrun.py`](/framework_examples/demo_dryrun.py)
 
 This class method can be used for offline testing. There will be no data exchange between [APRS-IS](https://aprs-is.net/) and the bot.
 
