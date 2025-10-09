@@ -73,10 +73,8 @@ def get_command_line_params():
 
 
 if __name__ == "__main__":
-    logger.info(msg=f"Starting {__name__}")
-    logger.info(
-        msg="This is a demo APRS client which performs an offline dry-run on a given APRS message/APRS callsign combination."
-    )
+    logger.info(msg=f"Starting demo module: dryrun")
+    logger.info(msg="This is a demo APRS client which performs an offline dry-run on a given APRS message/APRS callsign combination.")
 
     # Get the configuration file name
     configfile = get_command_line_params()
