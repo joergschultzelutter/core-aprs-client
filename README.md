@@ -35,7 +35,7 @@ It's as simple as that.
 - Core APRS-IS functionality, covering both 'old' and '[new](http://www.aprs.org/aprs11/replyacks.txt)' ACK processing
 - Configurable dupe message handler
 - Optional:
-    - Support for APRS beaconing and bulletins
+    - APRS beacons and bulletins, including support for dynamic bulletin content generated during runtime
     - Program crash handler, allowing you to get notified in case the client program crashes
 
 ## Installation and Configuration
