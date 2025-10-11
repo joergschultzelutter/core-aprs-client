@@ -79,10 +79,14 @@ def create_demo_dict():
 
         while total_length < target_length:
             word_length = random.randint(2, 8)
-            word_chars = random.choices(string.ascii_letters + string.digits, k=word_length)
-            word = ''.join(word_chars)
+            word_chars = random.choices(
+                string.ascii_letters + string.digits, k=word_length
+            )
+            word = "".join(word_chars)
 
-            word = word[0].upper() + ''.join(random.choice([c.upper(), c.lower()]) for c in word[1:])
+            word = word[0].upper() + "".join(
+                random.choice([c.upper(), c.lower()]) for c in word[1:]
+            )
 
             if total_length + len(word) + len(words) > target_length:
                 break
@@ -92,7 +96,13 @@ def create_demo_dict():
 
         # Fallback in case nothing was generated
         if not words:
-            words.append(''.join(random.choices(string.ascii_uppercase + string.digits, k=target_length)))
+            words.append(
+                "".join(
+                    random.choices(
+                        string.ascii_uppercase + string.digits, k=target_length
+                    )
+                )
+            )
 
         value = "-".join(words)[:target_length]
         demo_dict[key] = value
@@ -100,7 +110,7 @@ def create_demo_dict():
     return demo_dict
 
 
-def make_demo_beacon(myclient: CoreAprsClient):
+def make_demo_bulletin(myclient: CoreAprsClient):
     """
     This is a simple "setter" method which will first generate a dictionary
     with random bulletins and then add them to the target dictionary. It gets called
@@ -152,8 +162,12 @@ def get_command_line_params():
 if __name__ == "__main__":
 
     logger.info(msg=f"Starting demo module: APRS bot with dynamic bulletins")
-    logger.info(msg="This is a demo APRS client which connects to APRS-IS and extends the set of static bulletins with dynamic bulletin data")
-    logger.info(msg="Remember that the configuration file needs to have bulletins enabled (aprsis_broadcast_bulletins = true)")
+    logger.info(
+        msg="This is a demo APRS client which connects to APRS-IS and extends the set of static bulletins with dynamic bulletin data"
+    )
+    logger.info(
+        msg="Remember that the configuration file needs to have bulletins enabled (aprsis_broadcast_bulletins = true)"
+    )
 
     # Get the configuration file name
     configfile = get_command_line_params()
@@ -201,9 +215,9 @@ if __name__ == "__main__":
     # items to the handler that takes care of the static bulletins from the
     # configuration file
     my_scheduler.add_job(
-        make_demo_beacon,
+        make_demo_bulletin,
         "interval",
-        id="beacondemo",
+        id="bulletindemo",
         seconds=45,
         args=[
             client,
