@@ -688,11 +688,20 @@ def init_scheduler_jobs(class_instance: object):
             _aprsis_table = program_config["beacon_config"]["aprsis_table"]
             _aprsis_symbol = program_config["beacon_config"]["aprsis_symbol"]
             _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
-            _aprsis_beacon_altitude_ft = str(program_config["beacon_config"]["aprsis_beacon_altitude_ft"]).zfill(6)[:6]
+            _aprsis_beacon_altitude_ft = program_config["beacon_config"]["aprsis_beacon_altitude_ft"]
             # fmt:on
 
+            # check if altitude data is present
+            _altitude_present = len(_aprsis_beacon_altitude_ft) > 0
+            if _altitude_present:
+                # fmt: off
+                _aprsis_beacon_altitude_ft = str(_aprsis_beacon_altitude_ft).zfill(6)[:6]
+                # fmt: on
+
             # generate the APRS beacon string
-            _beacon = f"={_aprsis_latitude}{_aprsis_table}{_aprsis_longitude}{_aprsis_symbol}{_aprsis_callsign} {__version__} /A={_aprsis_beacon_altitude_ft}"
+            _beacon = f"={_aprsis_latitude}{_aprsis_table}{_aprsis_longitude}{_aprsis_symbol}{_aprsis_callsign} {__version__}"
+            if _altitude_present:
+                _beacon = _beacon + f" /A={_aprsis_beacon_altitude_ft}"
 
             # and store it in a list item
             aprs_beacon_messages: list = [_beacon]
