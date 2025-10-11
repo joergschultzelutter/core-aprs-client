@@ -708,6 +708,11 @@ def init_scheduler_jobs(class_instance: object):
                 # we might have encountered a cfg value in the config file
                 # which did not consist of purely numeric content
                 _altitude_present = len(_aprsis_beacon_altitude_ft) > 0
+                if _altitude_present:
+                    if not any(char.isdigit() for char in _aprsis_beacon_altitude_ft):
+                        raise ValueError(
+                            "Invalid 'altitude' setting in configuration file; value must either be numeric or empty"
+                        )
 
             # Build the proper altitude string if altitude data is present
             _aprsis_beacon_altitude_ft = (
