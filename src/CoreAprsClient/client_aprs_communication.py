@@ -688,11 +688,41 @@ def init_scheduler_jobs(class_instance: object):
             _aprsis_table = program_config["beacon_config"]["aprsis_table"]
             _aprsis_symbol = program_config["beacon_config"]["aprsis_symbol"]
             _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
-            _aprsis_beacon_altitude_ft = str(program_config["beacon_config"]["aprsis_beacon_altitude_ft"]).zfill(6)[:6]
+            _aprsis_beacon_altitude_ft = program_config["beacon_config"]["aprsis_beacon_altitude_ft"]
             # fmt:on
 
+            # check if altitude data is present
+            #
+            # default assumption: User has provided a numeric value which is then
+            # transposed to altitude settings; the config file importer has already
+            # done this job for us by now. However, if the variable's type is "str",
+            # there is a chance that the user did not provide us with altitude information
+            # so we need to check on whether we have to include this field in our
+            # beacon or not
+            #
+            # Assume the default case first (user HAS provided altitude)
+            _altitude_present = True
+            # field type = 'str'? Then check if the field is empty
+            if type(_aprsis_beacon_altitude_ft) is str:
+                # Note that this should ALWAYS return "false" - otherwise,
+                # we might have encountered a cfg value in the config file
+                # which did not consist of purely numeric content
+                _altitude_present = len(_aprsis_beacon_altitude_ft) > 0
+                if _altitude_present:
+                    if not bool(re.fullmatch(r"\d+", _aprsis_beacon_altitude_ft)):
+                        raise ValueError(
+                            "Invalid 'altitude' setting in configuration file; value must either be numeric or empty"
+                        )
+
+            # Build the proper altitude string if altitude data is present
+            _aprsis_beacon_altitude_ft = (
+                f" /A={str(_aprsis_beacon_altitude_ft).zfill(6)[:6]}"
+                if _altitude_present
+                else ""
+            )
+
             # generate the APRS beacon string
-            _beacon = f"={_aprsis_latitude}{_aprsis_table}{_aprsis_longitude}{_aprsis_symbol}{_aprsis_callsign} {__version__} /A={_aprsis_beacon_altitude_ft}"
+            _beacon = f"={_aprsis_latitude}{_aprsis_table}{_aprsis_longitude}{_aprsis_symbol}{_aprsis_callsign} {__version__}{_aprsis_beacon_altitude_ft}"
 
             # and store it in a list item
             aprs_beacon_messages: list = [_beacon]
