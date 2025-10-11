@@ -16,6 +16,10 @@ APRS Beaconing enables your `core-aprs-client` instance to appear on [aprs.fi](h
 | `aprsis_beacon_altitude_ft`      | `int`     | `824`             | Changes your bot's altitude setting. Details: [aprs101.pdf](https://github.com/wb2osz/aprsspec) chapter 8. Note that the value needs to be specified in `feet` and not in `meters`.                                                                                                                                                                            |
 | `aprsis_beacon_interval_minutes` | `int`     | `30` (30 minutes) | Defines your bot's beaconing interval in minutes. Default is ```30``` (minutes). Changing this setting to a smaller value is not recommended.                                                                                                                                                                                                                  |
 
+> [!NOTE]
+> `aprsis_beacon_altitude_ft` is an optional field. You are not required to supply this information. If you omit this field's value, no altitude data will get transmitted as part of the APRS beacon.
+> Rule of thumb: Either provide a numeric value or leave the string empty (`aprsis_beacon_altitude_ft =`). Alplanumeric content will result in a `ValueError`)
+
 The respective section from `core-aprs-client`'s config file lists as follows:
 
 ```
@@ -51,6 +55,10 @@ aprsis_longitude = 00935.48E
 #
 # Altitude in *FEET* (not meters) for APRS beacon. Details: see aprs101.pdf chapter 8
 # (only used for cases where aprsis_broadcast_beacon = true)
+#
+# Usage of this field is recommended but optional. If you do not want to have altitude
+# data transmitted, leave this field's value empty. Example: aprsis_beacon_altitude_ft =
+#
 aprsis_beacon_altitude_ft = 824
 #
 #

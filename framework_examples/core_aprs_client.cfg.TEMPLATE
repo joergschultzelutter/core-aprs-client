@@ -87,6 +87,10 @@ aprsis_longitude = 00935.48E
 #
 # Altitude in *FEET* (not meters) for APRS beacon. Details: see aprs101.pdf chapter 8
 # (only used for cases where aprsis_broadcast_beacon = true)
+#
+# Usage of this field is recommended but optional. If you do not want to have altitude
+# data transmitted, leave this field's value empty. Example: aprsis_beacon_altitude_ft =
+#
 aprsis_beacon_altitude_ft = 824
 #
 #
