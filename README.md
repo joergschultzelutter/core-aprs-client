@@ -41,25 +41,25 @@ It's as simple as that.
 ## Installation and Configuration
 
 ### Installation instructions
-Instructions for installing the framework and its sample APRS client on your computer can be found [here](docs/installation.md).
+Instructions for installing the framework and its sample APRS client on your computer can be found [here](/docs/installation.md).
 
 ### Client Configuration
-The steps for modifying the client's config file are described [here](docs/configuration.md).
+The steps for modifying the client's config file are described [here]/docs/configuration.md).
 
 ### Framework examples 
-[This directory](framework_examples) contains sample program code; it also contains the ready-to-use templates for the framework's configuration files.
+[This directory](/framework_examples) contains sample program code; it also contains the ready-to-use templates for the framework's configuration files.
 
 ### `CoreAprsClient` class description
-The framework's class methods are described [here](docs/coreaprsclient_class.md)
+The framework's class methods are described [here](/docs/coreaprsclient_class.md)
 
 ### Source Code Anatomy
-A brief overview on this repositories' software modules used by the client can be found [here](docs/anatomy.md).
+A brief overview on this repositories' software modules used by the client can be found [here](/docs/anatomy.md).
 
 ### Framework usage
-The steps for using the client framework are described [here](docs/framework_usage.md).
+The steps for using the client framework are described [here](/docs/framework_usage.md).
 
 ### Client schematics
-If you want to learn about the bot's basic processing structure, then have a look at [this diagram](docs/schematics.md).
+If you want to learn about the bot's basic processing structure, then have a look at [this diagram](/docs/schematics.md).
 
 ## Known issues and caveats
 - This software is single-threaded. Due to APRS-IS's technical nature of resubmitting non-ack'ed messages, this limitation should not be an issue, though. Future versions of this software might support queued processing of incoming requests.
