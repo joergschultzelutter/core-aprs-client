@@ -16,7 +16,7 @@ The provided stubs are provided for demonstration purposes only. You are require
 | File Name                                    | Description                                                                                                                                                   |
 |----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
  | [`input_parser.py`](input_parser.py)         | Takes an incoming APRS message and tries to determine what the user wants us to do. Generates the input data for [`output_generator.py`](output_generator.py) |
- | [`output_generator.py`](output_generator.py) | Takes the data from [`input_parser.py`](input_parser.py) and generates the content for the future outgoing APRS message(s).                                   |
+ | [`output_generator.py`](output_generator.py) | Takes the data from [`input_parser.py`](input_parser.py) and generates the content for the future outgoing APRS message(s)                                    |
 
 ## Demo clients
 
