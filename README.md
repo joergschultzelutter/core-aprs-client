@@ -47,7 +47,7 @@ Instructions for installing the framework and its sample APRS client on your com
 The steps for modifying the client's config file are described [here](docs/configuration.md).
 
 ### Framework examples 
-[This directory](https://github.com/joergschultzelutter/core-aprs-client/blob/master/framework_examples) contains sample program code; it also contains the ready-to-use templates for the framework's configuration files.
+[This directory](framework_examples/README.md) contains sample program code; it also contains the ready-to-use templates for the framework's configuration files.
 
 ### `CoreAprsClient` class description
 The framework's class methods are described [here](docs/coreaprsclient_class.md)
