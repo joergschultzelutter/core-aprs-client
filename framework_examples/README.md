@@ -1,4 +1,4 @@
-# Framework examples:
+# Framework examples
 
 This directory contains:
 
