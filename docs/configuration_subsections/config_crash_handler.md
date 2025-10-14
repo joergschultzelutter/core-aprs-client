@@ -14,6 +14,7 @@
 The respective section from `core-aprs-client`'s config file lists as follows:
 
 ```
+[coac_crash_handler]
 #
 # Apprise config file name
 # Reference to an Apprise (https://github.com/caronc/apprise) configuration file

@@ -13,7 +13,7 @@ Due to the nature of APRS, we might receive the same APRS message as a resubmiss
 The respective section from `core-aprs-client`'s config file lists as follows:
 
 ```
-[dupe_detection]
+[coac_dupe_detection]
 #
 # Internal dupe message cache configuration
 #

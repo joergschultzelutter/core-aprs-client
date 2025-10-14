@@ -16,7 +16,7 @@ By default, the APRS bulletin data function is disabled (`aprsis_broadcast_bulle
 The respective section from `core-aprs-client`'s config file lists as follows:
 
 ```
-[bulletin_config]
+[coac_bulletin_config]
 #
 # Broadcast APRS bulletins (e.g. BLN0..9) true/false
 # When set to 'true', the client will beacon a FIXED set of APRS bulletin messages

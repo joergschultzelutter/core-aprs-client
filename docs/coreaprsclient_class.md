@@ -322,7 +322,7 @@ def make_demo_beacon(myclient: CoreAprsClient):
 
 ## Accessing the program's configuration data
 
-Any number of sections for configuration data can be defined within `core-aprs-client`'s [`custom`](docs/config_custom.md) configuration file. The data is read when the class is initialized and made available as an __immutable__ dictionary object.
+Any number of sections for configuration data can be defined within `core-aprs-client`'s [`custom`](configuration_subsections/config_custom.md) configuration file. The data is read when the class is initialized and made available as an __immutable__ dictionary object.
 
 Any number of custom configuration areas can be created; here too, the name ‘custom_config’ is only a placeholder. Of course, this requires that the framework-specific configuration areas remain unchanged.
 

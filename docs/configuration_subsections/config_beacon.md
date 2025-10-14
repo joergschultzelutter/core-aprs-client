@@ -23,7 +23,7 @@ APRS Beaconing enables your `core-aprs-client` instance to appear on [aprs.fi](h
 The respective section from `core-aprs-client`'s config file lists as follows:
 
 ```
-[beacon]
+[coac_beacon_config]
 #
 # Broadcast position beacon true/false
 # When set to 'true', the client will beacon its existence plus lat/lon settings

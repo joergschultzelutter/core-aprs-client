@@ -18,7 +18,7 @@
 The respective section from `core-aprs-client`'s config file lists as follows:
 
 ```
-[network_config]
+[coac_network_config]
 #
 # APRS-IS server, see https://www.aprs2.net/
 aprsis_server_name = euro.aprs2.net

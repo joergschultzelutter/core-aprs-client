@@ -26,7 +26,7 @@ The following settings are optional:
 The respective section from `core-aprs-client`'s config file lists as follows:
 
 ```
-[client_config]
+[coac_client_config]
 #
 # APRS Listener call sign. Default call sign is COAC
 # This is the call sign on which the APRS client listens to
@@ -50,10 +50,6 @@ aprs_client_name = Core APRS Client
 # whenever the input parser was unable to understand the user's message.
 aprs_input_parser_default_error_message = Did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client
 #
-# This is the bot's default error message. It will be sent to the user
-# whenever the input parser was unable to understand the user's message.
-aprs_input_parser_default_error_message = Did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client
-#
 # Enable or disable message enumeration.
 # message enumeration = True:  add trailing two-digit message number to the
 #                              end of each message. Content for the max msg
@@ -63,7 +59,6 @@ aprs_input_parser_default_error_message = Did not understand your request. Have 
 #                              of each message. Message len stays at 67 chars
 #
 # Default setting: message enumeration = False
-#
 aprs_message_enumeration = False
 ```
 
