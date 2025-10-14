@@ -24,7 +24,7 @@
 > - You can use the framework's[`dryrun_testcall`](coreaprsclient_class.md#dryrun_testcall-class-method) method for a 100% offline testing option which does not connect to APRS-IS. `dryrun_testcall` will route a user's call sign and APRS message through both input parser and output generator modules.
 
 ## Implemented APRS Command Stubs
-By default, `core-aprs-client`'s default installation comes with three keywords that you can send to its associated APRS call sign. In its default demonstration setup, the framework accepts these keywords:
+By default, `core-aprs-client`'s default installation comes with sample keywords that you can send to its associated APRS call sign. In its default demonstration setup, the framework accepts these keywords:
 
 | APRS Command Code | Purpose                                                                                                                                                                                                                                                                                                                                                   |
 |-------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

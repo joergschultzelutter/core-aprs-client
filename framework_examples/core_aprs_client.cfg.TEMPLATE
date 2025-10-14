@@ -215,3 +215,10 @@ aprs_data_directory = data_files
 # This is the name of the file that will contain the program's message counter
 # If not present, then the file will be created by the program
 aprs_message_counter_file_name = core_aprs_client_message_counter.txt
+
+[custom_config]
+#
+# This section is deliberately kept empty and can be used for storing your
+# individual APRS bot's configuration settings. core-aprs-client` will make
+# that data available to you via the class object's `config_data` getter property.
+# For further details, please have a look at the program's documentation.
