@@ -28,7 +28,7 @@ config = configparser.ConfigParser()
 program_config = {}
 
 
-def load_config(config_file: str = "core_aprs_client.cfg"):
+def load_config(config_file: str):
     """
     Loads the program configuration from the config file
     Returns the program configuration as a dictionary

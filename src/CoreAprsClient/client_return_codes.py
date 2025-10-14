@@ -51,6 +51,7 @@ from enum import Enum
 # might be use cases where you simply need to ignore a (technically valid) request
 # in your custom code.
 
+
 class CoreAprsClientInputParserStatus(Enum):
     PARSE_ERROR = -1
     PARSE_IGNORE = 0

@@ -74,6 +74,27 @@ class CoreAprsClient:
         self._dynamic_aprs_bulletins: Dict[str, Any] = {}
         self._lock = threading.Lock()
 
+        # Prepare the config file handler
+        # Check if the config file exists
+        if not os.path.isfile(config_file):
+            raise FileNotFoundError(f"Configuration file '{config_file}' not found")
+
+        # load the program config from our external config file
+        load_config(config_file=self.config_file)
+        if len(program_config) == 0:
+            logger.error(
+                msg="Program config file is empty or contains an error; exiting"
+            )
+            sys.exit(0)
+
+        # And check if the user still runs with the default config
+        # Currently, we do not abort the code but only issue an error to the user
+        check_for_default_config()
+
+        # Finally, create the MappingProxyType copy of the configuration
+        # so that we can expose it to the user, if requested.
+        self._config_data = MappingProxyType(program_config.copy())
+
         # Update the log level (if needed)
         update_logging_level(logging_level=self.log_level)
 
@@ -92,6 +113,7 @@ class CoreAprsClient:
 
         """
 
+        """
         # load the program config from our external config file
         load_config(config_file=self.config_file)
         if len(program_config) == 0:
@@ -103,6 +125,7 @@ class CoreAprsClient:
         # And check if the user still runs with the default config
         # Currently, we do not abort the code but only issue an error to the user
         check_for_default_config()
+        """
 
         # Install our custom exception handler, thus allowing us to signal the
         # user who hosts this bot with a message whenever the program is prone to crash
@@ -226,7 +249,6 @@ class CoreAprsClient:
             if client_shared.AIS.ais_is_connected():
                 client_shared.AIS.ais_close()
 
-
     def dryrun_testcall(self, message_text: str, from_callsign: str):
         """
         This function can be used for 100% offline testing. It does trigger
@@ -342,3 +364,8 @@ class CoreAprsClient:
     def dynamic_aprs_bulletins(self, new_dict: Dict[str, Any]) -> None:
         with self._lock:
             self._dynamic_aprs_bulletins = copy.deepcopy(new_dict)
+
+    @property
+    def config_data(self) -> Mapping[str, Any]:
+        with self._lock:
+            return self._config_data
