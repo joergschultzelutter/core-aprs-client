@@ -153,7 +153,6 @@ aprsis_broadcast_bulletins = false
 # Broadcast interval for bulletins (default: 240 minutes = 4 hours)
 aprsis_bulletin_interval_minutes = 240
 
-
 [coac_bulletin_messages]
 #
 # APRS Bulletin messages BLN0..BLN9
