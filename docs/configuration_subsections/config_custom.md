@@ -4,7 +4,7 @@
 > Custom content. You can add your very own configuration here - `core-aprs-client` will make that data available to you via the class object's `config_data` 'getter' property. 
 
 > [!NOTE]
-> All framework-specific sections of the configuration file begin with the prefix ‘coac’. I recommend using a different prefix for your own code adjustments.
+> All framework-specific sections of the configuration file begin with the prefix `coac`. I recommend using a different prefix for your own code adjustments.
 
 Example:
 
