@@ -25,7 +25,7 @@
 #
 import configparser
 from os import path
-from client_configuration_schema import (
+from .client_configuration_schema import (
     CONFIGURATION_SCHEMA,
     EXCLUDED_CONFIGURATION_SCHEMA,
 )
