@@ -66,7 +66,7 @@ def _get_aprs_msg_len() -> int:
     if "__main__" not in sys.modules:
         return (
             APRS_MSG_LEN_TRAILING
-            if program_config["client_config"]["aprs_message_enumeration"]
+            if program_config["coac_client_config"]["aprs_message_enumeration"]
             else APRS_MSG_LEN_NOTRAILING
         )
     else:
@@ -535,7 +535,7 @@ def make_pretty_aprs_messages(
 
     # Check if the user wants unicode messages. Default is ASCII
     if (
-        not program_config["testing"]["aprsis_enforce_unicode_messages"]
+        not program_config["coac_testing"]["aprsis_enforce_unicode_messages"]
         and not force_outgoing_unicode_messages
     ):
         # Convert the message to plain ascii
@@ -701,14 +701,14 @@ def client_exception_handler():
     if not exception_occurred:
         return
 
-    client_name = program_config["client_config"]["aprs_client_name"]
+    client_name = program_config["coac_client_config"]["aprs_client_name"]
 
     # Send a message before we hit the bucket
     message_body = f"'{client_name}' process has crashed. Reason: {ex_value}"
 
     # Try to zip the log file if possible
     success, log_file_name = create_zip_file_from_log(
-        program_config["crash_handler"]["nohup_filename"]
+        program_config["coac_crash_handler"]["nohup_filename"]
     )
 
     # check if we can spot a 'nohup' file which already contains our status
@@ -720,7 +720,7 @@ def client_exception_handler():
     send_apprise_message(
         message_header=f"'{client_name}' process has crashed",
         message_body=message_body,
-        apprise_config_file=program_config["crash_handler"]["apprise_config_file"],
+        apprise_config_file=program_config["coac_crash_handler"]["apprise_config_file"],
         message_attachment=log_file_name,
     )
 
@@ -775,12 +775,12 @@ def check_for_default_config():
     =======
     """
 
-    if program_config["client_config"]["aprsis_tocall"] == "APRS":
+    if program_config["coac_client_config"]["aprsis_tocall"] == "APRS":
         logger.error(
             msg="'aprsis_tocall' is still set to default config; change config file ASAP"
         )
 
-    if program_config["client_config"]["aprsis_callsign"] == "COAC":
+    if program_config["coac_client_config"]["aprsis_callsign"] == "COAC":
         logger.error(
             msg="'aprsis_callsign' is still set to default config; change config file ASAP"
         )
@@ -852,7 +852,7 @@ def finalize_pretty_aprs_messages(mylistarray: list) -> list:
         Either formatted list (if more than one list entry was present) or
         the original list item
     """
-    if program_config["client_config"]["aprs_message_enumeration"]:
+    if program_config["coac_client_config"]["aprs_message_enumeration"]:
         return format_list_with_enumeration(mylistarray=mylistarray)
     else:
         return mylistarray

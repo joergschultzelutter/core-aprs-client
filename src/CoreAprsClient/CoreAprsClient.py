@@ -113,20 +113,6 @@ class CoreAprsClient:
 
         """
 
-        """
-        # load the program config from our external config file
-        load_config(config_file=self.config_file)
-        if len(program_config) == 0:
-            logger.error(
-                msg="Program config file is empty or contains an error; exiting"
-            )
-            sys.exit(0)
-
-        # And check if the user still runs with the default config
-        # Currently, we do not abort the code but only issue an error to the user
-        check_for_default_config()
-        """
-
         # Install our custom exception handler, thus allowing us to signal the
         # user who hosts this bot with a message whenever the program is prone to crash
         # OR has ended. In any case, we will then send the file to the host
@@ -140,7 +126,9 @@ class CoreAprsClient:
         # Check whether the data directory exists
         success = check_and_create_data_directory(
             root_path_name=os.path.abspath(os.getcwd()),
-            relative_path_name=program_config["data_storage"]["aprs_data_directory"],
+            relative_path_name=program_config["coac_data_storage"][
+                "aprs_data_directory"
+            ],
         )
         if not success:
             exit(0)
@@ -148,13 +136,17 @@ class CoreAprsClient:
         #
         # Read the message counter
         client_shared.aprs_message_counter = APRSMessageCounter(
-            file_name=program_config["data_storage"]["aprs_message_counter_file_name"]
+            file_name=program_config["coac_data_storage"][
+                "aprs_message_counter_file_name"
+            ]
         )
 
         # Create the APRS-IS dupe message cache
         client_shared.aprs_message_cache = create_expiring_dict(
-            max_len=program_config["dupe_detection"]["msg_cache_max_entries"],
-            max_age_seconds=program_config["dupe_detection"]["msg_cache_time_to_live"],
+            max_len=program_config["coac_dupe_detection"]["msg_cache_max_entries"],
+            max_age_seconds=program_config["coac_dupe_detection"][
+                "msg_cache_time_to_live"
+            ],
         )
 
         # Register the SIGTERM handler; this will allow a safe shutdown of the program
@@ -168,13 +160,19 @@ class CoreAprsClient:
         try:
             while True:
                 client_shared.AIS = APRSISObject(
-                    aprsis_callsign=program_config["client_config"]["aprsis_callsign"],
+                    aprsis_callsign=program_config["coac_client_config"][
+                        "aprsis_callsign"
+                    ],
                     aprsis_passwd=str(
-                        program_config["network_config"]["aprsis_passcode"]
+                        program_config["coac_network_config"]["aprsis_passcode"]
                     ),
-                    aprsis_host=program_config["network_config"]["aprsis_server_name"],
-                    aprsis_port=program_config["network_config"]["aprsis_server_port"],
-                    aprsis_filter=program_config["network_config"][
+                    aprsis_host=program_config["coac_network_config"][
+                        "aprsis_server_name"
+                    ],
+                    aprsis_port=program_config["coac_network_config"][
+                        "aprsis_server_port"
+                    ],
+                    aprsis_filter=program_config["coac_network_config"][
                         "aprsis_server_filter"
                     ],
                 )
@@ -230,7 +228,7 @@ class CoreAprsClient:
 
                 # Enter sleep mode and then restart the loop
                 logger.debug(msg=f"Sleeping ...")
-                time.sleep(program_config["message_delay"]["packet_delay_message"])
+                time.sleep(program_config["coac_message_delay"]["packet_delay_message"])
 
         except (KeyboardInterrupt, SystemExit):
             # Tell the user that we are about to terminate our work
@@ -324,7 +322,7 @@ class CoreAprsClient:
                     # discrepancy between the action determined by the input parser
                     # and the responsive counter-action in the output processor
                     output_message = make_pretty_aprs_messages(
-                        message_to_add=program_config["client_config"][
+                        message_to_add=program_config["coac_client_config"][
                             "aprs_input_parser_default_error_message"
                         ],
                     )
@@ -341,7 +339,7 @@ class CoreAprsClient:
                 # If not, just dump the link to the instructions
                 else:
                     output_message = make_pretty_aprs_messages(
-                        message_to_add=program_config["client_config"][
+                        message_to_add=program_config["coac_client_config"][
                             "aprs_input_parser_default_error_message"
                         ],
                     )

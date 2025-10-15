@@ -243,8 +243,8 @@ def send_beacon_and_status_msg(
 
     # Generate some local variables because the 'black' beautifier seems
     # to choke on multi-dimensional dictionaries
-    _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
-    _aprsis_tocall = program_config["client_config"]["aprsis_tocall"]
+    _aprsis_callsign = program_config["coac_client_config"]["aprsis_callsign"]
+    _aprsis_tocall = program_config["coac_client_config"]["aprsis_tocall"]
 
     # Build and send the list of beacons
     for index, bcn in enumerate(aprs_beacon_messages, start=1):
@@ -261,11 +261,13 @@ def send_beacon_and_status_msg(
         # do we still have messages in our queue?
         # Yes, apply the regular beacon sleep cycle
         if index < len(aprs_beacon_messages):
-            time.sleep(program_config["message_delay"]["packet_delay_beacon"])
+            time.sleep(program_config["coac_message_delay"]["packet_delay_beacon"])
         else:
             # Otherwise, apply the shorter sleep cycle after sending out
             # our very last beacon message
-            time.sleep(program_config["message_delay"]["packet_delay_grace_period"])
+            time.sleep(
+                program_config["coac_message_delay"]["packet_delay_grace_period"]
+            )
 
 
 def send_bulletin_messages(
@@ -348,8 +350,8 @@ def send_bulletin_messages(
 
     # Generate some local variables because the 'black' beautifier seems
     # to choke on multi-dimensional dictionaries
-    _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
-    _aprsis_tocall = program_config["client_config"]["aprsis_tocall"]
+    _aprsis_callsign = program_config["coac_client_config"]["aprsis_callsign"]
+    _aprsis_tocall = program_config["coac_client_config"]["aprsis_tocall"]
 
     # Build and send the list of bulletins
     # Note that we iterate over the unified dictionary of APRS bulletins
@@ -367,11 +369,13 @@ def send_bulletin_messages(
         # do we still have messages in our queue?
         # Yes, apply the regular bulletin sleep cycle
         if index < len(bulletin_dict):
-            time.sleep(program_config["message_delay"]["packet_delay_bulletin"])
+            time.sleep(program_config["coac_message_delay"]["packet_delay_bulletin"])
         else:
             # Otherwise, apply the shorter sleep cycle after sending out
             # our very last bulletin message
-            time.sleep(program_config["message_delay"]["packet_delay_grace_period"])
+            time.sleep(
+                program_config["coac_message_delay"]["packet_delay_grace_period"]
+            )
 
 
 # APRSlib callback
@@ -458,14 +462,16 @@ def aprs_callback(
                 if msg_no_supported and not new_ackrej_format:
                     send_ack(
                         myaprsis=client_shared.AIS,
-                        simulate_send=program_config["testing"]["aprsis_simulate_send"],
-                        source_callsign=program_config["client_config"][
+                        simulate_send=program_config["coac_testing"][
+                            "aprsis_simulate_send"
+                        ],
+                        source_callsign=program_config["coac_client_config"][
                             "aprsis_callsign"
                         ],
-                        tocall=program_config["client_config"]["aprsis_tocall"],
+                        tocall=program_config["coac_client_config"]["aprsis_tocall"],
                         target_callsign=from_callsign,
                         source_msg_no=msgno_string,
-                        packet_delay=program_config["message_delay"][
+                        packet_delay=program_config["coac_message_delay"][
                             "packet_delay_ack"
                         ],
                     )
@@ -544,7 +550,7 @@ def aprs_callback(
                             # discrepancy between the action determined by the input parser
                             # and the responsive counter-action from the output processor
                             output_message = make_pretty_aprs_messages(
-                                message_to_add=program_config["client_config"][
+                                message_to_add=program_config["coac_client_config"][
                                     "aprs_input_parser_default_error_message"
                                 ],
                             )
@@ -565,7 +571,7 @@ def aprs_callback(
                         # to the client whenever there is no generic error text from the input parser
                         else:
                             output_message = make_pretty_aprs_messages(
-                                message_to_add=program_config["client_config"][
+                                message_to_add=program_config["coac_client_config"][
                                     "aprs_input_parser_default_error_message"
                                 ],
                             )
@@ -586,17 +592,19 @@ def aprs_callback(
                 # Send our message(s) to APRS-IS
                 _aprs_msg_count = send_aprs_message_list(
                     myaprsis=client_shared.AIS,
-                    simulate_send=program_config["testing"]["aprsis_simulate_send"],
+                    simulate_send=program_config["coac_testing"][
+                        "aprsis_simulate_send"
+                    ],
                     message_text_array=output_message,
                     destination_call_sign=from_callsign,
                     send_with_msg_no=msg_no_supported,
                     aprs_message_counter=client_shared.aprs_message_counter.get_counter(),
                     external_message_number=msgno_string,
                     new_ackrej_format=new_ackrej_format,
-                    packet_delay=program_config["message_delay"][
+                    packet_delay=program_config["coac_message_delay"][
                         "packet_delay_message"
                     ],
-                    packet_delay_grace_period=program_config["message_delay"][
+                    packet_delay_grace_period=program_config["coac_message_delay"][
                         "packet_delay_grace_period"
                     ],
                 )
@@ -630,8 +638,8 @@ def init_scheduler_jobs(class_instance: object):
     """
 
     if (
-        program_config["beacon_config"]["aprsis_broadcast_beacon"]
-        or program_config["bulletin_config"]["aprsis_broadcast_bulletins"]
+        program_config["coac_beacon_config"]["aprsis_broadcast_beacon"]
+        or program_config["coac_bulletin_config"]["aprsis_broadcast_bulletins"]
     ):
         # If we reach this position in the code, we have at least one
         # task that needs to be scheduled (bulletins and/or position messages
@@ -648,7 +656,7 @@ def init_scheduler_jobs(class_instance: object):
         # to APRS; it will be triggered every 4 hours
         #
 
-        if program_config["beacon_config"]["aprsis_broadcast_beacon"]:
+        if program_config["coac_beacon_config"]["aprsis_broadcast_beacon"]:
             # Send initial beacon after establishing the connection to APRS_IS
             logger.debug(
                 msg="Send initial beacon after establishing the connection to APRS_IS"
@@ -683,12 +691,12 @@ def init_scheduler_jobs(class_instance: object):
             # choke on multi-dimensional dictionaries
 
             # fmt:off
-            _aprsis_latitude = program_config["beacon_config"]["aprsis_latitude"]
-            _aprsis_longitude = program_config["beacon_config"]["aprsis_longitude"]
-            _aprsis_table = program_config["beacon_config"]["aprsis_table"]
-            _aprsis_symbol = program_config["beacon_config"]["aprsis_symbol"]
-            _aprsis_callsign = program_config["client_config"]["aprsis_callsign"]
-            _aprsis_beacon_altitude_ft = program_config["beacon_config"]["aprsis_beacon_altitude_ft"]
+            _aprsis_latitude = program_config["coac_beacon_config"]["aprsis_latitude"]
+            _aprsis_longitude = program_config["coac_beacon_config"]["aprsis_longitude"]
+            _aprsis_table = program_config["coac_beacon_config"]["aprsis_table"]
+            _aprsis_symbol = program_config["coac_beacon_config"]["aprsis_symbol"]
+            _aprsis_callsign = program_config["coac_client_config"]["aprsis_callsign"]
+            _aprsis_beacon_altitude_ft = program_config["coac_beacon_config"]["aprsis_beacon_altitude_ft"]
             # fmt:on
 
             # check if altitude data is present
@@ -732,7 +740,7 @@ def init_scheduler_jobs(class_instance: object):
                 class_instance=class_instance,
                 myaprsis=client_shared.AIS,
                 aprs_beacon_messages=aprs_beacon_messages,
-                simulate_send=program_config["testing"]["aprsis_simulate_send"],
+                simulate_send=program_config["coac_testing"]["aprsis_simulate_send"],
             )
 
             # Now let's add position beaconing to scheduler
@@ -740,20 +748,20 @@ def init_scheduler_jobs(class_instance: object):
                 send_beacon_and_status_msg,
                 "interval",
                 id="aprsbeacon",
-                minutes=program_config["beacon_config"][
+                minutes=program_config["coac_beacon_config"][
                     "aprsis_beacon_interval_minutes"
                 ],
                 args=[
                     class_instance,
                     client_shared.AIS,
                     aprs_beacon_messages,
-                    program_config["testing"]["aprsis_simulate_send"],
+                    program_config["coac_testing"]["aprsis_simulate_send"],
                 ],
                 max_instances=1,
                 coalesce=True,
             )
 
-        if program_config["bulletin_config"]["aprsis_broadcast_bulletins"]:
+        if program_config["coac_bulletin_config"]["aprsis_broadcast_bulletins"]:
             # prepare the bulletin data
             aprs_bulletin_messages = parse_bulletin_data(core_config=program_config)
 
@@ -764,14 +772,14 @@ def init_scheduler_jobs(class_instance: object):
                 send_bulletin_messages,
                 "interval",
                 id="aprsbulletin",
-                minutes=program_config["bulletin_config"][
+                minutes=program_config["coac_bulletin_config"][
                     "aprsis_bulletin_interval_minutes"
                 ],
                 args=[
                     class_instance,
                     client_shared.AIS,
                     aprs_bulletin_messages,
-                    program_config["testing"]["aprsis_simulate_send"],
+                    program_config["coac_testing"]["aprsis_simulate_send"],
                 ],
                 max_instances=1,
                 coalesce=True,
