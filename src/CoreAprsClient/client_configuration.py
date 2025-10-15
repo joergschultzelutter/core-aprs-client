@@ -23,7 +23,7 @@
 #
 import configparser
 from os import path
-from client_configuration_schema import CLIENT_CONFIGURATION
+from client_configuration_schema import CONFIGURATION_SCHEMA
 
 config = configparser.ConfigParser()
 program_config = {}
@@ -135,7 +135,7 @@ def validate_config_schema(cfg: dict):
         if not section.startswith("coac_"):
             continue
 
-        expected_schema = CLIENT_CONFIGURATION.get(section)
+        expected_schema = CONFIGURATION_SCHEMA.get(section)
         if not expected_schema:
             raise ValueError(f"Schema definition for section '{section}' is missing from the configuration file")
 
