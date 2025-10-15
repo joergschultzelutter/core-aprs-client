@@ -28,15 +28,15 @@ aprs_client_name = Core APRS Client
 aprs_input_parser_default_error_message = Did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client
 #
 # Enable or disable message enumeration.
-# message enumeration = True:  add trailing two-digit message number to the
+# message enumeration = true:  add trailing two-digit message number to the
 #                              end of each message. Content for the max msg
 #                              len gets reduced to 59 characters (excluding
 #                              message number)
-# message enumeration = False: do not add trailing message number to the end
+# message enumeration = false: do not add trailing message number to the end
 #                              of each message. Message len stays at 67 chars
 #
-# Default setting: message enumeration = False
-aprs_message_enumeration = False
+# Default setting: message enumeration = false
+aprs_message_enumeration = false
 
 [coac_network_config]
 #
