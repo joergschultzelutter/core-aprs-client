@@ -763,7 +763,7 @@ def init_scheduler_jobs(class_instance: object):
 
         if program_config["coac_bulletin_config"]["aprsis_broadcast_bulletins"]:
             # prepare the bulletin data
-            aprs_bulletin_messages = parse_bulletin_data(core_config=program_config)
+            aprs_bulletin_messages = parse_bulletin_data()
 
             # Install scheduler task 2 - send standard bulletins (advertising the program instance)
             # The bulletin messages consist of fixed content and are defined at the beginning of

@@ -622,7 +622,7 @@ def split_string_to_string_list(
     return split_strings
 
 
-def parse_bulletin_data(core_config: dict):
+def parse_bulletin_data():
     """
     This function parses the bulletin messages from the configuration file,
     checks them for validity and then adds them to the global 'aprs_bulletin_messages'
@@ -630,8 +630,6 @@ def parse_bulletin_data(core_config: dict):
 
     Parameters
     ==========
-    core_config: dict
-        The bulletin messages from the configuration file in their raw state
 
     Returns
     =======
@@ -641,7 +639,7 @@ def parse_bulletin_data(core_config: dict):
     aprs_bulletin_messages: dict = {}
 
     # Get the key and value from our configuration file's bulletin messages section
-    for key, value in core_config["coac_bulletin_messages"].items():
+    for key, value in program_config["coac_bulletin_messages"].items():
         # Message populated and less than max APRS message length?
         # note: we do not use message enumeration for bulletins
         # therefore, the max length requirement is always fixed (67 bytes)
