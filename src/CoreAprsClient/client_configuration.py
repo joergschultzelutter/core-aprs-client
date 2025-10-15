@@ -1,6 +1,8 @@
 #
 # Core APRS Client
-# Wrapper for configparser data
+# Configuration file import and validation
+# Imports the configuration data into a dictionary object
+# and performs a generic validation against predefined schema data
 # Author: Joerg Schultze-Lutter, 2025
 #
 # aprslib does not allow us to pass additional parameters to its
@@ -23,6 +25,10 @@
 #
 import configparser
 from os import path
+from .client_configuration_schema import (
+    CONFIGURATION_SCHEMA,
+    EXCLUDED_CONFIGURATION_SCHEMA,
+)
 
 config = configparser.ConfigParser()
 program_config = {}
@@ -52,6 +58,7 @@ def load_config(config_file: str):
             program_config.clear()
     else:
         program_config.clear()
+    validate_config_schema(program_config)
 
 
 def _parse_value(value: str):
@@ -114,6 +121,52 @@ def get_config():
         Our program configuration dictionary
     """
     return program_config
+
+
+def validate_config_schema(cfg: dict):
+    """
+    Helper method: validates config file data against
+    predefined schema and checks for missing fields and/or
+    fields with invalid data types
+
+    Parameters
+    ==========
+    cfg: dict
+        Dictionary with data from config file
+
+    Returns
+    =======
+    """
+    for section, values in cfg.items():
+        if not section.startswith("coac_"):
+            continue
+
+        expected_schema = CONFIGURATION_SCHEMA.get(section)
+        if not expected_schema:
+            if section in EXCLUDED_CONFIGURATION_SCHEMA:
+                continue
+            else:
+                raise KeyError(
+                    f"Schema definition for section '{section}' is missing from the configuration file"
+                )
+
+        # a) Check all required keys are present
+        missing_keys = set(expected_schema.keys()) - set(values.keys())
+        if missing_keys:
+            raise KeyError(
+                f"Configuration file section '{section}': missing keys {missing_keys}"
+            )
+
+        # b) Check type correctness
+        for key, expected_type in expected_schema.items():
+            if key not in values:
+                continue
+            actual_value = values[key]
+            if not isinstance(actual_value, expected_type):
+                raise TypeError(
+                    f"Configuration file section '{section}': key '{key}' has wrong type "
+                    f"(expected {expected_type.__name__}, got {type(actual_value).__name__})"
+                )
 
 
 if __name__ == "__main__":
