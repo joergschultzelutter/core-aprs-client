@@ -326,11 +326,14 @@ Any number of sections for configuration data can be defined within `core-aprs-c
 
 Any number of custom configuration areas can be created; here too, the name ‘custom_config’ is only a placeholder. Of course, this requires that the framework-specific configuration areas remain unchanged.
 
+> [!INFORMATION]
+> All framework-specific sections of the configuration file begin with the prefix ‘coac’. I recommend using a different prefix for your own code adjustments.
+
 ### Example
 ##### Configuration file excerpt with two custom config sections
 
 ```python
-[data_storage]
+[coac_data_storage]
 #
 # This is the name of the subdiectory where the program will store the
 # APRS message counter file. Location: $cwd/<directory>
@@ -395,7 +398,7 @@ print (pformat(client.config_data))
               ....
                                  'aprsis_server_name': 'euro.aprs2.net',
                                  'aprsis_server_port': 14580},
-              'testing': {'aprsis_enforce_unicode_messages': False,
+              'coac_testing': {'aprsis_enforce_unicode_messages': False,
                           'aprsis_simulate_send': True},
               'zzz_custom_config': {'hello': 'Welt'},
               'zzz_custom_config2': {'hello': 'World'}})
