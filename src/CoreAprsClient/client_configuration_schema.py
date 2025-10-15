@@ -3,9 +3,14 @@
 # Schema file for the configuration file parser
 # Author: Joerg Schultze-Lutter, 2025
 #
-# aprslib does not allow us to pass additional parameters to its
-# callback function. Therefore, this module acts as a pseudo object in
-# order to provide global access to its worker variables
+# Used for a validation of the configuration file data. Every configuration
+# file section that starts with a leading "coac_" AND is NOT part of this
+# file's EXCLUDED_CONFIGURATION_SCHEMA section will get validated against:
+#
+# - expected configuration file sections
+# - within these sections:
+#   - expected variable names
+#   - expected variable types
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,13 +27,16 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
+# This section defines the configuration data that we _want_ to validate
+# Literally speaking, all configuration sections starting with a leading
+# "coac_" string are validated
 CONFIGURATION_SCHEMA = {
     "coac_client_config": {
         "aprsis_callsign": str,
         "aprsis_tocall": str,
         "aprs_client_name": str,
         "aprs_input_parser_default_error_message": str,
-        "aprs_message_enumeration": str,
+        "aprs_message_enumeration": bool,
     },
     "coac_network_config": {
         "aprsis_server_name": str,
@@ -71,8 +79,15 @@ CONFIGURATION_SCHEMA = {
     "coac_data_storage": {
         "aprs_data_directory": str,
         "aprs_message_counter_file_name": str,
-    }
+    },
 }
+
+# This section defines the configuration data that we want to
+# _exclude_ from validation. We cannot validate the bulletin
+# messages as they represent dynamic data which can be changed
+# by the end user
+EXCLUDED_CONFIGURATION_SCHEMA = ["coac_bulletin_messages"]
+
 
 if __name__ == "__main__":
     pass

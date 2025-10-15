@@ -15,6 +15,10 @@ When it comes to the user's individual configuration settings, `core-aprs-client
 > [!TIP]
 > Complete sample file templates for both [the configuration file](/framework_examples/core_aprs_client.cfg.TEMPLATE) and the [Apprise configuration file](/framework_examples/apprise.yml.TEMPLATE) can be found in the [`framework_examples`](/framework_examples) directory.
 
+## Configuration file schema validation
+
+During initialization, `core-aprs-client` performs a generic validation of the imported configuration file's data against its very own expected [schema data](/src/CoreAprsClient/client_configuration_schema.py). In case of a deviation, an exception is raised.
+
 ## Mandatory configuration file sections
 
 | Configuration Section                                         | Usage                                                                                                                           |
