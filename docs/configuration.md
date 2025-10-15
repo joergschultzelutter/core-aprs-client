@@ -27,15 +27,16 @@ When it comes to the user's individual configuration settings, `core-aprs-client
 > [!Tip]
 > These configuration file sections have been preconfigured. You can use the file's default settings unless you want to use a very specific configuration for your program's purposes.
 
-| Configuration Section                                                                                                                            | Usage                                                                                                               |
-|--------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
-| [beacon_config](configuration_subsections/config_beacon.md)                                                                                      | Used in case you want to beacon your APRS bot's position & APRS symbol to [APRS-IS](https://aprs-is.net/)           |
-| [bulletin_config](configuration_subsections/config_bulletin.md) and [bulletin_messages](configuration_subsections/config_bulletin_messages.md)   | Used in case you want to send out fixed APRS bulletin messages to [APRS-IS](https://aprs-is.net/)                   |
-| [crash_handler](configuration_subsections/config_crash_handler.md)                                                                               | Optional setting which enables the bot to send you a core dump file in case the program has crashed.                |
-| [dupe_detection](configuration_subsections/config_dupe_detection.md)                                                                             | Default settings for how many incoming APRS messages are stored. The time-to-live setting can also be defined here. |
-| [message_delay](configuration_subsections/config_message_delay.md)                                                                               | Configures the delays between outgoing multiple [APRS-IS](https://aprs-is.net/) messages                            |
-| [testing](configuration_subsections/config_testing.md)                                                                                           | Configuration settings for software and integration testing                                                         |
-| [data_storage](configuration_subsections/config_data_storage.md)                                                                                 | Configuration settings for the storage of data files, e.g. the data file which persists the APRS message counter    |
+| Configuration Section                                                                                                                          | Usage                                                                                                               |
+|------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| [beacon_config](configuration_subsections/config_beacon.md)                                                                                    | Used in case you want to beacon your APRS bot's position & APRS symbol to [APRS-IS](https://aprs-is.net/)           |
+| [bulletin_config](configuration_subsections/config_bulletin.md) and [bulletin_messages](configuration_subsections/config_bulletin_messages.md) | Used in case you want to send out fixed APRS bulletin messages to [APRS-IS](https://aprs-is.net/)                   |
+| [custom_config](configuration_subsections/config_custom.md)                                                                                    | A configuration area where specific user configuration data can be stored optionally.                               |
+| [crash_handler](configuration_subsections/config_crash_handler.md)                                                                             | Optional setting which enables the bot to send you a core dump file in case the program has crashed.                |
+| [dupe_detection](configuration_subsections/config_dupe_detection.md)                                                                           | Default settings for how many incoming APRS messages are stored. The time-to-live setting can also be defined here. |
+| [message_delay](configuration_subsections/config_message_delay.md)                                                                             | Configures the delays between outgoing multiple [APRS-IS](https://aprs-is.net/) messages                            |
+| [testing](configuration_subsections/config_testing.md)                                                                                         | Configuration settings for software and integration testing                                                         |
+| [data_storage](configuration_subsections/config_data_storage.md)                                                                               | Configuration settings for the storage of data files, e.g. the data file which persists the APRS message counter    |
 
 ## Configuration file sample
 
@@ -47,7 +48,7 @@ The following chapter illustrates a sample of a complete configuration file.
 # https://github.com/joergschultzelutter/core-aprs-client/blob/master/docs/configuration.md
 # for additional information on what these settings do
 
-[client_config]
+[coac_client_config]
 #
 # APRS Listener call sign. Default call sign is COAC
 # This is the call sign on which the APRS client listens to
@@ -82,7 +83,7 @@ aprs_input_parser_default_error_message = Did not understand your request. Have 
 # Default setting: message enumeration = False
 aprs_message_enumeration = False
 
-[network_config]
+[coac_network_config]
 #
 # APRS-IS server, see https://www.aprs2.net/
 aprsis_server_name = euro.aprs2.net
@@ -99,7 +100,7 @@ aprsis_passcode = 12345
 # Ensure that both aprsis_callsign and aprsis_server_filter relate to the same call sign!
 aprsis_server_filter = g/COAC
 
-[beacon_config]
+[coac_beacon_config]
 #
 # Broadcast position beacon true/false
 # When set to 'true', the client will beacon its existence plus lat/lon settings
@@ -141,7 +142,7 @@ aprsis_beacon_altitude_ft = 824
 # Broadcast interval for beacons (default: 30 minutes)
 aprsis_beacon_interval_minutes = 30
 
-[bulletin_config]
+[coac_bulletin_config]
 #
 # Broadcast APRS bulletins (e.g. BLN0..9) true/false
 # When set to 'true', the client will beacon a FIXED set of APRS bulletin messages
@@ -152,8 +153,7 @@ aprsis_broadcast_bulletins = false
 # Broadcast interval for bulletins (default: 240 minutes = 4 hours)
 aprsis_bulletin_interval_minutes = 240
 
-
-[bulletin_messages]
+[coac_bulletin_messages]
 #
 # APRS Bulletin messages BLN0..BLN9
 # If you don't want to configure a bulletin message, then leave the value empty or
@@ -179,7 +179,7 @@ bln7 =
 bln8 =
 bln9 =
 
-[crash_handler]
+[coac_crash_handler]
 #
 # Apprise config file name
 # Reference to an Apprise (https://github.com/caronc/apprise) configuration file
@@ -196,7 +196,7 @@ apprise_config_file = apprise.yml
 # in case the program crashes
 nohup_filename = nohup.out
 
-[dupe_detection]
+[coac_dupe_detection]
 #
 # Internal dupe message cache configuration
 #
@@ -206,7 +206,7 @@ msg_cache_max_entries = 2160
 # max time span of dupe detection in seconds (3600 sec = 1 hour)
 msg_cache_time_to_live = 3600
 
-[message_delay]
+[coac_message_delay]
 #
 # delay between messages if more than one message is to be sent to APRS-IS
 # Unit of measure: seconds
@@ -233,7 +233,7 @@ packet_delay_bulletin = 6.0
 # Unit of measure: seconds
 packet_delay_beacon = 6.0
 
-[testing]
+[coac_testing]
 #
 # Force outgoing unicode messages (default: false)
 # When set to 'true', outgoing content will allow UTF-8 encoding
@@ -249,7 +249,7 @@ aprsis_enforce_unicode_messages = false
 # true: receive from APRS-IS, but don't send anything to APRS-IS
 aprsis_simulate_send = false
 
-[data_storage]
+[coac_data_storage]
 #
 # This is the name of the subdiectory where the program will store the
 # APRS message counter file. Location: $cwd/<directory>
@@ -259,6 +259,14 @@ aprs_data_directory = data_files
 # This is the name of the file that will contain the program's message counter
 # If not present, then the file will be created by the program
 aprs_message_counter_file_name = core_aprs_client_message_counter.txt
+
+[custom_config]
+#
+# This section is deliberately kept empty and can be used for storing your
+# individual APRS bot's configuration settings. core-aprs-client` will make
+# that data available to you via the class object's `config_data` getter property.
+# For further details, please have a look at the program's documentation.
+
 ```
 
 

@@ -14,7 +14,7 @@ This configuration section contains two settings:
 The respective section from `core-aprs-client`'s config file lists as follows:
 
 ```
-[data_storage]
+[coac_data_storage]
 #
 # This is the name of the subdiectory where the program will store the
 # APRS message counter file. Location: $cwd/<directory>

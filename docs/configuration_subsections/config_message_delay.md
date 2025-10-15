@@ -14,6 +14,7 @@
 The respective section from `core-aprs-client`'s config file lists as follows:
 
 ```
+[coac_message_delay]
 #
 # delay between messages if more than one message is to be sent to APRS-IS
 # Unit of measure: seconds

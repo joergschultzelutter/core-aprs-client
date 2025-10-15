@@ -41,7 +41,7 @@ Currently, this class supports two methods:
 - [`activate_client`](coreaprsclient_class.md#activate_client-class-method) connects to [APRS-IS](https://aprs-is.net/) and exchanges data with the APRS network
 - [`dryrun_testcall`](coreaprsclient_class.md#dryrun_testcall-class-method) can be used for offline testing. When triggered, it will run a simulated and freely configurable APRS input message through the `input_processor` code and, whereas applicable, uses the `output_generator` code in order to create the outgoing message content.
 
-Additionally, a [set of specific return codes](coreaprsclient_class.md#input_processor-return-codes) have to be imported by the `input_parser` function. Finally, an optional `dict` attribute allows users to send additional dynamic APRS bulletins in addition to the statically configured bulletins. 
+Additionally, a [set of specific return codes](coreaprsclient_class.md#input_processor-return-codes) have to be imported by the `input_parser` function. Finally, an optional `dict` attribute allows users to send additional dynamic APRS bulletins in addition to the statically configured bulletins. A 'getter' method allows you to retrieve the (immutable) `dict` object of the class' configuration file data, thus allowing you to store your specific configuration file content in `core-aprs-client`'s config file. 
 ### Your responsibilities 
 
 You are responsible for designing the functions associated with the `input_parser` and `output_generator` parameters. Check the [Framework Usage](framework_usage.md) help pages for further details. 
@@ -318,4 +318,89 @@ def make_demo_beacon(myclient: CoreAprsClient):
 
     """
     myclient.dynamic_aprs_bulletins = {"BLN0DEMO": "Hello World"}
+```
+
+## Accessing the program's configuration data
+
+Any number of sections for configuration data can be defined within `core-aprs-client`'s [`custom`](configuration_subsections/config_custom.md) configuration file. The data is read when the class is initialized and made available as an __immutable__ dictionary object.
+
+Any number of custom configuration areas can be created; here too, the name ‘custom_config’ is only a placeholder. Of course, this requires that the framework-specific configuration areas remain unchanged.
+
+> [!NOTE]
+> All framework-specific sections of the configuration file begin with the prefix `coac`. I recommend using a different prefix for your own code adjustments.
+
+### Example
+##### Configuration file excerpt with two custom config sections
+
+```python
+[coac_data_storage]
+#
+# This is the name of the subdiectory where the program will store the
+# APRS message counter file. Location: $cwd/<directory>
+# If not present, then the directory will be created by the program
+aprs_data_directory = data_files
+#
+# This is the name of the file that will contain the program's message counter
+# If not present, then the file will be created by the program
+aprs_message_counter_file_name = core_aprs_client_message_counter.txt
+
+[zzz_custom_config]
+#
+# This section is deliberately kept empty and can be used for storing your
+# individual APRS bot's configuration settings. core-aprs-client` will make
+# that data available to you via the class object's `config_data` getter property.
+# For further details, please have a look at the program's documentation.
+
+Hello = Welt
+
+[zzz_custom_config2]
+#
+# This section is deliberately kept empty and can be used for storing your
+# individual APRS bot's configuration settings. core-aprs-client` will make
+# that data available to you via the class object's `config_data` getter property.
+# For further details, please have a look at the program's documentation.
+
+Hello = World
+```
+
+##### Demo program
+
+```python
+from CoreAprsClient import CoreAprsClient
+
+# Your custom input parser and output generator code
+from input_parser import parse_input_message
+from output_generator import generate_output_message
+
+import logging
+from pprint import pformat
+
+# Create the CoreAprsClient object. Supply the
+# following parameters:
+#
+# - configuration file name
+# - log level (from Python's 'logging' package)
+# - function names for both input processor and output generator
+#
+client = CoreAprsClient(
+    config_file="my_config_file.cfg",
+    log_level=logging.DEBUG,
+    input_parser=parse_input_message,
+    output_generator=generate_output_message,
+)
+
+print (pformat(client.config_data))
+```
+
+##### Output (excerpt)
+
+```
+              ....
+                                 'aprsis_server_name': 'euro.aprs2.net',
+                                 'aprsis_server_port': 14580},
+              'coac_testing': {'aprsis_enforce_unicode_messages': False,
+                          'aprsis_simulate_send': True},
+              'zzz_custom_config': {'hello': 'Welt'},
+              'zzz_custom_config2': {'hello': 'World'}})
+
 ```

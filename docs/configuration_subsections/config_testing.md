@@ -11,7 +11,7 @@
 The respective section from `core-aprs-client`'s config file lists as follows:
 
 ```
-[testing]
+[coac_testing]
 #
 # Force outgoing unicode messages (default: false)
 # When set to 'true', outgoing content will allow UTF-8 encoding
