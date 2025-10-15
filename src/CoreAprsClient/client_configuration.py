@@ -23,6 +23,7 @@
 #
 import configparser
 from os import path
+from client_configuration_schema import CLIENT_CONFIGURATION
 
 config = configparser.ConfigParser()
 program_config = {}
@@ -48,6 +49,7 @@ def load_config(config_file: str):
         try:
             config.read(config_file)
             config_to_dict(config)
+            validate_config_schema(program_config)
         except:
             program_config.clear()
     else:
@@ -114,6 +116,44 @@ def get_config():
         Our program configuration dictionary
     """
     return program_config
+
+def validate_config_schema(cfg: dict):
+    """
+    Helper method: validates config file data against 
+    predefined schema and checks for missing fields and/or
+    fields with invalid data types
+
+    Parameters
+    ==========
+    cfg: dict
+        Dictionary with data from config file
+        
+    Returns
+    =======
+    """
+    for section, values in cfg.items():
+        if not section.startswith("coac_"):
+            continue
+
+        expected_schema = CLIENT_CONFIGURATION.get(section)
+        if not expected_schema:
+            raise ValueError(f"Schema definition for section '{section}' is missing from the configuration file")
+
+        # a) Check all required keys are present
+        missing_keys = set(expected_schema.keys()) - set(values.keys())
+        if missing_keys:
+            raise ValueError(f"Configuration file section '{section}': missing keys {missing_keys}")
+
+        # b) Check type correctness
+        for key, expected_type in expected_schema.items():
+            if key not in values:
+                continue
+            actual_value = values[key]
+            if not isinstance(actual_value, expected_type):
+                raise ValueError(
+                    f"Configuration file section '{section}': key '{key}' has wrong type "
+                    f"(expected {expected_type.__name__}, got {type(actual_value).__name__})"
+                )
 
 
 if __name__ == "__main__":
