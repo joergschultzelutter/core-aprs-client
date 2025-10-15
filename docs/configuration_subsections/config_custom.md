@@ -3,7 +3,7 @@
 > [!TIP]
 > Custom content. You can add your very own configuration here - `core-aprs-client` will make that data available to you via the class object's `config_data` 'getter' property. 
 
-> [!INFORMATION]
+> [!NOTE]
 > All framework-specific sections of the configuration file begin with the prefix ‘coac’. I recommend using a different prefix for your own code adjustments.
 
 Example:
@@ -52,5 +52,5 @@ The respective section from `core-aprs-client`'s config file lists as follows:
 # For further details, please have a look at the program's documentation.
 ```
 
-> [!INFORMATION]
+> [!NOTE]
 > Any number of custom configuration areas can be created; here too, the name ‘custom_config’ is only a placeholder. Of course, this requires that the framework-specific configuration areas remain unchanged.

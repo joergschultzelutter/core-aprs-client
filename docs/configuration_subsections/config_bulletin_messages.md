@@ -3,7 +3,7 @@
 > [!TIP]
 > This section of the configuration file allows you to configure the __static__ bulletins that you want to send out to the user; see the [bulletin configuration documentation](config_bulletin) for further info. Its content is only used if `aprsis_broadcast_bulletins` is set to `true`. Otherwise, this whole section is completely disregarded.
 
-> [!INFORMATION]
+> [!NOTE]
 > Note that in addition, __dynamic__ bulletin data can be inserted [during runtime](/docs/coreaprsclient_class.md#use-of-dynamic-content-for-aprs-bulletins-additional-to-static-bulletin-content), too.
 
 By default, `core-aprs-client` comes with a predefined set of 10 bulletin messages (`bln0` to `bln9`). You can add additional customized bulletin messages to that section as long as they follow these ground rules:

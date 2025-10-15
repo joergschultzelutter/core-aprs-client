@@ -326,7 +326,7 @@ Any number of sections for configuration data can be defined within `core-aprs-c
 
 Any number of custom configuration areas can be created; here too, the name ‘custom_config’ is only a placeholder. Of course, this requires that the framework-specific configuration areas remain unchanged.
 
-> [!INFORMATION]
+> [!NOTE]
 > All framework-specific sections of the configuration file begin with the prefix ‘coac’. I recommend using a different prefix for your own code adjustments.
 
 ### Example
