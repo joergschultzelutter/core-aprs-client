@@ -641,7 +641,7 @@ def parse_bulletin_data(core_config: dict):
     aprs_bulletin_messages: dict = {}
 
     # Get the key and value from our configuration file's bulletin messages section
-    for key, value in core_config["bulletin_messages"].items():
+    for key, value in core_config["coac_bulletin_messages"].items():
         # Message populated and less than max APRS message length?
         # note: we do not use message enumeration for bulletins
         # therefore, the max length requirement is always fixed (67 bytes)
