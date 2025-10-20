@@ -209,11 +209,11 @@ client.send_apprise_message(
 |--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|
 | `msg_header`       | Apprise message header. Dependent on the selected messenger type, this field's value may get omitted.                                                                                                                                                                                             | `str`           |
 | `msg_body`         | Apprise message body (aka the message that you want to send to the messenger account(s)                                                                                                                                                                                                           | `str`           |
-| `msg_attachment`   | File name of an external file that is to be sent as attachment or `None` (default value) if no attachment is supposed to be used                                                                                                                                                                  | `str` or 'None' |
-| `apprise_cfg_file` | File name the [Apprise YAML Configuration File](https://github.com/caronc/apprise/wiki/config_yaml). If set to `None` (default value), the Apprise configuration file name is determined by the value from the framework configuration file's [`crash handler`](config_crash_handler.md) section. | `str` or 'None' |
+| `msg_attachment`   | File name of an external file that is to be sent as attachment or `None` (default value) if no attachment is supposed to be used                                                                                                                                                                  | `str` or `None` |
+| `apprise_cfg_file` | File name the [Apprise YAML Configuration File](https://github.com/caronc/apprise/wiki/config_yaml). If set to `None` (default value), the Apprise configuration file name is determined by the value from the framework configuration file's [`crash handler`](config_crash_handler.md) section. | `str` or `None` |
 
 
-> [!INFORMATION]
+> [!NOTE]
 > A missing `apprise_cfg_file` will NOT result in a program error. The missing file name will end up as notification in the program log file and you will receive a `success` value of `False`. You can still abort your code afterwards, if necessary.
 
 ### Return values
