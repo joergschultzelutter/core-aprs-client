@@ -392,10 +392,12 @@ class CoreAprsClient:
         The message body
 
         msg_attachment: str|None
-        The message attachment (as a reference to an external file name) OR 'None' for no attachment
+        Optional. The message attachment (as a reference to an external file name) or 'None' for no attachment
 
         apprise_cfg_file: str|None
-        Path to an Apprise config file. If set to 'None', use the framework's config file
+        Path to an Apprise config file. If set to 'None', we try to use the framework's config file, see
+        https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/configuration_subsections/config_crash_handler.md
+
 
         Returns
         =======

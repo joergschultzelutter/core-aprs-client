@@ -360,12 +360,12 @@ def generate_apprise_message(
 
     if not check_if_file_exists(apprise_config_file):
         logger.error(
-            msg=f"Apprise config file {apprise_config_file} does not exist; aborting"
+            msg=f"Apprise config file '{apprise_config_file}' does not exist; aborting"
         )
         return success
 
     if message_attachment and not check_if_file_exists(message_attachment):
-        logger.debug("Attachment file missing; disabling attachments")
+        logger.debug(msg="Attachment file missing; disabling attachments")
         message_attachment = None
 
     # Create the Apprise instance

@@ -8,7 +8,10 @@
 # an additional scheduler job for feeding additional bulletin data
 # to the APRS bulletin routines.
 #
-#
+# Class methods:
+# https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/coreaprsclient_class.md#dryrun_testcall-class-method
+# AND
+# https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/coreaprsclient_class.md#use-of-dynamic-content-for-aprs-bulletins-additional-to-static-bulletin-content
 #
 # !!!!!!
 # It is strongly recommended to run this program in 'simulated' mode

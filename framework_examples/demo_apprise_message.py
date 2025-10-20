@@ -1,12 +1,12 @@
 #
 # Core APRS Client
-# Sample APRS Client stub, using the core-aprs-client framework
-#
-# This demo client imports the input parser and output processor
-# functions and performs an offline processing of a given APRS message
+# Demo of the framework's Apprise messaging functions
 #
 # Demo of class method:
-# https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/coreaprsclient_class.md#dryrun_testcall-class-method
+# https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/configuration_subsections/config_crash_handler.md
+#
+# For further details on Apprise, please visit
+# https://www.github.com/caronc/apprise
 #
 # Author: Joerg Schultze-Lutter, 2025
 #
@@ -34,6 +34,7 @@ import argparse
 import os
 import sys
 import logging
+from pprint import pformat
 
 logging.basicConfig(
     level=logging.INFO,
@@ -76,8 +77,10 @@ def get_command_line_params():
 
 
 if __name__ == "__main__":
-    logger.info(msg=f"Starting demo module: dryrun")
-    logger.info(msg="This is a demo APRS client which performs an offline dry-run on a given APRS message/APRS callsign combination.")
+    logger.info(msg=f"Starting demo module: Apprise messaging")
+    logger.info(
+        msg="This is a demo APRS client which sends a fixed demo message via Apprise to 1..n messaging clients"
+    )
 
     # Get the configuration file name
     configfile = get_command_line_params()
@@ -96,7 +99,22 @@ if __name__ == "__main__":
         output_generator=generate_output_message,
     )
 
-    # The preconfigured example assumes that callsign "DF1JSL-1"
-    # has sent the APRS message text "lorem" to your bot.
+    # This sends a fixed test message to 1..n messenger
+    # clients via Apprise. By omitting the apprise_cfg_file
+    # value, we tell the framework to use the Apprise config
+    # file name from core-aprs-client's config file (see
+    # https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/configuration_subsections/config_crash_handler.md
+    # for further info. Alternatively, you can specify your very own
+    # Apprise configuration file name.
     #
-    client.dryrun_testcall(message_text="lorem", from_callsign="DF1JSL-1")
+    # Note that a missing Apprise config file will not result in an
+    # error but simply generates a log file error instead. By examining
+    # the given return code, you can still decide to abort your program
+    # afterwards, if necessary
+
+    client.send_apprise_message(
+        msg_header="Hello from Apprise",
+        msg_body="This is a demo message",
+        msg_attachment=None,
+        apprise_cfg_file=None,
+    )

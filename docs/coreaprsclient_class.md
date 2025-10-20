@@ -76,6 +76,14 @@ client = CoreAprsClient(
 # Activate the APRS client
 client.activate_client()
 ```
+### Parameters
+
+This method has no parameters
+
+### Return values
+
+This method has no return values
+
     
 ## `dryrun_testcall` class method
 
@@ -112,12 +120,16 @@ client = CoreAprsClient(
 client.dryrun_testcall(message_text="lorem", from_callsign="DF1JSL-1")
 ```
 
-### Parameter
+### Parameters
 
 | Field Name      | Description                                                    | Field Type |
 |-----------------|----------------------------------------------------------------|------------|
 | `message_text`  | The APRS message that we are supposed to process.              | `str`      |
 | `from_callsign` | Name of the callsign which has sent us the (simulated) message | `str`      |
+
+### Return values
+
+This method has no return values
 
 ### Sample output
 
@@ -148,8 +160,52 @@ This is the sample output for the `lorem` keyword from the [`demo_dryrun.py`](/f
 
 ## `send_apprise_message` class method
 
-lorem ipsum
+This is a wrapper for the [Apprise messaging](https://www.github.com/caronc/apprise) features. You can use this feature to send messages to messenger accounts. For example, [`mpad`](https://github.com/joergschultzelutter/mpad) uses this feature internally to alert you to errors during regular downloads of external files, in case one of the source URLs might have changed.
 
+Apprise code example:
+
+```python
+# This sends a fixed test message to 1..n messenger
+# clients via Apprise. By omitting the apprise_cfg_file
+# value, we tell the framework to use the Apprise config
+# file name from core-aprs-client's config file (see
+# https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/configuration_subsections/config_crash_handler.md
+# for further info. Alternatively, you can specify your very own
+# Apprise configuration file name.
+#
+# Note that a missing Apprise config file will not result in an
+# error but simply generates a log file error instead. By examining
+# the given return code, you can still decide to abort your program
+# afterwards, if necessary
+
+client.send_apprise_message(
+    msg_header="Hello from Apprise",
+    msg_body="This is a demo message",
+    msg_attachment=None,
+    apprise_cfg_file=None,
+)
+```
+
+### Parameters
+
+| Field Name         | Description                                                                                                                                                                                                                                                                                       | Field Type      |
+|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|
+| `msg_header`       | Apprise message header. Dependent on the selected messenger type, this field's value may get omitted.                                                                                                                                                                                             | `str`           |
+| `msg_body`         | Apprise message body (aka the message that you want to send to the messenger account(s)                                                                                                                                                                                                           | `str`           |
+| `msg_attachment`   | File name of an external file that is to be sent as attachment or `None` (default value) if no attachment is supposed to be used                                                                                                                                                                  | `str` or 'None' |
+| `apprise_cfg_file` | File name the [Apprise YAML Configuration File](https://github.com/caronc/apprise/wiki/config_yaml). If set to `None` (default value), the Apprise configuration file name is determined by the value from the framework configuration file's [`crash handler`](config_crash_handler.md) section. | `str` or 'None' |
+
+
+> [!INFORMATION]
+> A missing `apprise_cfg_file` will NOT result in a program error. The missing file name will end up as notification in the program log file and you will receive a `success` value of `False`. You can still abort your code afterwards, if necessary.
+
+### Return values
+
+| Field Name | Description                                                     | Field Type |
+|------------|-----------------------------------------------------------------|------------|
+| `success`  | `True` if message was sent to Apprise module, otherwise `False` | `bool`     |
+
+A `success` value of `True` describes the situation where the Apprise module has accepted the incoming message. It does not necessarily guarantee that the message was actually sent to the messenger recipient clients.
 
 ## `input_processor` return codes
 
