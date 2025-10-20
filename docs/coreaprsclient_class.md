@@ -2,6 +2,11 @@
 
 The `CoreAprsClient` class is responsible for the communication between the local APRS bot and [APRS-IS](https://aprs-is.net/). Additionally, it also provides a 'dry-run' function, allowing you to test your custom `input_parser`/`output_generator` code offline without any interaction with APRS-IS. 
 
+> [!TIP]
+> Examples of all class methods can be found in the [`framework_examples`](/framework_examples/README.md) directory
+
+
+
 Import the class via
 
 ```python
