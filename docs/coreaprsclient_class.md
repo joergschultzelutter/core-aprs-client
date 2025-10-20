@@ -186,6 +186,18 @@ client.send_apprise_message(
 )
 ```
 
+### Sample output
+
+```python
+2025-10-20 20:44:06,214 - demo_apprise_message -INFO - Starting demo module: Apprise messaging
+2025-10-20 20:44:06,214 - demo_apprise_message -INFO - This is a demo APRS client which sends a fixed demo message via Apprise to 1..n messaging clients
+2025-10-20 20:44:06,217 - CoreAprsClient -DEBUG - No apprise_cfg_file specified; using default from core-aprs-client's configuration file
+2025-10-20 20:44:06,217 - client_utils -DEBUG - Starting Apprise message processing
+2025-10-20 20:44:06,467 - base -INFO - Loaded 1 entries from file://apprise.yml?encoding=utf-8&cache=yes
+2025-10-20 20:44:06,693 - telegram -INFO - Sent Telegram notification.
+2025-10-20 20:44:06,694 - client_utils -DEBUG - Finished Apprise message processing
+```
+
 ### Parameters
 
 | Field Name         | Description                                                                                                                                                                                                                                                                                       | Field Type      |

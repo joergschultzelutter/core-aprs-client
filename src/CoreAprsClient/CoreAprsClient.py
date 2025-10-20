@@ -412,7 +412,7 @@ class CoreAprsClient:
         # will be taken care of by the message generator itself
         if not apprise_cfg_file:
             logger.debug(
-                msg="No apprise_cfg_file specified; using default from config file"
+                msg="No apprise_cfg_file specified; using default from core-aprs-client's configuration file"
             )
             with self._lock:
                 pgm_config = self._config_data
