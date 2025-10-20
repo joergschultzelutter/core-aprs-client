@@ -11,7 +11,7 @@
 > [!TIP]
 > If one (or both) of these settings point to an invalid file name, an empty value setting or use `NOT_CONFIGURED` as setting, then the crash handler gets deactivated.
 
-> [!INFORMATION]
+> [!NOTE]
 > `apprise_config_file` is a shared resource and is used by the class' [`send_apprise_message`](https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/coreaprsclient_class.md#send_apprise_message-class-method) function as a default for its Apprise config file. Note that the user _can_ overwrite these settings in the `send_apprise_message` function, thus making it possible to disable the crash handler and still enable Apprise messaging at the same time. 
 
 The respective section from `core-aprs-client`'s config file lists as follows:
