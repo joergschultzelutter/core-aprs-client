@@ -6,6 +6,9 @@
 # This demo client imports the input parser and output processor
 # functions and establishes a live connection to APRS-IS
 #
+# Demo of class method:
+# https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/coreaprsclient_class.md#activate_client-class-method
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3 of the License, or

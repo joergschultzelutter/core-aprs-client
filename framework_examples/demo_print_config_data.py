@@ -5,6 +5,9 @@
 # This demo client imports the input parser and output processor
 # functions and performs an offline processing of a given APRS message
 #
+# Demo of class method:
+# https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/coreaprsclient_class.md#accessing-the-programs-configuration-data
+#
 # Author: Joerg Schultze-Lutter, 2025
 #
 # This program is free software; you can redistribute it and/or modify

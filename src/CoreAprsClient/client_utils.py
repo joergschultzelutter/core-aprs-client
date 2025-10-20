@@ -320,12 +320,12 @@ def signal_term_handler(signal_number, frame):
     sys.exit(0)
 
 
-def send_apprise_message(
+def generate_apprise_message(
     message_header: str,
     message_body: str,
     apprise_config_file: str,
     message_attachment: str = None,
-):
+) -> bool:
     """
     Generates Apprise messages and triggers transmission to the user
     We will use this e.g. for post-mortem dumps in case the client is on the
@@ -360,12 +360,12 @@ def send_apprise_message(
 
     if not check_if_file_exists(apprise_config_file):
         logger.error(
-            msg=f"Apprise config file {apprise_config_file} does not exist; aborting"
+            msg=f"Apprise config file '{apprise_config_file}' does not exist; aborting"
         )
         return success
 
     if message_attachment and not check_if_file_exists(message_attachment):
-        logger.debug("Attachment file missing; disabling attachments")
+        logger.debug(msg="Attachment file missing; disabling attachments")
         message_attachment = None
 
     # Create the Apprise instance
@@ -713,9 +713,9 @@ def client_exception_handler():
     if log_file_name and check_if_file_exists(log_file_name):
         message_body = message_body + " (log file attached)"
 
-    # send_apprise_message will check again if the file exists or not
+    # generate_apprise_message will check again if the file exists or not
     # Therefore, we can skip any further detection steps here
-    send_apprise_message(
+    generate_apprise_message(
         message_header=f"'{client_name}' process has crashed",
         message_body=message_body,
         apprise_config_file=program_config["coac_crash_handler"]["apprise_config_file"],
