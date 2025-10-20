@@ -37,7 +37,7 @@ class CoreAprsClient:
 
 ### Supported class methods
 
-Currently, this class supports two methods:
+Currently, this class supports the following methods:
 - [`activate_client`](coreaprsclient_class.md#activate_client-class-method) connects to [APRS-IS](https://aprs-is.net/) and exchanges data with the APRS network
 - [`dryrun_testcall`](coreaprsclient_class.md#dryrun_testcall-class-method) can be used for offline testing. When triggered, it will run a simulated and freely configurable APRS input message through the `input_processor` code and, whereas applicable, uses the `output_generator` code in order to create the outgoing message content.
 
@@ -145,6 +145,11 @@ This is the sample output for the `lorem` keyword from the [`demo_dryrun.py`](/f
  'kasd gubergren, no sea takimata sanctus est Lorem ipsum     (10/11)',
  'dolor sit amet.                                             (11/11)']
 ```
+
+## `send_apprise_message` class method
+
+lorem ipsum
+
 
 ## `input_processor` return codes
 

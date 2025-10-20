@@ -40,6 +40,7 @@ from .client_utils import (
     check_for_default_config,
     finalize_pretty_aprs_messages,
     make_pretty_aprs_messages,
+    generate_apprise_message,
 )
 from .client_configuration import load_config, program_config
 from .client_aprsobject import APRSISObject
@@ -367,3 +368,57 @@ class CoreAprsClient:
     def config_data(self) -> Mapping[str, Any]:
         with self._lock:
             return self._config_data
+
+    def send_apprise_message(
+        self,
+        msg_header: str,
+        msg_body: str,
+        msg_attachment: str | None,
+        apprise_cfg_file: str | None,
+    ) -> bool:
+        """
+        This function is uses the utility function's Apprise messaging
+        code in order to send messages via Apprise. For the Apprise config file,
+        the user can either specify a separate file OR omits the file name; in that case,
+        core-aprs-client will take the Apprise config file name from the framework's config
+        file
+
+        Parameters
+        ==========
+        msg_header: str
+        The message header
+
+        msg_body: str
+        The message body
+
+        msg_attachment: str|None
+        The message attachment (as a reference to an external file name) OR 'None' for no attachment
+
+        apprise_cfg_file: str|None
+        Path to an Apprise config file. If set to 'None', use the framework's config file
+
+        Returns
+        =======
+        success: bool
+        The message was sent successfully
+        """
+
+        # Check if the user has provided us with an Apprise config file name
+        # If not, pick the one that we have in our configuration file
+        #
+        # Note that there is no need for us to check if the file exists or not: this part
+        # will be taken care of by the message generator itself
+        if not apprise_cfg_file:
+            logger.debug(
+                msg="No apprise_cfg_file specified; using default from config file"
+            )
+            with self._lock:
+                pgm_config = self._config_data
+            apprise_cfg_file = pgm_config["coac_crash_handler"]["apprise_config_file"]
+
+        return generate_apprise_message(
+            message_header=msg_header,
+            message_body=msg_body,
+            message_attachment=msg_attachment,
+            apprise_config_file=apprise_cfg_file,
+        )
