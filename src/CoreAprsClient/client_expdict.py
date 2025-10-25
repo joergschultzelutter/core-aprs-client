@@ -24,11 +24,6 @@
 from expiringdict import ExpiringDict
 from .client_logger import logger
 
-#
-# This is our (future) global variable for the expiring dictionary
-#
-aprs_message_cache: ExpiringDict = None
-
 
 # Helper method for creating our APRS message cache
 def create_expiring_dict(max_len: int, max_age_seconds: int):
@@ -45,8 +40,6 @@ def create_expiring_dict(max_len: int, max_age_seconds: int):
     Returns
     =======
     """
-
-    global aprs_message_cache
 
     # Create the decaying APRS message cache. Any APRS message that is present in
     # this cache will be considered as a duplicate / delayed and will not be processed

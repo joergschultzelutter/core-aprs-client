@@ -68,6 +68,28 @@ class CoreAprsClient:
         output_generator: Callable[..., Any],
         log_level: int = logging.INFO,
     ):
+        """
+        Class initialization
+
+        Parameters
+        ==========
+        config_file: str
+            'core-aprs-client's config file name, see
+            see https://github.com/joergschultzelutter/core-aprs-client/blob/master/docs/configuration.md
+        input_parser: Callable[..., Any]
+            Name of the user's input parser function, see
+            https://github.com/joergschultzelutter/core-aprs-client/blob/master/docs/framework_usage.md
+        output_generator: Callable[..., Any]
+            Name of the user's output generator function, see
+            https://github.com/joergschultzelutter/core-aprs-client/blob/master/docs/framework_usage.md
+        log_level: int
+            Log level from Python's 'logging' module
+            https://docs.python.org/3/library/logging.html#logging-levels
+
+        Returns
+        =======
+
+        """
         self.config_file = config_file
         self.input_parser = input_parser
         self.output_generator = output_generator
@@ -132,7 +154,7 @@ class CoreAprsClient:
             ],
         )
         if not success:
-            exit(0)
+            sys.exit(0)
 
         #
         # Read the message counter
@@ -396,8 +418,7 @@ class CoreAprsClient:
 
         apprise_cfg_file: str|None
         Path to an Apprise config file. If set to 'None', we try to use the framework's config file, see
-        https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/configuration_subsections/config_crash_handler.md
-
+        www.github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/configuration_subsections/config_crash_handler.md
 
         Returns
         =======
