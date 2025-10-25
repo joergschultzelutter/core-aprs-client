@@ -378,16 +378,52 @@ class CoreAprsClient:
 
     @property
     def dynamic_aprs_bulletins(self) -> Mapping[str, Any]:
+        """
+        'getter' for the dynamic aprs bulletins
+
+        Parameters
+        ==========
+
+        Returns
+        =======
+        dynamic_aprs_bulletins: Mapping[str, Any]
+            immutable copy of the dynamic aprs bulletins' 'dict' object
+        """
+
         with self._lock:
             return MappingProxyType(self._dynamic_aprs_bulletins)
 
     @dynamic_aprs_bulletins.setter
     def dynamic_aprs_bulletins(self, new_dict: Dict[str, Any]) -> None:
+        """
+        'setter' for the dynamic aprs bulletins
+
+        Parameters
+        ==========
+        new_dict: Mapping[str, Any]
+            dynamic aprs bulletins' 'dict' object, used as a foundation
+            for the class' dict object
+
+        Returns
+        =======
+
+        """
         with self._lock:
             self._dynamic_aprs_bulletins = copy.deepcopy(new_dict)
 
     @property
     def config_data(self) -> Mapping[str, Any]:
+        """
+        'getter' for the class' config data
+
+        Parameters
+        ==========
+
+        Returns
+        =======
+        config_data: Mapping[str, Any]
+            immutable copy of the class' config data 'dict' object
+        """
         with self._lock:
             return self._config_data
 
