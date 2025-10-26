@@ -39,7 +39,7 @@ CLASSIFIERS = [
     "Programming Language :: Python :: 3",
     "Topic :: Software Development",
     "Operating System :: OS Independent",
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
 ]
 INSTALL_REQUIRES = [
     "aprslib>=0.7.2",
