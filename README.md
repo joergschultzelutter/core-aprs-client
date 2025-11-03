@@ -67,3 +67,8 @@ If you want to learn about the bot's basic processing structure, then have a loo
 - You should at least know the APRS basics before you use this software. Acquaint yourself with [the official APRS documentation](https://github.com/wb2osz/aprsspec) and learn about [how APRS works](https://how.aprs.works/) in general. Additionally, have a look at the [APRS Foundation](https://www.aprsfoundation.org/)'s website.
 - You HAVE to assign your personal call sign to the bot.
 - You HAVE to [request your personal APRS TOCALL](https://github.com/aprsorg/aprs-deviceid) for using this bot __in production__. See the [APRS Device ID](https://github.com/aprsorg/aprs-deviceid/blob/main/ALLOCATING.md#development-phase) information section on proper usage.
+
+## The fine print
+
+- If you intend to host an instance of this program, you must be a licensed radio amateur. BYOP: Bring your own (APRS-IS) passcode. If you don't know what this is, then this program is not for you.
+- APRS is a registered trademark of APRS Software and Bob Bruninga, WB4APR.
