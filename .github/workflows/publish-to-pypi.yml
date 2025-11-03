@@ -151,10 +151,16 @@ jobs:
   # 
   # BEGIN of Job 2
   #
-  # This section will create the PyPi package and first deploy it to PyPi test.
-  # If successful, it will also try to issue a PyPi Prod deployment afterwards
+  # This section will create the PyPi package and deploy it to PyPi test.
+  # in case a pre-release was selected
   #
-  deploy-to-pypi:
+  # NOTE: When using PyPi's 'Trusted Publishing", one cannot use the same
+  # OIDC token for both Test and Prod - otherwise, error
+  # "Attestation generation failure: The following distributions already have publish attestations"
+  # will be thrown. See https://github.com/pypa/gh-action-pypi-publish/issues/319 for details
+  # This is the only reason for Test and Prod not sharing the same work flow
+  #
+  deploy-to-pypi-test:
     runs-on: ubuntu-latest
     environment: pypi
     needs: get-python-version-info
@@ -195,6 +201,55 @@ jobs:
         #password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         repository-url: https://test.pypi.org/legacy/
         
+  #
+  # END of Job 2
+  #
+  #
+  # BEGIN of Job 3
+  #
+  # This section will create the PyPi package and fdeploy it to PyPi Prod.
+  #
+  # NOTE: When using PyPi's 'Trusted Publishing", one cannot use the same
+  # OIDC token for both Test and Prod - otherwise, error
+  # "Attestation generation failure: The following distributions already have publish attestations"
+  # will be thrown. See https://github.com/pypa/gh-action-pypi-publish/issues/319 for details
+  # This is the only reason for Test and Prod not sharing the same work flow
+  #
+  deploy-to-pypi-prod:
+    runs-on: ubuntu-latest
+    environment: pypi
+    needs: [get-python-version-info, deploy-to-pypi-test]
+    permissions:
+      id-token: write
+
+    steps:
+
+    - uses: actions/checkout@v5
+    # Set up Python environment
+    - name: Set up Python
+      if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags') && !github.event.release.prerelease
+      uses: actions/setup-python@v6
+      with:
+        python-version: '${{ env.PYTHON_VERSION }}'
+
+    # Install all dependencies
+    - name: Install dependencies
+      if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags') && !github.event.release.prerelease
+      run: |
+        python -m pip install --upgrade pip
+        pip install build
+
+    # Export the program version; content will be picked up by the setup.py script
+    - name: Export program version
+      if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags') && !github.event.release.prerelease
+      run: echo GITHUB_PROGRAM_VERSION='${{ needs.get-python-version-info.outputs.my-program-version }}' >> $GITHUB_ENV
+
+    # Build the package. The export MUST be part of THIS step
+    # Otherwise, the Python setup job will not see this information
+    - name: Build package
+      if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags') && !github.event.release.prerelease
+      run: python -m build
+
     # Publish everything to Prod PyPi but only if it is not a prerelease
     - name: Publish package to Prod PyPi
       if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags') && !github.event.release.prerelease
@@ -203,5 +258,4 @@ jobs:
         #user: __token__
         #password: ${{ secrets.PROD_PYPI_API_TOKEN }}
   #
-  # END of Job 2
-  #
+  # END of Job 3
