@@ -84,6 +84,7 @@ jobs:
   # to next Github Actions job in line.
   get-python-version-info:
     runs-on: ubuntu-latest
+    environment: pypi
     permissions: write-all
 
     # Output which is passed to the PyPi publication job
@@ -155,7 +156,10 @@ jobs:
   #
   deploy-to-pypi:
     runs-on: ubuntu-latest
+    environment: pypi
     needs: get-python-version-info
+    permissions:
+      id-token: write
 
     steps:
 
@@ -187,17 +191,17 @@ jobs:
       if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags')
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        user: __token__
-        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        #user: __token__
+        #password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         repository-url: https://test.pypi.org/legacy/
         
     # Publish everything to Prod PyPi but only if it is not a prerelease
     - name: Publish package to Prod PyPi
       if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags') && !github.event.release.prerelease
       uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.PROD_PYPI_API_TOKEN }}
+      #with:
+        #user: __token__
+        #password: ${{ secrets.PROD_PYPI_API_TOKEN }}
   #
   # END of Job 2
   #
