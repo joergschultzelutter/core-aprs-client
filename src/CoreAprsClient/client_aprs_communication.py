@@ -377,7 +377,10 @@ def send_bulletin_messages(
 # Extract the fields from the APRS message, start the parsing process,
 # execute the command and send the command output back to the user
 def aprs_callback(
-    raw_aprs_packet: dict, parser: types.FunctionType, generator: types.FunctionType
+    raw_aprs_packet: dict,
+    parser: types.FunctionType,
+    generator: types.FunctionType,
+    **kwargs,
 ):
     """
     aprslib callback; this is the core process that takes care of everything
@@ -484,6 +487,7 @@ def aprs_callback(
                 retcode, input_parser_error_message, response_parameters = parser(
                     aprs_message=message_text_string,
                     from_callsign=from_callsign,
+                    **kwargs,
                 )
                 logger.debug(msg=f"Input parser result: {retcode}")
                 logger.debug(msg=response_parameters)
@@ -534,7 +538,7 @@ def aprs_callback(
                         # Note: we call the function which was passed along with the
                         # callback object
                         success, output_string = generator(
-                            input_parser_response_object=response_parameters
+                            input_parser_response_object=response_parameters, **kwargs
                         )
                         if success:
                             output_message = make_pretty_aprs_messages(

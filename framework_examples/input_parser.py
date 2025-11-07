@@ -25,7 +25,7 @@
 from CoreAprsClient import CoreAprsClientInputParserStatus
 
 
-def parse_input_message(aprs_message: str, from_callsign: str):
+def parse_input_message(aprs_message: str, from_callsign: str, **kwargs):
     """
     This is a stub for your custom APRS input parser.
 

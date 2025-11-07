@@ -111,7 +111,7 @@ def __process_loremipsum_keyword(data_parameters: dict):
     return success, output_message
 
 
-def generate_output_message(input_parser_response_object: dict | object):
+def generate_output_message(input_parser_response_object: dict | object, **kwargs):
     """
     This is a stub for your custom APRS output generator
 

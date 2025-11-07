@@ -121,7 +121,7 @@ class CoreAprsClient:
         # Update the log level (if needed)
         update_logging_level(logging_level=self.log_level)
 
-    def activate_client(self):
+    def activate_client(self, **kwargs):
         """
         This function is responsible for setting up the communication
         with APRS-IS. It reads the configuration file and establishes
@@ -218,6 +218,7 @@ class CoreAprsClient:
                         aprs_callback,
                         parser=self.input_parser,
                         generator=self.output_generator,
+                        **kwargs,
                     )
 
                     #
@@ -270,7 +271,7 @@ class CoreAprsClient:
             if client_shared.AIS.ais_is_connected():
                 client_shared.AIS.ais_close()
 
-    def dryrun_testcall(self, message_text: str, from_callsign: str):
+    def dryrun_testcall(self, message_text: str, from_callsign: str, **kwargs):
         """
         This function can be used for 100% offline testing. It does trigger
         the standard input parser and output generator.
@@ -307,7 +308,7 @@ class CoreAprsClient:
         )
 
         retcode, input_parser_error_message, response_parameters = self.input_parser(
-            aprs_message=message_text, from_callsign=from_callsign
+            aprs_message=message_text, from_callsign=from_callsign, **kwargs
         )
 
         logger.info(msg="Parsed message:")
@@ -320,7 +321,7 @@ class CoreAprsClient:
 
                 # (Try to) build the outgoing message string
                 success, output_message_string = self.output_generator(
-                    input_parser_response_object=response_parameters
+                    input_parser_response_object=response_parameters, **kwargs
                 )
                 logger.info(msg=f"Output Processor response={success}, message:")
                 logger.info(msg=output_message_string)
