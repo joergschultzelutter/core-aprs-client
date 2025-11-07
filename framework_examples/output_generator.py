@@ -126,6 +126,8 @@ def generate_output_message(input_parser_response_object: dict | object, **kwarg
         Note that you can also return other objects such as classes. Just ensure that
         both input_parser and output_generator share the very same
         structure for this variable.
+    **kwargs: dict
+        Optional keyword arguments
 
     Returns
     =======

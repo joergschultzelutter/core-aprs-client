@@ -392,6 +392,10 @@ def aprs_callback(
         input parser function
     generator: types.FunctionType
         output generator function
+    **kwargs: dict
+        Potential user-defined parameters; will get passed along to
+        both input parser and output generator
+
     Returns
     =======
     """

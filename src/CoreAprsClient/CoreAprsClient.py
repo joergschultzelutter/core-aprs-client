@@ -130,6 +130,9 @@ class CoreAprsClient:
 
         Parameters
         ==========
+        **kwargs: dict
+            Potential user-defined parameters; will get passed along to
+            both input parser and output generator
 
         Returns
         =======
@@ -282,6 +285,9 @@ class CoreAprsClient:
             The (simulated) APRS input message; sent to us by "from_callsign"
         from_callsign: str
             The callsign that the message was sent from
+        **kwargs: dict
+            Potential user-defined parameters; will get passed along to
+            both input parser and output generator
 
         Returns
         =======

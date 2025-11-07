@@ -78,12 +78,20 @@ client = CoreAprsClient(
     output_generator=generate_output_message,
 )
 
-# Activate the APRS client
+# Activate the APRS client without additional user data (default)
 client.activate_client()
+
+# Activate the APRS client with additional user parameters
+#client.activate_client(hello="world", lorem="ipsum")
 ```
 ### Parameters
 
-This method has no parameters
+| Field name      | Content                                                            | Field Type |
+|-----------------|--------------------------------------------------------------------|------------|
+| `**kwargs`      | Optional user-defined parameters                                   | `dict`     |
+
+Any `**kwargs` arguments will get passed along to both `input_parser` and `output_generator`.
+
 
 ### Return values
 
@@ -121,8 +129,11 @@ client = CoreAprsClient(
     output_generator=generate_output_message,
 )
 
-# Activate the dryrun call
+# Activate the dryrun call witout additional user data (default)
 client.dryrun_testcall(message_text="lorem", from_callsign="DF1JSL-1")
+
+# Activate the dryrun testcall with additional user data
+#client.dryrun_testcall(message_text="lorem", from_callsign="DF1JSL-1", hello="world", lorem="ipsum")
 ```
 
 ### Parameters
@@ -131,6 +142,10 @@ client.dryrun_testcall(message_text="lorem", from_callsign="DF1JSL-1")
 |-----------------|----------------------------------------------------------------|------------|
 | `message_text`  | The APRS message that we are supposed to process.              | `str`      |
 | `from_callsign` | Name of the callsign which has sent us the (simulated) message | `str`      |
+| `**kwargs`      | Optional user-defined parameters                               | `dict`     |
+
+Any `**kwargs` arguments will get passed along to both `input_parser` and `output_generator`.
+
 
 ### Return values
 
@@ -276,7 +291,7 @@ Valid values:
 ```python
 from CoreAprsClient import CoreAprsClientInputParserStatus
 
-def parse_input_message(aprs_message: str, from_callsign: str):
+def parse_input_message(aprs_message: str, from_callsign: str, **kwargs):
     ....
     do some processing
     input_parser_response_object = {"key" : "value"}

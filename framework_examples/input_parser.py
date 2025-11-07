@@ -39,6 +39,8 @@ def parse_input_message(aprs_message: str, from_callsign: str, **kwargs):
         Ham radio callsign that sent the message to us.
         Might be required by the input processor e.g. in case you
         have to determine the from_callsign's latitude/longitude.
+    **kwargs: dict
+        Optional keyword arguments
 
     Returns
     =======
