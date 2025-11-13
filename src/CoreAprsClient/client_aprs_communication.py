@@ -38,6 +38,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers import base as apbase
 import copy
 import re
+from collections.abc import Callable
+from typing import Any
 
 APRS_MSG_LEN_NOTRAILING = 67
 
@@ -378,8 +380,9 @@ def send_bulletin_messages(
 # execute the command and send the command output back to the user
 def aprs_callback(
     raw_aprs_packet: dict,
-    parser: types.FunctionType,
-    generator: types.FunctionType,
+    parser: Callable[..., Any],
+    generator: Callable[..., Any],
+    postproc: Callable[..., Any] | None,
     **kwargs,
 ):
     """
@@ -388,10 +391,12 @@ def aprs_callback(
     ==========
     raw_aprs_packet: dict
         dict object, containing the raw APRS data
-    parser: types.FunctionType
+    parser: Callable[..., Any]
         input parser function
-    generator: types.FunctionType
+    generator: Callable[..., Any]
         output generator function
+    postproc: Callable[..., Any] | None
+        optional postprocessing function
     **kwargs: dict
         Potential user-defined parameters; will get passed along to
         both input parser and output generator
@@ -499,6 +504,13 @@ def aprs_callback(
                 # this is our future output message object
                 output_message = []
 
+                # this is our potential postprocessor input object
+                # If its future value is not 'None' AND a post processor has been
+                # set up for the class' object instance, then we try to run the
+                # given post processor AFTER the output processor's message has been sent
+                # to the user via APRS
+                postproc_data = None
+
                 #
                 # parsing successful?
                 #
@@ -541,7 +553,7 @@ def aprs_callback(
                         #
                         # Note: we call the function which was passed along with the
                         # callback object
-                        success, output_string = generator(
+                        success, output_string, postproc_data = generator(
                             input_parser_response_object=response_parameters, **kwargs
                         )
                         if success:
@@ -626,6 +638,13 @@ def aprs_callback(
                     target_callsign=from_callsign,
                     aprs_cache=client_shared.aprs_message_cache,
                 )
+
+                # Finally, execute the post processor function but ONLY if the user has
+                # forwarded a function to us AND we have received some postprocessor-specific
+                # input from the output generator function - which indicates to us that the
+                # user actually wants us to to that postprocessor step
+                if postproc_data and postproc:
+                    _ = postproc(postprocessor_input_object=postproc_data, **kwargs)
 
 
 def init_scheduler_jobs(class_instance: object):

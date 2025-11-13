@@ -45,6 +45,13 @@ def __process_greetme_keyword(data_parameters: dict):
         True if everything is fine, False otherwise.
     output_message: str
         The output message that we want to return to the user.
+    postprocessor_input_object: object | None
+        'None' if no post-processor is supposed to be triggered
+        Otherwise, use this parameter for transporting data structures
+        to your custom post-processor code. Note that in order to get
+        triggered, a) the post-processor code function needs to be supplied
+        to the instantiated class object AND b) postprocessor_input_object
+        must not be 'None'
     """
 
     # generate the output message
@@ -53,7 +60,7 @@ def __process_greetme_keyword(data_parameters: dict):
     # Finally, indicate to the main process that we were successful
     success = True
 
-    return success, output_message
+    return success, output_message, None
 
 
 def __process_sayhello_keyword(data_parameters: dict):
@@ -73,6 +80,13 @@ def __process_sayhello_keyword(data_parameters: dict):
         True if everything is fine, False otherwise.
     output_message: str
         The output message that we want to return to the user.
+    postprocessor_input_object: object | None
+        'None' if no post-processor is supposed to be triggered
+        Otherwise, use this parameter for transporting data structures
+        to your custom post-processor code. Note that in order to get
+        triggered, a) the post-processor code function needs to be supplied
+        to the instantiated class object AND b) postprocessor_input_object
+        must not be 'None'
     """
     # generate the output message
     output_message = "Hello World"
@@ -80,7 +94,53 @@ def __process_sayhello_keyword(data_parameters: dict):
     # Finally, indicate to the main process that we were successful
     success = True
 
-    return success, output_message
+    return success, output_message, None
+
+
+def __process_postproc_keyword(data_parameters: dict):
+    """
+    This is a stub which generates a static "Hello World" message AND
+    performs a post-processing command AFTER
+
+    Parameters
+    ==========
+    data_parameters: dict
+        dictionary object, containing data from input_parser.py
+        as received by this module's generate_output_message function.
+        (not used in this function)
+
+    Returns
+    =======
+    success: bool
+        True if everything is fine, False otherwise.
+    output_message: str
+        The output message that we want to return to the user.
+    postprocessor_input_object: object | None
+        'None' if no post-processor is supposed to be triggered
+        Otherwise, use this parameter for transporting data structures
+        to your custom post-processor code. Note that in order to get
+        triggered, a) the post-processor code function needs to be supplied
+        to the instantiated class object AND b) postprocessor_input_object
+        must not be 'None'
+        For the framework examples, this stub deliberately uses a simple
+        dictionary for passing data from the output generator to the post
+        processor. One could use a more complex dict object (just like the one used
+        by input processor and output generator) - or a simple string. Again, what
+        you want to use is up to you, the developer.
+    """
+    # generate the output message
+    output_message = "Before Post Processing"
+
+    # Finally, indicate to the main process that we were successful
+    success = True
+
+    # By returning a data scructure that is (obviously) not 'None', we tell
+    # core-aprs-client that we want to have this data forwarded to the postprocessor.
+    # If the user has selected such a post processor as part of the class' instantiation,
+    # that post processor along with this given data will get triggered.
+    postprocessor_input_object = {"post_processing_action": "After Post Processing"}
+
+    return success, output_message, postprocessor_input_object
 
 
 def __process_loremipsum_keyword(data_parameters: dict):
@@ -102,13 +162,20 @@ def __process_loremipsum_keyword(data_parameters: dict):
         True if everything is fine, False otherwise.
     output_message: str
         The output message that we want to return to the user.
+    postprocessor_input_object: object | None
+        'None' if no post-processor is supposed to be triggered
+        Otherwise, use this parameter for transporting data structures
+        to your custom post-processor code. Note that in order to get
+        triggered, a) the post-processor code function needs to be supplied
+        to the instantiated class object AND b) postprocessor_input_object
+        must not be 'None'
     """
     output_message = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
 
     # Finally, indicate to the main process that we were successful
     success = True
 
-    return success, output_message
+    return success, output_message, None
 
 
 def generate_output_message(input_parser_response_object: dict | object, **kwargs):
@@ -138,6 +205,13 @@ def generate_output_message(input_parser_response_object: dict | object, **kwarg
         return code will suffice.
     output_message: str
         The output message that we want to return to the user.
+    postprocessor_input_object: object | None
+        'None' if no post-processor is supposed to be triggered
+        Otherwise, use this parameter for transporting data structures
+        to your custom post-processor code. Note that in order to get
+        triggered, a) the post-processor code function needs to be supplied
+        to the instantiated class object AND b) postprocessor_input_object
+        must not be 'None'
     """
 
     # This output generator stub is capable of processing two
@@ -172,6 +246,10 @@ def generate_output_message(input_parser_response_object: dict | object, **kwarg
             return __process_loremipsum_keyword(
                 data_parameters=input_parser_response_object
             )
+        case "postproc":
+            return __process_postproc_keyword(
+                data_parameters=input_parser_response_object
+            )
         case _:
             # Unless properly parsed via input processor, we should never reach this code
             # If we do, then there is a discrepancy between the input_processor's "command_code"
@@ -179,7 +257,7 @@ def generate_output_message(input_parser_response_object: dict | object, **kwarg
             # If such a case should ever arise, core_aprs_client's callback function will simply
             # respond to the user's request with the default error message from the config file
             # --> program_config["client_config"]["aprs_input_parser_default_error_message"]
-            return False, None
+            return False, None, None
 
 
 if __name__ == "__main__":

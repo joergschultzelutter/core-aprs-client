@@ -119,6 +119,9 @@ def parse_input_message(aprs_message: str, from_callsign: str, **kwargs):
         # We found a valid command
         command_code = "loremipsum"
         success = True
+    if "postprocessor" in aprs_message:
+        command_code = "postproc"
+        success = True
     if "error" in aprs_message:
         # Simulate that we did NOT find a valid command
         # Instead of using a default error message, we will use the
