@@ -21,12 +21,14 @@ class CoreAprsClient:
     log_level: int
     input_parser: Callable[..., Any]
     output_generator: Callable[..., Any]
+    post_processor: Callable[..., Any] | None
 
     def __init__(
         self,
         config_file: str,
         input_parser: Callable[..., Any],
         output_generator: Callable[..., Any],
+        post_processor: Callable[..., Any] | None = None,
         log_level: int = logging.INFO,
     ):
 ```
@@ -38,6 +40,7 @@ class CoreAprsClient:
 | `config_file`      | `core_aprs_client`'s configuration file; see [this documentation section](configuration.md)                                                                                                                                                     | `str`      |
 | `input_parser`     | Function name of the external input processor which parses incoming APRS messages and tries to figure out what the user wants us to do.                                                                                                         | `Callable` |
 | `output_generator` | Function name of the external output generator. Based on the `input_parser`'s feedback, this code is responsible for generating the output message - which will then be transformed by the `core-aprs-client` framework into 1..n APRS messages | `Callable` |
+| `post_processor`   | Optional. Function name of an external post processing function. Triggered by `output_generator` providing post-processing data to the framework. Executed _after_ the APRS response has been sent to the user.                                 | `Callable` |
 | `log_level`        | Log level from Python's `logging` function. Default value: `logging.INFO`                                                                                                                                                                       | `enum`     |
 
 ### Supported class methods
@@ -47,9 +50,10 @@ Currently, this class supports the following methods:
 - [`dryrun_testcall`](coreaprsclient_class.md#dryrun_testcall-class-method) can be used for offline testing. When triggered, it will run a simulated and freely configurable APRS input message through the `input_processor` code and, whereas applicable, uses the `output_generator` code in order to create the outgoing message content.
 
 Additionally, a [set of specific return codes](coreaprsclient_class.md#input_processor-return-codes) have to be imported by the `input_parser` function. Finally, an optional `dict` attribute allows users to send additional dynamic APRS bulletins in addition to the statically configured bulletins. A 'getter' method allows you to retrieve the (immutable) `dict` object of the class' configuration file data, thus allowing you to store your specific configuration file content in `core-aprs-client`'s config file. 
+
 ### Your responsibilities 
 
-You are responsible for designing the functions associated with the `input_parser` and `output_generator` parameters. Check the [Framework Usage](framework_usage.md) help pages for further details. 
+You are responsible for designing the functions associated with the `input_parser` and `output_generator` parameters (plus `post_processor` in case post processing code is required). Check the [Framework Usage](framework_usage.md) help pages for further details. 
 
 ## `activate_client` class method
 
@@ -90,8 +94,7 @@ client.activate_client()
 |-----------------|--------------------------------------------------------------------|------------|
 | `**kwargs`      | Optional user-defined parameters                                   | `dict`     |
 
-Any `**kwargs` arguments will get passed along to both `input_parser` and `output_generator`.
-
+Any `**kwargs` arguments will get passed along to both `input_parser` and `output_generator` (and `post_processor` if a custom post processor has been provided by the user).
 
 ### Return values
 
