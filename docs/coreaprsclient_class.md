@@ -503,7 +503,7 @@ print (pformat(client.config_data))
 
 ## Using the post processor
 
-> [!INFORMATION]
+> [!NOTE]
 > The use of the post processor is optional. You can use this function for cases where actions still need to be performed after the APRS reply message has been sent to the user.
 
 Using the post processor requires two settings:
