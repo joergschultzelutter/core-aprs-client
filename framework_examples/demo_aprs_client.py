@@ -68,7 +68,7 @@ def get_command_line_params():
     cfg = args.configfile.name
 
     if not os.path.isfile(cfg):
-        print("Config file does not exist; exiting")
+        logger.error(msg=f"Config file '{cfg}' does not exist; exiting")
         sys.exit(0)
 
     return cfg

@@ -69,7 +69,7 @@ def get_command_line_params():
     cfg = args.configfile.name
 
     if not os.path.isfile(cfg):
-        print("Config file does not exist; exiting")
+        logger.error(msg=f"Config file '{cfg}' does not exist; exiting")
         sys.exit(0)
 
     return cfg
@@ -77,7 +77,9 @@ def get_command_line_params():
 
 if __name__ == "__main__":
     logger.info(msg=f"Starting demo module: dryrun")
-    logger.info(msg="This is a demo APRS client which performs an offline dry-run on a given APRS message/APRS callsign combination.")
+    logger.info(
+        msg="This is a demo APRS client which performs an offline dry-run on a given APRS message/APRS callsign combination."
+    )
 
     # Get the configuration file name
     configfile = get_command_line_params()
