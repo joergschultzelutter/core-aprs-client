@@ -31,7 +31,7 @@ Brief overview of `core-aprs-client` repository's source files.
 
 ## Python package modules
 
-Location: `~/src/CoreAprsClient`
+Location: [`~/src/CoreAprsClient`](/src/CoreAprsClient)
 
 | File Name                                                                              | Usage                                                                                                                                                                                                                             |
 |----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -49,9 +49,9 @@ Location: `~/src/CoreAprsClient`
 
 ## Configuration files 
 
-Location: `~/framework_examples`
+Location: [`~/framework_examples`](/framework_examples)
 
->[!NOTE]
+>[!WARNING]
 >Although most of these configuration files are provided with predefined default content, you do need to modify these files.
 
 | File Name                                                                            | Usage                                                                                                                                                                                                                                                         |
@@ -61,7 +61,7 @@ Location: `~/framework_examples`
 
 ## User files
 
-Location: `~/framework_examples`
+Location: [`~/framework_examples`](/framework_examples)
 
 >[!NOTE]
 >These files are stubs which will help you to understand how `core-aprs-client` works. For production use, you need to modify these files.
