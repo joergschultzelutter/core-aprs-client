@@ -104,4 +104,4 @@ if __name__ == "__main__":
     # The preconfigured example assumes that callsign "DF1JSL-1"
     # has sent the APRS message text "postproc" to your bot.
     #
-    client.dryrun_testcall(message_text="postproc", from_callsign="DF1JSL-1")
+    client.dryrun_testcall(message_text="postprocessor", from_callsign="DF1JSL-1")

@@ -380,6 +380,7 @@ def send_bulletin_messages(
 # execute the command and send the command output back to the user
 def aprs_callback(
     raw_aprs_packet: dict,
+    clsobj: object,
     parser: Callable[..., Any],
     generator: Callable[..., Any],
     postproc: Callable[..., Any] | None,

@@ -225,6 +225,7 @@ class CoreAprsClient:
                     # create the partial object for our callback
                     enhanced_callback = partial(
                         aprs_callback,
+                        clsobj=self,
                         parser=self.input_parser,
                         generator=self.output_generator,
                         postproc=self.post_processor,
