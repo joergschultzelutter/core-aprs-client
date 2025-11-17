@@ -103,7 +103,7 @@ This method has no return values
     
 ## `dryrun_testcall` class method
 
-Sample_code: [`demo_dryrun.py`](/framework_examples/demo_dryrun.py)
+Sample_code: [`demo_dryrun.py`](/framework_examples/demo_dryrun.py) (plain testcall) and [`demo_dryrun_with_postprocessor.py`](/framework_examples/demo_dryrun_with_postprocessor.py). For details on how post-processing works, see [this documentation](/postproc/docs/coreaprsclient_class.md#using-the-post-processor)
 
 This class method can be used for offline testing. There will be no data exchange between [APRS-IS](https://aprs-is.net/) and the bot.
 
@@ -502,6 +502,8 @@ print (pformat(client.config_data))
 ```
 
 ## Using the post processor
+
+Sample code: [`demo_aprs_client_with_postprocessor.py`](/framework_examples/demo_aprs_client_with_postprocessor.py) and [`demo_dryrun_with_postprocessor.py`](/framework_examples/demo_dryrun_with_postprocessor.py) 
 
 > [!NOTE]
 > The use of the post processor is optional. You can use this function for use cases where actions still need to be performed _after_ the APRS reply message has been sent to the user.

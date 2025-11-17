@@ -76,7 +76,10 @@ def parse_input_message(
     # Command #3 - "lorem" keyword
     #              Sends a really long "lorem ipsum" string to the user
     #              Internal command code = "loremipsum"
-    # Command #4 - "error" keyword
+    # Command #4 - "postprocessor" keyword
+    #              Demonstrate core-aprs-client's post-processor functionalities
+    #              internal command code = "postproc"
+    # Command #5 - "error" keyword
     #              Simulates an error (e.g. missing keyword parameter)
     #              Internal command code = "sayhello"
     #
@@ -124,6 +127,13 @@ def parse_input_message(
         command_code = "loremipsum"
         success = True
     if "postprocessor" in aprs_message:
+        # we found a valid command
+        #
+        # NOTE: in order to run post-processor code, you have to
+        # a) assign a custom post processor to your code
+        # b) have the output generator to provide content that is
+        #    to be transferred to your post-processor code
+        # example: /framework_examples/demo_dryrun_with_postprocessor.py
         command_code = "postproc"
         success = True
     if "error" in aprs_message:

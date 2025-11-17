@@ -76,7 +76,9 @@ def get_command_line_params():
 
 if __name__ == "__main__":
     logger.info(msg=f"Starting demo module: APRS bot")
-    logger.info(msg="This is a demo APRS client which connects to APRS-IS")
+    logger.info(
+        msg="This is a demo APRS client which connects to APRS-IS, listens to messages and processes them."
+    )
 
     # Get the configuration file name
     configfile = get_command_line_params()

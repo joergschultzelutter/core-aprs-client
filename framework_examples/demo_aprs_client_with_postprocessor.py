@@ -1,18 +1,19 @@
 #
 # Core APRS Client
 # Sample APRS Client stub, using the core-aprs-client framework
+# Author: Joerg Schultze-Lutter, 2025
 #
 # This demo client imports the input parser and output processor
-# functions and performs an offline processing of a given APRS message
+# functions and establishes a live connection to APRS-IS. Additionally,
+# post-processing code gets executed AFTER the APRS response was sent to
+# the user. The post-processing code will ONLY get executed if the user
+# sends the "postprocessor" command to the core-aprs-client instance
 #
 # Demo of class method:
-# https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/coreaprsclient_class.md#dryrun_testcall-class-method
-# Same as demo_dryrun.py, but with active postprocessor
+# https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/coreaprsclient_class.md#activate_client-class-method
 #
-# Details on how post-processing works:
+# Details on post-processing:
 # https://github.com/joergschultzelutter/core-aprs-client/blob/postproc/docs/coreaprsclient_class.md#using-the-post-processor
-#
-# Author: Joerg Schultze-Lutter, 2025
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -83,9 +84,9 @@ def get_command_line_params():
 
 
 if __name__ == "__main__":
-    logger.info(msg=f"Starting demo module: dryrun with post-processor")
+    logger.info(msg=f"Starting demo module: APRS bot with post processor")
     logger.info(
-        msg="This is a demo APRS client which performs an offline dry-run on a given APRS message/APRS callsign combination."
+        msg="This is a demo APRS client which connects to APRS-IS, processes the incoming message, sends a response back to the client and finally executes post-processing code."
     )
 
     # Get the configuration file name
@@ -97,6 +98,13 @@ if __name__ == "__main__":
     # - configuration file name
     # - log level (from Python's 'logging' package)
     # - function names for both input processor and output generator
+    # - function name for the post processor
+    #
+    # Note: in order to trigger the post-processor, send the APRS message
+    #       "postprocessor" to your core-aprs-client instance. This will tell
+    #       the output generator to provide input data for the post processor
+    #       which will then trigger the post-processing AFTER the APRS response
+    #       has been sent back to the user
     #
     client = CoreAprsClient(
         config_file=configfile,
@@ -106,11 +114,5 @@ if __name__ == "__main__":
         post_processor=post_processing,
     )
 
-    # The preconfigured example assumes that callsign "DF1JSL-1"
-    # has sent the APRS message text "postprocessor" to your bot.
-    # If you send any other APRS message, the input processor/output generator
-    # stub code will not create post-processing input data, thus effectively
-    # disabling the post-processing code. Details:
-    # https://github.com/joergschultzelutter/core-aprs-client/blob/postproc/docs/coreaprsclient_class.md#using-the-post-processor
-    #
-    client.dryrun_testcall(message_text="postprocessor", from_callsign="DF1JSL-1")
+    # Activate the APRS client and connect to APRS-IS
+    client.activate_client()
