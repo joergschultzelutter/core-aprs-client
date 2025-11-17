@@ -225,7 +225,7 @@ class CoreAprsClient:
                     # create the partial object for our callback
                     enhanced_callback = partial(
                         aprs_callback,
-                        clsobj=self,
+                        instance=self,
                         parser=self.input_parser,
                         generator=self.output_generator,
                         postproc=self.post_processor,
@@ -322,7 +322,7 @@ class CoreAprsClient:
         )
 
         retcode, input_parser_error_message, response_parameters = self.input_parser(
-            clsobj=self,
+            instance=self,
             aprs_message=message_text,
             from_callsign=from_callsign,
             **kwargs,
@@ -345,7 +345,7 @@ class CoreAprsClient:
 
                 # (Try to) build the outgoing message string
                 success, output_message_string, postproc_data = self.output_generator(
-                    clsobj=self,
+                    instance=self,
                     input_parser_response_object=response_parameters,
                     **kwargs,
                 )
@@ -381,7 +381,9 @@ class CoreAprsClient:
                 if self.post_processor and postproc_data:
                     logger.debug(msg="Activating postprocessor...")
                     success = self.post_processor(
-                        clsobj=self, postprocessor_input_object=postproc_data, **kwargs
+                        instance=self,
+                        postprocessor_input_object=postproc_data,
+                        **kwargs,
                     )
                     logger.debug(msg=f"postprocessor response='{success}'")
 

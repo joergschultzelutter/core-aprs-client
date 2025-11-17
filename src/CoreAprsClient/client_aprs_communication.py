@@ -380,7 +380,7 @@ def send_bulletin_messages(
 # execute the command and send the command output back to the user
 def aprs_callback(
     raw_aprs_packet: dict,
-    clsobj: object,
+    instance: object,
     parser: Callable[..., Any],
     generator: Callable[..., Any],
     postproc: Callable[..., Any] | None,
@@ -392,6 +392,7 @@ def aprs_callback(
     ==========
     raw_aprs_packet: dict
         dict object, containing the raw APRS data
+
     parser: Callable[..., Any]
         input parser function
     generator: Callable[..., Any]
@@ -495,7 +496,7 @@ def aprs_callback(
                 # Note: we call the function which was passed along with the
                 # callback object
                 retcode, input_parser_error_message, response_parameters = parser(
-                    clsobj=clsobj,
+                    instance=instance,
                     aprs_message=message_text_string,
                     from_callsign=from_callsign,
                     **kwargs,
@@ -556,7 +557,7 @@ def aprs_callback(
                         # Note: we call the function which was passed along with the
                         # callback object
                         success, output_string, postproc_data = generator(
-                            clsobj=clsobj,
+                            instance=instance,
                             input_parser_response_object=response_parameters,
                             **kwargs,
                         )
@@ -649,7 +650,7 @@ def aprs_callback(
                 # user actually wants us to to that postprocessor step
                 if postproc_data and postproc:
                     _ = postproc(
-                        clsobj=clsobj,
+                        instance=instance,
                         postprocessor_input_object=postproc_data,
                         **kwargs,
                     )

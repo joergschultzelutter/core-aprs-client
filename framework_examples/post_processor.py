@@ -32,7 +32,7 @@ from pprint import pformat
 
 
 def post_processing(
-    clsobj: CoreAprsClient, postprocessor_input_object: dict | object, **kwargs
+    instance: CoreAprsClient, postprocessor_input_object: dict | object, **kwargs
 ):
     """
     This is a stub for your custom APRS post processor code.
@@ -60,10 +60,9 @@ def post_processing(
     """
 
     if postprocessor_input_object:
-        print("Running post processor with arguments:")
-        print(pformat(postprocessor_input_object))
-    else:
-        print("Running post processor")
+        instance.send_apprise_message(
+            msg_header="Hello World", msg_body="Executing post processor code"
+        )
 
     return True
 
