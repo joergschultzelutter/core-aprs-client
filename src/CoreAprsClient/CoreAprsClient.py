@@ -322,7 +322,10 @@ class CoreAprsClient:
         )
 
         retcode, input_parser_error_message, response_parameters = self.input_parser(
-            aprs_message=message_text, from_callsign=from_callsign, **kwargs
+            clsobj=self,
+            aprs_message=message_text,
+            from_callsign=from_callsign,
+            **kwargs,
         )
 
         # this is our potential postprocessor input object
@@ -342,7 +345,9 @@ class CoreAprsClient:
 
                 # (Try to) build the outgoing message string
                 success, output_message_string, postproc_data = self.output_generator(
-                    input_parser_response_object=response_parameters, **kwargs
+                    clsobj=self,
+                    input_parser_response_object=response_parameters,
+                    **kwargs,
                 )
                 logger.info(msg=f"Output Processor response={success}, message:")
                 logger.info(msg=output_message_string)
@@ -376,7 +381,7 @@ class CoreAprsClient:
                 if self.post_processor and postproc_data:
                     logger.debug(msg="Activating postprocessor...")
                     success = self.post_processor(
-                        postprocessor_input_object=postproc_data, **kwargs
+                        clsobj=self, postprocessor_input_object=postproc_data, **kwargs
                     )
                     logger.debug(msg=f"postprocessor response='{success}'")
 

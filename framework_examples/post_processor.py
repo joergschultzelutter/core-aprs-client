@@ -26,10 +26,14 @@
 # from the input_processor) are forwarded as a 'dict' object. You need to modify
 # this code according to your very own use case.
 #
+
+from CoreAprsClient import CoreAprsClient
 from pprint import pformat
 
 
-def post_processing(postprocessor_input_object: dict | object, **kwargs):
+def post_processing(
+    clsobj: CoreAprsClient, postprocessor_input_object: dict | object, **kwargs
+):
     """
     This is a stub for your custom APRS post processor code.
 

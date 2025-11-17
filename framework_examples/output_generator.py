@@ -27,6 +27,8 @@
 # this code according to your very own use case.
 #
 
+from CoreAprsClient import CoreAprsClient
+
 
 def __process_greetme_keyword(data_parameters: dict):
     """
@@ -178,7 +180,9 @@ def __process_loremipsum_keyword(data_parameters: dict):
     return success, output_message, None
 
 
-def generate_output_message(input_parser_response_object: dict | object, **kwargs):
+def generate_output_message(
+    clsobj: CoreAprsClient, input_parser_response_object: dict | object, **kwargs
+):
     """
     This is a stub for your custom APRS output generator
 

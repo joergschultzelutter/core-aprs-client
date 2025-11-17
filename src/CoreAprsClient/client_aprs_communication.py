@@ -495,6 +495,7 @@ def aprs_callback(
                 # Note: we call the function which was passed along with the
                 # callback object
                 retcode, input_parser_error_message, response_parameters = parser(
+                    clsobj=clsobj,
                     aprs_message=message_text_string,
                     from_callsign=from_callsign,
                     **kwargs,
@@ -555,7 +556,9 @@ def aprs_callback(
                         # Note: we call the function which was passed along with the
                         # callback object
                         success, output_string, postproc_data = generator(
-                            input_parser_response_object=response_parameters, **kwargs
+                            clsobj=clsobj,
+                            input_parser_response_object=response_parameters,
+                            **kwargs,
                         )
                         if success:
                             output_message = make_pretty_aprs_messages(
@@ -645,7 +648,11 @@ def aprs_callback(
                 # input from the output generator function - which indicates to us that the
                 # user actually wants us to to that postprocessor step
                 if postproc_data and postproc:
-                    _ = postproc(postprocessor_input_object=postproc_data, **kwargs)
+                    _ = postproc(
+                        clsobj=clsobj,
+                        postprocessor_input_object=postproc_data,
+                        **kwargs,
+                    )
 
 
 def init_scheduler_jobs(class_instance: object):

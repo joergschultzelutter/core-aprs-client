@@ -22,10 +22,12 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-from CoreAprsClient import CoreAprsClientInputParserStatus
+from CoreAprsClient import CoreAprsClient, CoreAprsClientInputParserStatus
 
 
-def parse_input_message(aprs_message: str, from_callsign: str, **kwargs):
+def parse_input_message(
+    clsobj: CoreAprsClient, aprs_message: str, from_callsign: str, **kwargs
+):
     """
     This is a stub for your custom APRS input parser.
 
