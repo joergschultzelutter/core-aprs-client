@@ -39,6 +39,8 @@ def post_processing(
 
     Parameters
     ==========
+    instance: CoreAprsClient
+        Instance of the core-aprs-client object.
     postprocessor_input_object: dict | object
         Use this parameter for transporting data structures from the output generator
         to your custom post-processor code. Note that in order to get

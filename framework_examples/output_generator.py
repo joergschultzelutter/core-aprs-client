@@ -188,6 +188,8 @@ def generate_output_message(
 
     Parameters
     ==========
+    instance: CoreAprsClient
+        Instance of the core-aprs-client object.
     input_parser_response_object: dict | object
         dictionary object, containing data from input_parser.py
         Literally speaking, you will use the content from this

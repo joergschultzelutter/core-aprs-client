@@ -518,3 +518,19 @@ class CoreAprsClient:
             message_attachment=msg_attachment,
             apprise_config_file=apprise_cfg_file,
         )
+
+    @staticmethod
+    def log_info(msg: str) -> None:
+        logger.info(msg)
+
+    @staticmethod
+    def log_error(msg: str) -> None:
+        logger.error(msg)
+
+    @staticmethod
+    def log_debug(msg: str) -> None:
+        logger.debug(msg)
+
+    @staticmethod
+    def log_warning(msg: str) -> None:
+        logger.warning(msg)

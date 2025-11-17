@@ -33,6 +33,8 @@ def parse_input_message(
 
     Parameters
     ==========
+    instance: CoreAprsClient
+        Instance of the core-aprs-client object.
     aprs_message: str
         The APRS message that the user has provided us with (1..67
         bytes in length). Parse the content and figure out what
