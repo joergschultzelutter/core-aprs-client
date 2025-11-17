@@ -466,8 +466,8 @@ class CoreAprsClient:
         self,
         msg_header: str,
         msg_body: str,
-        msg_attachment: str | None,
-        apprise_cfg_file: str | None,
+        msg_attachment: str | None = None,
+        apprise_cfg_file: str | None = None,
     ) -> bool:
         """
         This function is uses the utility function's Apprise messaging
