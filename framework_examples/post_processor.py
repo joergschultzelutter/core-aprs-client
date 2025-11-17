@@ -62,8 +62,9 @@ def post_processing(
     """
 
     if postprocessor_input_object:
+        instance.log_debug(msg="Executing post-processor")
         instance.send_apprise_message(
-            msg_header="Hello World", msg_body="Executing post processor code"
+            msg_header="Hello World", msg_body="Executing post-processor code"
         )
 
     return True

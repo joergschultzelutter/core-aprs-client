@@ -48,21 +48,25 @@ Any _other_ command that is sent to `core-aprs-client` will generate the bot's _
 ## Extending the input parser [`input_parser.py`](/framework_examples/input_parser.py)
 
 ```python
-def parse_input_message(aprs_message: str, 
+def parse_input_message(instance: CoreAprsClient,
+                        aprs_message: str, 
                         from_callsign: str, 
                         **kwargs):
     ....
-    return return_code, input_parser_error_message, input_parser_response_object
+    return  (return_code, 
+             input_parser_error_message, 
+             input_parser_response_object)
 ```
 
 
 ### Input processor: Inputs
 
-| Field name      | Content                                                            | Field Type |
-|-----------------|--------------------------------------------------------------------|------------|
-| `aprs_message`  | The actual APRS message that we have received from `from_callsign` | `str`      |
-| `from_callsign` | The call sign that has sent the incoming APRS message to us        | `str`      |
-| `**kwargs`      | Optional user-defined parameters                                   | `dict`     |
+| Field name      | Content                                                            | Field Type       |
+|-----------------|--------------------------------------------------------------------|------------------|
+| `instance`      | Your `core-aprs-client` instance                                   | `CoreAprsClient` |
+| `aprs_message`  | The actual APRS message that we have received from `from_callsign` | `str`            |
+| `from_callsign` | The call sign that has sent the incoming APRS message to us        | `str`            |
+| `**kwargs`      | Optional user-defined parameters                                   | `dict`           |
 
 ### Input processor: Outputs
 
@@ -123,12 +127,15 @@ The default `input_parser_response_object` object (as provided with the sample c
 
 ```python
 def generate_output_message(
+    instance: CoreAprsClient,
     input_parser_response_object: dict | object, 
     default_error_message: str,
     **kwargs
 ):
     ...
-    return success, output_message, postprocessor_input_object
+    return  (success, 
+             output_message, 
+             postprocessor_input_object)
 ```
 
 The output generator has only one input parameter: the input parser's response object.
@@ -138,6 +145,7 @@ The output generator has only one input parameter: the input parser's response o
 
 | Field name                     | Content                                                                                                                                                                                                                                                                                                  | Field Type                       |
 |--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
+| `instance`                     | Your `core-aprs-client` instance                                                                                                                                                                                                                                                                         | `CoreAprsClient`                 |
 | `input_parser_response_object` | (Dictionary) object where we store the data that is required by the `output_generator` module for generating the APRS message. Note that you can also return other objects such as classes. Just ensure that both `input_parser` and `output_generator` share the very same structure for this variable. | `dict` (default) or any `object` |
 | `**kwargs`                     | Optional user-defined parameters                                                                                                                                                                                                                                                                         | `dict`                           |
  
@@ -156,6 +164,7 @@ The output generator has only one input parameter: the input parser's response o
 
 ```python
 def post_processing(
+    instance: CoreAprsClient,
     postprocessor_input_object: dict | object, 
     **kwargs
 ):
@@ -168,10 +177,11 @@ The post processor has only one input parameter: a simple `True`/`False` respons
 
 ### Post Processor: Inputs
 
-| Field name                    | Content                                                                                                                                                                                                                                                                                                                                 | Field Type                       |
-|-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
-| `postprocessor_input_object`  | (Dictionary) object where we store the data that is required by the `post_processor` module for the individual post processing action. The data type can be anything from a simple string, dictionary to a class object. Just ensure that both `output_generator` and `post_processor` share the very same structure for this variable. | `dict` (default) or any `object` |
-| `**kwargs`                    | Optional user-defined parameters                                                                                                                                                                                                                                                                                                        | `dict`                           |
+| Field name                   | Content                                                                                                                                                                                                                                                                                                                                 | Field Type                       |
+|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
+| `instance`                   | Your `core-aprs-client` instance                                                                                                                                                                                                                                                                                                        | `CoreAprsClient`                 |
+| `postprocessor_input_object` | (Dictionary) object where we store the data that is required by the `post_processor` module for the individual post processing action. The data type can be anything from a simple string, dictionary to a class object. Just ensure that both `output_generator` and `post_processor` share the very same structure for this variable. | `dict` (default) or any `object` |
+| `**kwargs`                   | Optional user-defined parameters                                                                                                                                                                                                                                                                                                        | `dict`                           |
  
 ### Post Processor: Outputs
 
