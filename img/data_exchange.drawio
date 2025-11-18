@@ -1,0 +1,37 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/25.0.2 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="25.0.2">
+  <diagram id="prtHgNgQTEPvFCAcTncT" name="Page-1">
+    <mxGraphModel dx="1434" dy="784" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="NXcHPpBootGxJ3cSa07u-17" value="Post-Processor" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#b1ddf0;strokeColor=#10739e;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="185" y="250" width="389" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="NXcHPpBootGxJ3cSa07u-11" value="Input Parser" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#ffff88;strokeColor=#36393d;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="184" y="50" width="390" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="NXcHPpBootGxJ3cSa07u-15" value="Output Generator" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#ffcccc;strokeColor=#36393d;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="185" y="150" width="389" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="NXcHPpBootGxJ3cSa07u-13" value="input_parser_response_object&lt;div&gt;&lt;i&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;(Response object A)&lt;/font&gt;&lt;/i&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 8;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="264" y="100" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="NXcHPpBootGxJ3cSa07u-16" value="output_generator_response_object&lt;div&gt;&lt;i&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;(Response object B)&lt;/font&gt;&lt;/i&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=3;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="264" y="200" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="NXcHPpBootGxJ3cSa07u-19" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Exchanging data between &lt;font face=&quot;Helvetica&quot;&gt;Input Parser, Output Generator and Post-Processor&lt;/font&gt;&lt;/h1&gt;&lt;p&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;b style=&quot;&quot;&gt;Input Parser&lt;/b&gt; and &lt;b&gt;Output Generator&lt;/b&gt; share mutual response object A&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;Output Generator&lt;/b&gt; and &lt;b&gt;Post-Processor&lt;/b&gt; share mutual response object B&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;Response objects A and B may be identical or different&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;Both response objects A and B can have any data type.&amp;nbsp;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;&quot;&gt;&lt;span style=&quot;font-size: 15px;&quot;&gt;core-aprs-client uses the output structure of the &lt;b&gt;Input Parser&lt;/b&gt; and assigns it as input to the &lt;b&gt;Output Generator&lt;/b&gt;. There is no access to this data structure within core-aprs-client.&lt;/span&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;A &#39;dict&#39; object is usually used for data transfer between the respective subroutines.&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;The use of the &lt;b&gt;Post-Processor&lt;/b&gt; is optional. It requires the user to specify a custom post-processor function &lt;b style=&quot;text-decoration-line: underline;&quot;&gt;and&lt;/b&gt; the Output Generator function to provide post-processing data.&lt;/font&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="134" y="340" width="550" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="NXcHPpBootGxJ3cSa07u-25" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fillColor=#b0e3e6;strokeColor=#0e8088;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="594" y="50" as="sourcePoint" />
+            <mxPoint x="594" y="310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NXcHPpBootGxJ3cSa07u-27" value="Process flow" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;rotation=-90;" parent="1" vertex="1">
+          <mxGeometry x="524" y="160" width="170" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
