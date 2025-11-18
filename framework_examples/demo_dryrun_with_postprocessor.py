@@ -1,12 +1,16 @@
 #
 # Core APRS Client
-# Demo of the framework's Apprise messaging functions
+# Sample APRS Client stub, using the core-aprs-client framework
+#
+# This demo client imports the input parser and output processor
+# functions and performs an offline processing of a given APRS message
 #
 # Demo of class method:
-# https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/configuration_subsections/config_crash_handler.md
+# https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/coreaprsclient_class.md#dryrun_testcall-class-method
+# Same as demo_dryrun.py, but with active postprocessor
 #
-# For further details on Apprise, please visit
-# https://www.github.com/caronc/apprise
+# Details on how post-processing works:
+# https://github.com/joergschultzelutter/core-aprs-client/blob/postproc/docs/coreaprsclient_class.md#using-the-post-processor
 #
 # Author: Joerg Schultze-Lutter, 2025
 #
@@ -30,11 +34,13 @@ from CoreAprsClient import CoreAprsClient
 from input_parser import parse_input_message
 from output_generator import generate_output_message
 
+# Your custom post processor
+from post_processor import post_processing
+
 import argparse
 import os
 import sys
 import logging
-from pprint import pformat
 
 logging.basicConfig(
     level=logging.INFO,
@@ -77,9 +83,9 @@ def get_command_line_params():
 
 
 if __name__ == "__main__":
-    logger.info(msg=f"Starting demo module: Apprise messaging")
+    logger.info(msg=f"Starting demo module: dryrun with post-processor")
     logger.info(
-        msg="This is a demo APRS client which sends a fixed demo message via Apprise to 1..n messaging clients"
+        msg="This is a demo APRS client which performs an offline dry-run on a given APRS message/APRS callsign combination."
     )
 
     # Get the configuration file name
@@ -97,24 +103,14 @@ if __name__ == "__main__":
         log_level=logging.DEBUG,
         input_parser=parse_input_message,
         output_generator=generate_output_message,
+        post_processor=post_processing,
     )
 
-    # This sends a fixed test message to 1..n messenger
-    # clients via Apprise. By omitting the apprise_cfg_file
-    # value, we tell the framework to use the Apprise config
-    # file name from core-aprs-client's config file (see
-    # https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/configuration_subsections/config_crash_handler.md
-    # for further info. Alternatively, you can specify your very own
-    # Apprise configuration file name.
+    # The preconfigured example assumes that callsign "DF1JSL-1"
+    # has sent the APRS message text "postprocessor" to your bot.
+    # If you send any other APRS message, the input processor/output generator
+    # stub code will not create post-processing input data, thus effectively
+    # disabling the post-processing code. Details:
+    # https://github.com/joergschultzelutter/core-aprs-client/blob/postproc/docs/coreaprsclient_class.md#using-the-post-processor
     #
-    # Note that a missing Apprise config file will not result in an
-    # error but simply generates a log file error instead. By examining
-    # the given return code, you can still decide to abort your program
-    # afterwards, if necessary
-
-    client.send_apprise_message(
-        msg_header="Hello from Apprise",
-        msg_body="This is a demo message",
-        msg_attachment=None,
-        apprise_cfg_file=None,
-    )
+    client.dryrun_testcall(message_text="postprocessor", from_callsign="DF1JSL-1")

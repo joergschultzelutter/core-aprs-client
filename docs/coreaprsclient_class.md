@@ -21,12 +21,14 @@ class CoreAprsClient:
     log_level: int
     input_parser: Callable[..., Any]
     output_generator: Callable[..., Any]
+    post_processor: Callable[..., Any] | None
 
     def __init__(
         self,
         config_file: str,
         input_parser: Callable[..., Any],
         output_generator: Callable[..., Any],
+        post_processor: Callable[..., Any] | None = None,
         log_level: int = logging.INFO,
     ):
 ```
@@ -38,6 +40,7 @@ class CoreAprsClient:
 | `config_file`      | `core_aprs_client`'s configuration file; see [this documentation section](configuration.md)                                                                                                                                                     | `str`      |
 | `input_parser`     | Function name of the external input processor which parses incoming APRS messages and tries to figure out what the user wants us to do.                                                                                                         | `Callable` |
 | `output_generator` | Function name of the external output generator. Based on the `input_parser`'s feedback, this code is responsible for generating the output message - which will then be transformed by the `core-aprs-client` framework into 1..n APRS messages | `Callable` |
+| `post_processor`   | Optional. Function name of an external post processing function. Triggered by `output_generator` providing post-processing data to the framework. Executed _after_ the APRS response has been sent to the user. Default: `None` (disabled)      | `Callable` |
 | `log_level`        | Log level from Python's `logging` function. Default value: `logging.INFO`                                                                                                                                                                       | `enum`     |
 
 ### Supported class methods
@@ -47,9 +50,10 @@ Currently, this class supports the following methods:
 - [`dryrun_testcall`](coreaprsclient_class.md#dryrun_testcall-class-method) can be used for offline testing. When triggered, it will run a simulated and freely configurable APRS input message through the `input_processor` code and, whereas applicable, uses the `output_generator` code in order to create the outgoing message content.
 
 Additionally, a [set of specific return codes](coreaprsclient_class.md#input_processor-return-codes) have to be imported by the `input_parser` function. Finally, an optional `dict` attribute allows users to send additional dynamic APRS bulletins in addition to the statically configured bulletins. A 'getter' method allows you to retrieve the (immutable) `dict` object of the class' configuration file data, thus allowing you to store your specific configuration file content in `core-aprs-client`'s config file. 
+
 ### Your responsibilities 
 
-You are responsible for designing the functions associated with the `input_parser` and `output_generator` parameters. Check the [Framework Usage](framework_usage.md) help pages for further details. 
+You are responsible for designing the functions associated with the `input_parser` and `output_generator` parameters (plus `post_processor` in case post processing code is required). Check the [Framework Usage](framework_usage.md) help pages for further details. 
 
 ## `activate_client` class method
 
@@ -90,8 +94,7 @@ client.activate_client()
 |-----------------|--------------------------------------------------------------------|------------|
 | `**kwargs`      | Optional user-defined parameters                                   | `dict`     |
 
-Any `**kwargs` arguments will get passed along to both `input_parser` and `output_generator`.
-
+Any `**kwargs` arguments will get passed along to both `input_parser` and `output_generator` (and `post_processor` if a custom post processor has been provided by the user).
 
 ### Return values
 
@@ -100,7 +103,7 @@ This method has no return values
     
 ## `dryrun_testcall` class method
 
-Sample_code: [`demo_dryrun.py`](/framework_examples/demo_dryrun.py)
+Sample_code: [`demo_dryrun.py`](/framework_examples/demo_dryrun.py) (plain testcall) and [`demo_dryrun_with_postprocessor.py`](/framework_examples/demo_dryrun_with_postprocessor.py). For details on how post-processing works, see [this documentation](/postproc/docs/coreaprsclient_class.md#using-the-post-processor)
 
 This class method can be used for offline testing. There will be no data exchange between [APRS-IS](https://aprs-is.net/) and the bot.
 
@@ -496,4 +499,56 @@ print (pformat(client.config_data))
               'zzz_custom_config': {'hello': 'Welt'},
               'zzz_custom_config2': {'hello': 'World'}})
 
+```
+
+## Using the post processor
+
+Sample code: [`demo_aprs_client_with_postprocessor.py`](/framework_examples/demo_aprs_client_with_postprocessor.py) and [`demo_dryrun_with_postprocessor.py`](/framework_examples/demo_dryrun_with_postprocessor.py) 
+
+> [!NOTE]
+> The use of the post processor is optional. You can use this function for use cases where actions still need to be performed _after_ the APRS reply message has been sent to the user.
+
+Using the post processor requires two settings:
+
+* The class instance must have been assigned a corresponding [`post_processor` function](coreaprsclient_class.md#class-constructor).
+* The `output_generator` function must return an object that is not `None` in the `postprocessor_input_object` field.
+
+If these two conditions are met and no standard error message was generated by the `output_generator` when generating the response message (which would indicate an internal program error), then the user's own post processor code is executed after the APRS response is sent. Similar to the provision of data between `input_parser` and `output_generator`, the user can define a separate data structure for the transfer of data from `output_generator` to `post_processor`; the associated transport data field `postprocessor_input_object` is transferred directly from `output_generator` to `post_processor`. In the examples provided, this is done using a simple `dict` object.
+
+The `post_processor` option is avaliable to as part of both [`activate_client`](coreaprsclient_class.md#activate_client-class-method) and [`dryrun_testcall`](coreaprsclient_class.md#dryrun_testcall-class-method) class methods
+
+##### Demo program
+
+```python
+from CoreAprsClient import CoreAprsClient
+
+# Your custom input parser and output generator code
+from input_parser import parse_input_message
+from output_generator import generate_output_message
+
+# your custom post processor code which will get executed
+# after the APRS response has been sent back to the user
+from post_processor import post_processing
+
+import logging
+from pprint import pformat
+
+# Create the CoreAprsClient object. Supply the
+# following parameters:
+#
+# - configuration file name
+# - log level (from Python's 'logging' package)
+# - function names for both input processor and output generator
+#
+client = CoreAprsClient(
+    config_file="my_config_file.cfg",
+    log_level=logging.DEBUG,
+    input_parser=parse_input_message,
+    output_generator=generate_output_message,
+    post_processor=post_processing,
+)
+
+# Activate the dryrun call and run the "postproc" keyword which is going to illustrate
+# how the framework handles post processing 
+client.dryrun_testcall(message_text="postproc", from_callsign="DF1JSL-1")
 ```

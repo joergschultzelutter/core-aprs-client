@@ -60,12 +60,14 @@ class CoreAprsClient:
     log_level: int
     input_parser: Callable[..., Any]
     output_generator: Callable[..., Any]
+    post_processor: Callable[..., Any] | None
 
     def __init__(
         self,
         config_file: str,
         input_parser: Callable[..., Any],
         output_generator: Callable[..., Any],
+        post_processor: Callable[..., Any] | None = None,
         log_level: int = logging.INFO,
     ):
         """
@@ -82,6 +84,9 @@ class CoreAprsClient:
         output_generator: Callable[..., Any]
             Name of the user's output generator function, see
             https://github.com/joergschultzelutter/core-aprs-client/blob/master/docs/framework_usage.md
+        post_processor: Callable[..., Any] | None
+            (optional); Name of the user's post processor function, see
+            https://github.com/joergschultzelutter/core-aprs-client/blob/master/docs/framework_usage.md
         log_level: int
             Log level from Python's 'logging' module
             https://docs.python.org/3/library/logging.html#logging-levels
@@ -93,6 +98,7 @@ class CoreAprsClient:
         self.config_file = config_file
         self.input_parser = input_parser
         self.output_generator = output_generator
+        self.post_processor = post_processor
         self.log_level = log_level
         self._dynamic_aprs_bulletins: Dict[str, Any] = {}
         self._lock = threading.Lock()
@@ -219,8 +225,10 @@ class CoreAprsClient:
                     # create the partial object for our callback
                     enhanced_callback = partial(
                         aprs_callback,
+                        instance=self,
                         parser=self.input_parser,
                         generator=self.output_generator,
+                        postproc=self.post_processor,
                         **kwargs,
                     )
 
@@ -314,8 +322,18 @@ class CoreAprsClient:
         )
 
         retcode, input_parser_error_message, response_parameters = self.input_parser(
-            aprs_message=message_text, from_callsign=from_callsign, **kwargs
+            instance=self,
+            aprs_message=message_text,
+            from_callsign=from_callsign,
+            **kwargs,
         )
+
+        # this is our potential postprocessor input object
+        # If its future value is not 'None' AND a post processor has been
+        # set up for the class' object instance, then we try to run the
+        # given post processor AFTER the output processor's message has been sent
+        # to the user via APRS
+        postproc_data = None
 
         logger.info(msg="Parsed message:")
         logger.info(msg=pformat(response_parameters))
@@ -326,8 +344,10 @@ class CoreAprsClient:
                 logger.info("Running Output Processor build ...")
 
                 # (Try to) build the outgoing message string
-                success, output_message_string = self.output_generator(
-                    input_parser_response_object=response_parameters, **kwargs
+                success, output_message_string, postproc_data = self.output_generator(
+                    instance=self,
+                    input_parser_response_object=response_parameters,
+                    **kwargs,
                 )
                 logger.info(msg=f"Output Processor response={success}, message:")
                 logger.info(msg=output_message_string)
@@ -357,6 +377,16 @@ class CoreAprsClient:
                         ],
                     )
                 logger.info(msg=pformat(output_message))
+
+                if self.post_processor and postproc_data:
+                    logger.debug(msg="Activating postprocessor...")
+                    success = self.post_processor(
+                        instance=self,
+                        postprocessor_input_object=postproc_data,
+                        **kwargs,
+                    )
+                    logger.debug(msg=f"postprocessor response='{success}'")
+
             case CoreAprsClientInputParserStatus.PARSE_ERROR | _:
                 logger.error(
                     msg="input_parser_error_message = {input_parser_error_message}"
@@ -438,8 +468,8 @@ class CoreAprsClient:
         self,
         msg_header: str,
         msg_body: str,
-        msg_attachment: str | None,
-        apprise_cfg_file: str | None,
+        msg_attachment: str | None = None,
+        apprise_cfg_file: str | None = None,
     ) -> bool:
         """
         This function is uses the utility function's Apprise messaging
@@ -488,3 +518,19 @@ class CoreAprsClient:
             message_attachment=msg_attachment,
             apprise_config_file=apprise_cfg_file,
         )
+
+    @staticmethod
+    def log_info(msg: str) -> None:
+        logger.info(msg)
+
+    @staticmethod
+    def log_error(msg: str) -> None:
+        logger.error(msg)
+
+    @staticmethod
+    def log_debug(msg: str) -> None:
+        logger.debug(msg)
+
+    @staticmethod
+    def log_warning(msg: str) -> None:
+        logger.warning(msg)

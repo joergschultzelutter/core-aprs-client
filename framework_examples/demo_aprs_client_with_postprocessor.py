@@ -1,14 +1,19 @@
 #
 # Core APRS Client
-# Demo of the framework's Apprise messaging functions
+# Sample APRS Client stub, using the core-aprs-client framework
+# Author: Joerg Schultze-Lutter, 2025
+#
+# This demo client imports the input parser and output processor
+# functions and establishes a live connection to APRS-IS. Additionally,
+# post-processing code gets executed AFTER the APRS response was sent to
+# the user. The post-processing code will ONLY get executed if the user
+# sends the "postprocessor" command to the core-aprs-client instance
 #
 # Demo of class method:
-# https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/configuration_subsections/config_crash_handler.md
+# https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/coreaprsclient_class.md#activate_client-class-method
 #
-# For further details on Apprise, please visit
-# https://www.github.com/caronc/apprise
-#
-# Author: Joerg Schultze-Lutter, 2025
+# Details on post-processing:
+# https://github.com/joergschultzelutter/core-aprs-client/blob/postproc/docs/coreaprsclient_class.md#using-the-post-processor
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,11 +35,13 @@ from CoreAprsClient import CoreAprsClient
 from input_parser import parse_input_message
 from output_generator import generate_output_message
 
+# Your custom post processor
+from post_processor import post_processing
+
 import argparse
 import os
 import sys
 import logging
-from pprint import pformat
 
 logging.basicConfig(
     level=logging.INFO,
@@ -77,9 +84,9 @@ def get_command_line_params():
 
 
 if __name__ == "__main__":
-    logger.info(msg=f"Starting demo module: Apprise messaging")
+    logger.info(msg=f"Starting demo module: APRS bot with post processor")
     logger.info(
-        msg="This is a demo APRS client which sends a fixed demo message via Apprise to 1..n messaging clients"
+        msg="This is a demo APRS client which connects to APRS-IS, processes the incoming message, sends a response back to the client and finally executes post-processing code."
     )
 
     # Get the configuration file name
@@ -91,30 +98,21 @@ if __name__ == "__main__":
     # - configuration file name
     # - log level (from Python's 'logging' package)
     # - function names for both input processor and output generator
+    # - function name for the post processor
+    #
+    # Note: in order to trigger the post-processor, send the APRS message
+    #       "postprocessor" to your core-aprs-client instance. This will tell
+    #       the output generator to provide input data for the post processor
+    #       which will then trigger the post-processing AFTER the APRS response
+    #       has been sent back to the user
     #
     client = CoreAprsClient(
         config_file=configfile,
         log_level=logging.DEBUG,
         input_parser=parse_input_message,
         output_generator=generate_output_message,
+        post_processor=post_processing,
     )
 
-    # This sends a fixed test message to 1..n messenger
-    # clients via Apprise. By omitting the apprise_cfg_file
-    # value, we tell the framework to use the Apprise config
-    # file name from core-aprs-client's config file (see
-    # https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/configuration_subsections/config_crash_handler.md
-    # for further info. Alternatively, you can specify your very own
-    # Apprise configuration file name.
-    #
-    # Note that a missing Apprise config file will not result in an
-    # error but simply generates a log file error instead. By examining
-    # the given return code, you can still decide to abort your program
-    # afterwards, if necessary
-
-    client.send_apprise_message(
-        msg_header="Hello from Apprise",
-        msg_body="This is a demo message",
-        msg_attachment=None,
-        apprise_cfg_file=None,
-    )
+    # Activate the APRS client and connect to APRS-IS
+    client.activate_client()
