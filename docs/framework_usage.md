@@ -21,6 +21,8 @@
 
 `input_parser.py` and `output_generator.py` rely on exchanging data through a mutually equal data structure. That data structure can be defined by the user and is passed through between both user functions; the `core-aprs-client` framework itself does *not* use contents from this data element (`input_parser_response_object`) _in any way_. Just ensure that both custom code modules `input_parser.py` and `output_generator.py` share the same data exchange structure. Note that the same setup also applies to the data exchange between `output_generator.py` and `post_processor.py`.
 
+![DataExchange](/img/data_exchange.svg)
+
 ## Usage of the offline test option for your bot integration
 > [!TIP]
 > - You can use the framework's[`dryrun_testcall`](coreaprsclient_class.md#dryrun_testcall-class-method) method for a 100% offline testing option which does not connect to APRS-IS. `dryrun_testcall` will route a user's call sign and APRS message through both input parser and output generator modules: it also covers the post processor function logic.
