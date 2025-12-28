@@ -8,7 +8,7 @@ Although `core-aprs-client` is provided [as a Python package](https://pypi.org/p
 - Install a Python 3.11+ virtual environment and activate it
 - Open the [framework_examples](/framework_examples) directory
 - `pip install -r requirements.txt` (this will install the sample clients' required Python packages)
-- Follow the configuration instructions and change the [mandatory configuration file sections](https://github.com/joergschultzelutter/core-aprs-client/blob/23-implement-functoolspartial/docs/configuration.md#mandatory-configuration-file-sections)
+- Follow the configuration instructions and change the [mandatory configuration file sections](/docs/configuration.md#mandatory-configuration-file-sections)
 - Run one of the provided demo clients, e.g.the [`demo_aprs_client.py`](/framework_examples/demo_aprs_client.py) bot
 - Send an APRS message to your bot's callsign
 - Enjoy
