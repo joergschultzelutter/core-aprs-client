@@ -103,12 +103,12 @@ def send_aprs_message_list(
     send_with_msg_no: bool,
     aprs_message_counter: int,
     external_message_number: str,
+    source_callsign: str,
+    tocall: str,
     simulate_send: bool = True,
     new_ackrej_format: bool = False,
-    source_callsign: str = "COAC",
     packet_delay: float = 10.0,
     packet_delay_grace_period: float = 1.0,
-    tocall: str = "APRS",
 ):
     """
     Send a pre-prepared message list to to APRS_IS
@@ -621,6 +621,8 @@ def aprs_callback(
                     aprs_message_counter=client_shared.aprs_message_counter.get_counter(),
                     external_message_number=msgno_string,
                     new_ackrej_format=new_ackrej_format,
+                    source_callsign=program_config["coac_client_config"]["aprsis_callsign"],
+                    tocall=program_config["coac_client_config"]["aprsis_tocall"],
                     packet_delay=program_config["coac_message_delay"][
                         "packet_delay_message"
                     ],
@@ -647,7 +649,7 @@ def aprs_callback(
                 # Finally, execute the post processor function but ONLY if the user has
                 # forwarded a function to us AND we have received some postprocessor-specific
                 # input from the output generator function - which indicates to us that the
-                # user actually wants us to to that postprocessor step
+                # user actually wants us to that postprocessor step
                 if postproc_data and postproc:
                     _ = postproc(
                         instance=instance,
