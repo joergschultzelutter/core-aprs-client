@@ -2,6 +2,26 @@
 
 ![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![PyPi version](https://img.shields.io/pypi/v/core-aprs-client.svg)](https://pypi.python.org/pypi/core-aprs-client)
 
+
+## Table of Contents
+<!--ts-->
+* [Introduction](#introduction)
+* [Sample APRS Client](#sample-aprs-client)
+* [Core Features](#core-features)
+* [Installation and Configuration](#installation-and-configuration)
+  * [Installation instructions](#installation-instructions)
+  * [Client Configuration](#client-configuration)
+  * [Framework examples](#framework-examples)
+  * [`CoreAprsClient` class description](#coreaprsclient-class-description)
+  * [Source code anatomy](#source-code-anatomy)
+  * [Framework usage](#framework-usage)
+  * [Client schematics](#client-schematics)
+* [Known issues and caveats](#known-issues-and-caveats)
+* [The fine print](#the-fine-print)
+<!--te-->
+
+## Introduction
+
 Core APRS client framework with dupe detection, bulletin/beaconing support, and other APRS-IS related stuff.
 
 ```core-aprs-client``` is a modernized version of [mpad](https://github.com/joergschultzelutter/mpad)'s APRS functions which can be used for building your very own APRS client / bot. Its framework supports all of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS messaging functions, such as connecting to APRS-IS, message dupe detection, ACK handling, and other functionality such as APRS bulletins (supporting both static and dynamic contents) and APRS beaconing. Additionally, support for rare use cases such as [pre- and post-processing](/docs/framework_usage.md) is provided. However, ```core-aprs-client``` deliberately lacks any _specific_ APRS bot functions such as WX reporting etc. 
