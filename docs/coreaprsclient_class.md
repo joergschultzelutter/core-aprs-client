@@ -14,7 +14,7 @@
   * [Parameters](#parameters-1)
   * [Return values](#return-values-1)
   * [Sample output](#sample-output)
-* [`send_apprise_message` class method](#send-apprise-message-class-method)
+* [`send_apprise_message` class method](#send_apprise_message-class-method)
   * [Parameters](#parameters-2)
   * [Return values](#return-values-2)
   * [Sample output](#sample-output-1)
