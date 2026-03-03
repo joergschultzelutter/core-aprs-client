@@ -5,7 +5,7 @@
 * [Introduction](#introduction)
 * [Configuration file schema validation](#configuration-file-schema-validation)
 * [Mandatory configuration file sections](#mandatory-configuration-file-sections)
-* [Optional connfiguration file sectionns](#optional-configuration-file-sections)
+* [Optional connfiguration file sections](#optional-configuration-file-sections)
 * [Configuration file sample](#configuration-file-sample)
 <!--te-->
 
