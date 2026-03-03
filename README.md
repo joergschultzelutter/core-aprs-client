@@ -3,22 +3,26 @@
 ![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![PyPi version](https://img.shields.io/pypi/v/core-aprs-client.svg)](https://pypi.python.org/pypi/core-aprs-client)
 
 
-## Table of Contents
-<!--ts-->
-* [Introduction](#introduction)
-* [Sample APRS Client](#sample-aprs-client)
-* [Core Features](#core-features)
-* [Installation and Configuration](#installation-and-configuration)
-  * [Installation instructions](#installation-instructions)
-  * [Client Configuration](#client-configuration)
-  * [Framework examples](#framework-examples)
-  * [`CoreAprsClient` class description](#coreaprsclient-class-description)
-  * [Source code anatomy](#source-code-anatomy)
-  * [Framework usage](#framework-usage)
-  * [Client schematics](#client-schematics)
-* [Known issues and caveats](#known-issues-and-caveats)
-* [The fine print](#the-fine-print)
-<!--te-->
+# Table of contents
+<!--TOC-->
+
+- [core-aprs-client](#core-aprs-client)
+- [Table of contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Sample APRS Client](#sample-aprs-client)
+  - [Core features](#core-features)
+  - [Installation and Configuration](#installation-and-configuration)
+    - [Installation instructions](#installation-instructions)
+    - [Client Configuration](#client-configuration)
+    - [Framework examples](#framework-examples)
+    - [`CoreAprsClient` class description](#coreaprsclient-class-description)
+    - [Source Code Anatomy](#source-code-anatomy)
+    - [Framework usage](#framework-usage)
+    - [Client schematics](#client-schematics)
+  - [Known issues and caveats](#known-issues-and-caveats)
+  - [The fine print](#the-fine-print)
+
+<!--TOC-->
 
 ## Introduction
 
