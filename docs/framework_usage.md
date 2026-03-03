@@ -1,5 +1,24 @@
 # `core-aprs-client` framework usage
 
+## Table of Contents
+<!--ts-->
+* [Basic schematics](#basic-schematics)
+* [Your custom code vs. the `core-aprs-client` framework](#your-custom-code-vs-the-core-aprs-client-framework)
+* [General info](#general-info)
+* [Usage of the offline test option for your bot integration](#usage-of-the-offline-test-option-for-your-bot-integration)
+* [Implemented APRS Command Stubs](#implemented-aprs-command-stubs)
+* [Extending the input parser `input_parser.py`](#extending-the-input-parser-input_parserpy)
+  * [Input parser: Inputs](#input-processor-inputs)
+  * [Input parser: Outputs](#input-processor-outputs)
+  * [return_code - Valid values](#return_code---valid-values)
+* [Extending the output generator `output_generator.py`](#extending-the-output-generator-output_generatorpy)
+  * [Output generator: Inputs](#output-generator-inputs)
+  * [Output generator: Outputs](#output-generator-outputs)
+* [Extending the post processor `post_processor.py`](#extending-the-post-processor-post_processorpy)
+  * [Post processor: Inputs](#post-processor-inputs)
+  * [Post processor: Outputs](#post-processor-outputs)
+<!--te-->
+
 ## Basic schematics
 ![Workflow Input-Output Processing](/img/workflow_input_output_processing.svg)
 
@@ -78,7 +97,7 @@ def parse_input_message(instance: CoreAprsClient,
 | `input_parser_error_message`    | If `return_code` is not `PARSE_OK`, this field can contain an optional error message (e.g. context-specific errors related to the keyword that was sent to the bot). If this field is empty AND `return_code` is NOT `PARSE_OK`, then the default error message will be returned.                      | `str`                            |
 | `input_parser_response_object`  | Dictionary object where we store the data that is required by the `output_generator` module for generating the APRS message. Note that you can also return other objects such as classes. Just ensure that both `input_parser` and `output_generator` share the very same structure for this variable. | `dict` (default) or any `object` |
 
-#### `return_code` - Valid values
+### `return_code` - Valid values
 
 The return codes are defined in the [CoreAprsClientInputParserStatus](coreaprsclient_class.md#input_processor-return-codes) class. Import via
 ```python
