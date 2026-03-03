@@ -3,7 +3,7 @@
 ![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![PyPi version](https://img.shields.io/pypi/v/core-aprs-client.svg)](https://pypi.python.org/pypi/core-aprs-client)
 
 
-# Table of contents
+## Table of contents
 <!--ts-->
 
 * [Introduction](#introduction)
@@ -93,4 +93,5 @@ If you want to learn about the bot's basic processing structure, then have a loo
 ## The fine print
 
 - If you intend to host an instance of this program, you must be a licensed radio amateur. BYOP: Bring your own (APRS-IS) passcode. If you don't know what this is, then this program is not for you.
+
 - APRS is a registered trademark of APRS Software and Bob Bruninga, WB4APR.
