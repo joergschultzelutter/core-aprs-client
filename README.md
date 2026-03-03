@@ -4,25 +4,25 @@
 
 
 # Table of contents
-<!--TOC-->
-
-- [core-aprs-client](#core-aprs-client)
-- [Table of contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Sample APRS Client](#sample-aprs-client)
-  - [Core features](#core-features)
-  - [Installation and Configuration](#installation-and-configuration)
-    - [Installation instructions](#installation-instructions)
-    - [Client Configuration](#client-configuration)
-    - [Framework examples](#framework-examples)
-    - [`CoreAprsClient` class description](#coreaprsclient-class-description)
-    - [Source Code Anatomy](#source-code-anatomy)
-    - [Framework usage](#framework-usage)
-    - [Client schematics](#client-schematics)
-  - [Known issues and caveats](#known-issues-and-caveats)
-  - [The fine print](#the-fine-print)
-
-<!--TOC-->
+<!--ts-->
+
+* [core-aprs-client](#core-aprs-client)
+* [Table of contents](#table-of-contents)
+  * [Introduction](#introduction)
+  * [Sample APRS Client](#sample-aprs-client)
+  * [Core features](#core-features)
+  * [Installation and Configuration](#installation-and-configuration)
+    * [Installation instructions](#installation-instructions)
+    * [Client Configuration](#client-configuration)
+    * [Framework examples](#framework-examples)
+    * [`CoreAprsClient` class description](#coreaprsclient-class-description)
+    * [Source Code Anatomy](#source-code-anatomy)
+    * [Framework usage](#framework-usage)
+    * [Client schematics](#client-schematics)
+  * [Known issues and caveats](#known-issues-and-caveats)
+  * [The fine print](#the-fine-print)
+
+<!--te-->
 
 ## Introduction
 
