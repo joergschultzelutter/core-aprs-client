@@ -1,5 +1,15 @@
 # Source Code Anatomy and Usage
 
+## Table of Contents
+<!--ts-->
+* [Introduction](#introduction)
+* [Python package modules](#python-package-modules)
+* [Configuration files](#configuration-files)
+* [User files](#user-files)
+<!--te-->
+
+## Introduction
+
 Brief overview of `core-aprs-client` repository's source files. 
 
 ```
