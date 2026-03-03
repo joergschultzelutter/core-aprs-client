@@ -1,11 +1,46 @@
 # `CoreAprsClient` class
 
+## Table of Contents
+<!--ts-->
+* [Introduction](#introduction)
+* [Class constructor](#class-constructor)
+  * [Parameter](#parameter)
+  * [Supported class methods](#supported-class-methods)
+  * [Your responsibilities](#your-responsibilities)
+* [`activate_client` class method](#activate-client-class-method)
+  * [Parameters](#parameters)
+  * [Return values](#return-values)
+* [`dryrun_testcall` class method](#dryrun-testcall-class-method)
+  * [Parameters](#parameters-1)
+  * [Return values](#return-values-1)
+  * [Sample output](#sample-output)
+* [`send_apprise_message` class method](#send-apprise-message-class-method)
+  * [Parameters](#parameters-2)
+  * [Return values](#return-values-2)
+  * [Sample output](#sample-output-1)
+* [`input_processor` return codes](#input-processor-return-codes)
+  * [`input_processor` return code sample](#input-processor-return-code-sample)
+* [Use of dynamic content for APRS bulletins additional to static bulletin content](#use-of-dynamic-content-for-aprs-bulletins-additional-to-static-bulletin-content)
+  * [Introduction](#introduction-1)
+  * [Terms and conditions](#terms-and-conditions)
+  * [Using the dynamic bulletins option](#using-the-dynamic-bulletins-option)
+    * [Main function](#main-function)
+    * [Scheduler function](#scheduler-function)
+* [Accessing the program's configuration data](#accessing-the-programs-configuration-data)
+  * [Example](#example)
+    * [Configuration file excerpt with two custom config sections](#configuration-file-excerpt-with-two-custom-config-sections)
+    * [Demo program](#demo-program)
+    * [Output (excerpt)](#output-excerpt)
+* [Using the post processor](#using-the-post-processor)
+    * [Demo program](#demo-program-1)
+<!--te-->
+
+## Introduction
+
 The `CoreAprsClient` class is responsible for the communication between the local APRS bot and [APRS-IS](https://aprs-is.net/). Additionally, it also provides a 'dry-run' function, allowing you to test your custom `input_parser`/`output_generator` code offline without any interaction with APRS-IS. 
 
 > [!TIP]
 > Examples of all class methods can be found in the [`framework_examples`](/framework_examples/README.md) directory
-
-
 
 Import the class via
 
@@ -209,18 +244,6 @@ client.send_apprise_message(
 )
 ```
 
-### Sample output
-
-```python
-2025-10-20 20:44:06,214 - demo_apprise_message -INFO - Starting demo module: Apprise messaging
-2025-10-20 20:44:06,214 - demo_apprise_message -INFO - This is a demo APRS client which sends a fixed demo message via Apprise to 1..n messaging clients
-2025-10-20 20:44:06,217 - CoreAprsClient -DEBUG - No apprise_cfg_file specified; using default from core-aprs-client's configuration file
-2025-10-20 20:44:06,217 - client_utils -DEBUG - Starting Apprise message processing
-2025-10-20 20:44:06,467 - base -INFO - Loaded 1 entries from file://apprise.yml?encoding=utf-8&cache=yes
-2025-10-20 20:44:06,693 - telegram -INFO - Sent Telegram notification.
-2025-10-20 20:44:06,694 - client_utils -DEBUG - Finished Apprise message processing
-```
-
 ### Parameters
 
 | Field Name         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Field Type      |
@@ -241,6 +264,18 @@ client.send_apprise_message(
 | `success`  | `True` if message was sent to Apprise module, otherwise `False` | `bool`     |
 
 A `success` value of `True` describes the situation where the Apprise module has accepted the incoming message. It does not necessarily guarantee that the message was actually sent to the messenger recipient clients.
+
+### Sample output
+
+```python
+2025-10-20 20:44:06,214 - demo_apprise_message -INFO - Starting demo module: Apprise messaging
+2025-10-20 20:44:06,214 - demo_apprise_message -INFO - This is a demo APRS client which sends a fixed demo message via Apprise to 1..n messaging clients
+2025-10-20 20:44:06,217 - CoreAprsClient -DEBUG - No apprise_cfg_file specified; using default from core-aprs-client's configuration file
+2025-10-20 20:44:06,217 - client_utils -DEBUG - Starting Apprise message processing
+2025-10-20 20:44:06,467 - base -INFO - Loaded 1 entries from file://apprise.yml?encoding=utf-8&cache=yes
+2025-10-20 20:44:06,693 - telegram -INFO - Sent Telegram notification.
+2025-10-20 20:44:06,694 - client_utils -DEBUG - Finished Apprise message processing
+```
 
 ## `input_processor` return codes
 
