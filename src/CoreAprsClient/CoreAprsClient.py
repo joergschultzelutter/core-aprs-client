@@ -363,13 +363,6 @@ class CoreAprsClient:
             **kwargs,
         )
 
-        # this is our potential postprocessor input object
-        # If its future value is not 'None' AND a post processor has been
-        # set up for the class' object instance, then we try to run the
-        # given post processor AFTER the output processor's message has been sent
-        # to the user via APRS
-        postproc_data = None
-
         logger.info(msg="Parsed message:")
         logger.info(msg=pformat(response_parameters))
         logger.info(msg=f"return code: {retcode}")

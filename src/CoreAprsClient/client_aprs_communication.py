@@ -508,7 +508,7 @@ def aprs_callback(
 
                     # Now check if we have received a premature APRS message that we are supposed
                     # to send back to the user before we enter the input parser
-                    if success and type(pre_processor_response_message) == str:
+                    if success and type(pre_processor_response_message) is str:
                         if len(pre_processor_response_message) > 0:
                             # generate the message list ...
                             preproc_message = make_pretty_aprs_messages(

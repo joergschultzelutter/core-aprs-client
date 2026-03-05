@@ -62,7 +62,7 @@ def pre_processing(
         message to the user prior to starting the input parser parse process.
     """
 
-    return True, None
+    return True, "This is my pre-processor response message"
 
 
 if __name__ == "__main__":
