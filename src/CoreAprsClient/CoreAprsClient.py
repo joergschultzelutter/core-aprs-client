@@ -333,7 +333,7 @@ class CoreAprsClient:
                 **kwargs,
             )
             if success:
-                if type(pre_processor_response_string) in str:
+                if type(pre_processor_response_string) is str:
                     if len(pre_processor_response_string) > 0:
                         logger.info(
                             msg="Received positive pre-processor response; preparing for premature APRS send_msg"
