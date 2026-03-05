@@ -1,6 +1,6 @@
 #
 # Core APRS Client
-# APRS post processor stub
+# APRS pre-processor stub
 # Author: Joerg Schultze-Lutter, 2025
 #
 # This is a stub for the module which generates the outgoing APRS message
@@ -30,43 +30,39 @@
 from CoreAprsClient import CoreAprsClient
 
 
-def post_processing(
-    instance: CoreAprsClient, postprocessor_input_object: dict | object, **kwargs
+def pre_processing(
+    instance: CoreAprsClient, aprs_message: str, from_callsign: str, **kwargs
 ):
     """
-    This is a stub for your custom APRS post processor code.
+    This is a stub for your custom APRS pre-processor.
 
     Parameters
     ==========
     instance: CoreAprsClient
         Instance of the core-aprs-client object.
-    postprocessor_input_object: dict | object
-        Use this parameter for transporting data structures from the output generator
-        to your custom post-processor code. Note that in order to get
-        triggered, a) the post-processor code function needs to be supplied
-        to the instantiated class object AND b) postprocessor_input_object
-        must not be 'None'
-        For the framework examples, this stub deliberately uses a simple
-        dictionary for passing data from the output generator to the post
-        processor. One could use a more complex dict object (just like the one used
-        by input processor and output generator) - or a simple string. Again, what
-        you want to use is up to you, the developer.
+    aprs_message: str
+        The APRS message that the user has provided us with (1..67
+        bytes in length). Parse the content and figure out what
+        the user wants you to do.
+    from_callsign: str
+        Ham radio callsign that sent the message to us.
+        Might be required by the input processor e.g. in case you
+        have to determine the from_callsign's latitude/longitude.
     **kwargs: dict
         Optional keyword arguments
 
     Returns
     =======
     success: bool
-        True if everything is fine, False otherwise.
+        True if everything is fine, False otherwise. Used in combination with
+        pre_processor_response_message
+    pre_processor_response_message: str | None
+        if 'success' is 'True' AND "pre_processor_response_message" is 'str' AND
+        len(pre_processor_response_message) > 0, then the framework will send this
+        message to the user prior to starting the input parser parse process.
     """
 
-    if postprocessor_input_object:
-        instance.log_debug(msg="Executing post-processor")
-        instance.send_apprise_message(
-            msg_header="Hello World", msg_body="Executing post-processor code"
-        )
-
-    return True
+    return True, None
 
 
 if __name__ == "__main__":
