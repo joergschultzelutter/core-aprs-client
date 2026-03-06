@@ -111,6 +111,6 @@ if __name__ == "__main__":
     # If you send any other APRS message, the input processor/output generator
     # stub code will not create post-processing input data, thus effectively
     # disabling the post-processing code. Details:
-    # https://github.com/joergschultzelutter/core-aprs-client/blob/postproc/docs/coreaprsclient_class.md#using-the-post-processor
+    # https://github.com/joergschultzelutter/core-aprs-client/blob/master/framework_examples/demo_dryrun_with_postprocessor.py
     #
     client.dryrun_testcall(message_text="postprocessor", from_callsign="DF1JSL-1")
