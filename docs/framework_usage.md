@@ -200,7 +200,7 @@ def pre_processing(instance: CoreAprsClient,
 The post processor has only one input parameter: a simple `True`/`False` response whose value currently is of no consequence for the `core-aprs-client` framework.
 
 
-### Post Processor: Inputs
+### Pre-Processor: Inputs
 
 | Field name      | Content                                                            | Field Type       |
 |-----------------|--------------------------------------------------------------------|------------------|
@@ -210,7 +210,7 @@ The post processor has only one input parameter: a simple `True`/`False` respons
 | `**kwargs`      | Optional user-defined parameters                                   | `dict`           |
 
  
-### Post Processor: Outputs
+### Pre-Processor: Outputs
 
 | Field name                       | Content                                                                                                                                                                                                                                                                   | Field Type                                     |
 |----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
