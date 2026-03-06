@@ -56,6 +56,7 @@ class CoreAprsClient:
     log_level: int
     input_parser: Callable[..., Any]
     output_generator: Callable[..., Any]
+    pre_processor: Callable[..., Any] | None
     post_processor: Callable[..., Any] | None
 
     def __init__(
@@ -63,6 +64,7 @@ class CoreAprsClient:
         config_file: str,
         input_parser: Callable[..., Any],
         output_generator: Callable[..., Any],
+        pre_processor: Callable[..., Any] | None = None,
         post_processor: Callable[..., Any] | None = None,
         log_level: int = logging.INFO,
     ):
