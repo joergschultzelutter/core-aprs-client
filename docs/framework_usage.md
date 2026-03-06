@@ -66,7 +66,7 @@ Any _other_ command that is sent to `core-aprs-client` will generate the bot's _
 > For demonstration purposes, both `input_parser.py` and `output_generator.py` use a _VERY_ simplified processing algorithm. For your future code, you might want to implement proper parsing (e.g. by using regular expressions) and error handling.
 
 > [!NOTE]
-> - All input parameters for `input_parser.py`, `output_generator.py`, and `post_processor.py` are mandatory parameters
+> - All input parameters for `input_parser.py`, `output_generator.py`, `pre_processor.py`, and `post_processor.py` are mandatory parameters
 > - Internally, all input parameters are treated as named parameters.
 
 ## Extending the input parser [`input_parser.py`](/framework_examples/input_parser.py)
