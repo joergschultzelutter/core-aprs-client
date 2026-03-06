@@ -39,7 +39,7 @@ from apscheduler.schedulers import base as apbase
 import copy
 import re
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Iterable
 
 APRS_MSG_LEN_NOTRAILING = 67
 
@@ -515,6 +515,17 @@ def aprs_callback(
                             preproc_message = make_pretty_aprs_messages(
                                 message_to_add=pre_processor_response_message
                             )
+
+                            finalize_and_send_message(
+                                message_text_array=preproc_message,
+                                from_callsign=from_callsign,
+                                msg_no_supported=msg_no_supported,
+                                msgno_string=msgno_string,
+                                new_ackrej_format=new_ackrej_format,
+                            )
+                            """
+
+
                             # ... prepare it for broadcasting ...
                             # Finalize the outgoing message(s) and add the message
                             # numbers if the user has requested this in his configuration
@@ -553,6 +564,9 @@ def aprs_callback(
                             client_shared.aprs_message_counter.set_counter(
                                 _aprs_msg_count
                             )
+                            
+                            """
+
                 ###
                 ### END Pre-Processor Code
                 ###
@@ -687,6 +701,15 @@ def aprs_callback(
                     case _:
                         pass
 
+                finalize_and_send_message(
+                    message_text_array=output_message,
+                    from_callsign=from_callsign,
+                    msg_no_supported=msg_no_supported,
+                    msgno_string=msgno_string,
+                    new_ackrej_format=new_ackrej_format,
+                )
+
+                """
                 # Ultimately, finalize the outgoing message(s) and add the message
                 # numbers if the user has requested this in his configuration
                 # settings
@@ -720,6 +743,7 @@ def aprs_callback(
 
                 # And store the new APRS message number in our counter object
                 client_shared.aprs_message_counter.set_counter(_aprs_msg_count)
+                """
 
                 # We've finished processing this message. Update the decaying
                 # cache with our message.
@@ -761,6 +785,16 @@ def aprs_callback(
                             postproc_message = make_pretty_aprs_messages(
                                 message_to_add=post_processor_response_message
                             )
+
+                            finalize_and_send_message(
+                                message_text_array=postproc_message,
+                                from_callsign=from_callsign,
+                                msg_no_supported=msg_no_supported,
+                                msgno_string=msgno_string,
+                                new_ackrej_format=new_ackrej_format,
+                            )
+
+                            """
                             # ... prepare it for broadcasting ...
                             # Finalize the outgoing message(s) and add the message
                             # numbers if the user has requested this in his configuration
@@ -799,6 +833,7 @@ def aprs_callback(
                             client_shared.aprs_message_counter.set_counter(
                                 _aprs_msg_count
                             )
+                            """
 
 
 def init_scheduler_jobs(class_instance: object):
@@ -993,6 +1028,41 @@ def remove_scheduler(aprs_scheduler: BackgroundScheduler):
                 aprs_scheduler.shutdown()
             except:
                 logger.debug(msg="Exception during scheduler shutdown SystemExit loop")
+
+
+def finalize_and_send_message(
+    message_text_array: Iterable[str],
+    from_callsign: str,
+    msg_no_supported: bool,
+    msgno_string: str,
+    new_ackrej_format: bool = False,
+):
+
+    # Finalize the outgoing message(s) and add the message
+    # numbers if the user has requested this in his configuration
+    # settings
+    message_text_array = finalize_pretty_aprs_messages(mylistarray=message_text_array)
+
+    # Send our message(s) to APRS-IS
+    _aprs_msg_count = send_aprs_message_list(
+        myaprsis=client_shared.AIS,
+        simulate_send=program_config["coac_testing"]["aprsis_simulate_send"],
+        message_text_array=message_text_array,
+        destination_call_sign=from_callsign,
+        send_with_msg_no=msg_no_supported,
+        aprs_message_counter=client_shared.aprs_message_counter.get_counter(),
+        external_message_number=msgno_string,
+        new_ackrej_format=new_ackrej_format,
+        source_callsign=program_config["coac_client_config"]["aprsis_callsign"],
+        tocall=program_config["coac_client_config"]["aprsis_tocall"],
+        packet_delay=program_config["coac_message_delay"]["packet_delay_message"],
+        packet_delay_grace_period=program_config["coac_message_delay"][
+            "packet_delay_grace_period"
+        ],
+    )
+
+    # And store the new APRS message number in our counter object
+    client_shared.aprs_message_counter.set_counter(_aprs_msg_count)
 
 
 if __name__ == "__main__":
