@@ -26,7 +26,7 @@
 
 Core APRS client framework with dupe detection, bulletin/beaconing support, and other APRS-IS related stuff.
 
-```core-aprs-client``` is a modernized version of [mpad](https://github.com/joergschultzelutter/mpad)'s APRS functions which can be used for building your very own APRS client / bot. Its framework supports all of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS messaging functions, such as connecting to APRS-IS, message dupe detection, ACK handling, and other functionality such as APRS bulletins (supporting both static and dynamic contents) and APRS beaconing. Additionally, support for rare use cases such as [pre- and post-processing](/docs/framework_usage.md) is provided. However, ```core-aprs-client``` deliberately lacks any _specific_ APRS bot functions such as WX reporting etc. 
+```core-aprs-client``` is a modernized version of [mpad](https://github.com/joergschultzelutter/mpad)'s APRS functions which can be used for building your very own APRS client / bot. Its framework supports all of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS messaging functions, such as connecting to APRS-IS, message dupe detection, ACK handling, and other functionality such as APRS bulletins (supporting both static and dynamic contents) and APRS beaconing. Additionally, support for rare use cases such as [pre- and post-processing](/docs/framework_usage.md#extending-the-pre-processor-pre_processorpy) of APRS requests is provided. However, ```core-aprs-client``` deliberately lacks any _specific_ APRS bot functions such as WX reporting etc. 
 
 This is where _you_ step in. Add your bot-specific code to the client's APRS framework code. Everything else related to APRS messaging and communication with APRS-IS will be covered by the ```core-aprs-client``` framework.
 
@@ -57,8 +57,10 @@ It's as simple as that.
 - Core APRS-IS functionality, covering both 'old' and '[new](http://www.aprs.org/aprs11/replyacks.txt)' ACK processing
 - Configurable dupe message handler
 - Optional:
-    - APRS beacons and bulletins, including support for dynamic bulletin content generated during runtime
-    - Program crash handler, allowing you to get notified in case the client program crashes
+    - APRS beacons and bulletins, including [support for dynamic bulletin content](/docs/coreaprsclient_class.md#use-of-dynamic-content-for-aprs-bulletins-additional-to-static-bulletin-content) generated during runtime
+    - Program [crash handler](/docs/configuration_subsections/config_crash_handler.md), allowing you to get notified in case the client program crashes
+    - Support for [pre- and post-processing](/docs/framework_usage.md#extending-the-pre-processor-pre_processorpy)
+- All configuration settings are stored in a single [program configuration file](/docs/configuration.md#program-configuration-file)
 
 ## Installation and Configuration
 
@@ -95,3 +97,4 @@ If you want to learn about the bot's basic processing structure, then have a loo
 - If you intend to host an instance of this program, you must be a licensed radio amateur. BYOP: Bring your own (APRS-IS) passcode. If you don't know what this is, then this program is not for you.
 
 - APRS is a registered trademark of APRS Software and Bob Bruninga, WB4APR.
+
