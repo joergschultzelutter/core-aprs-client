@@ -408,12 +408,14 @@ class CoreAprsClient:
 
                 if self.post_processor and postproc_data:
                     logger.debug(msg="post_processor: Activating post-processor...")
-                    success = self.post_processor(
+                    success, post_processor_response_string = self.post_processor(
                         instance=self,
                         postprocessor_input_object=postproc_data,
                         **kwargs,
                     )
-                    logger.debug(msg=f"post-processor response='{success}'")
+                    logger.debug(
+                        msg=f"post-processor response='{success}', post_processor_response_string='{post_processor_response_string}')"
+                    )
 
             case CoreAprsClientInputParserStatus.PARSE_ERROR | _:
                 logger.error(
