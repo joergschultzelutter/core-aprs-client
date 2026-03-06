@@ -3,9 +3,9 @@
 # APRS post processor stub
 # Author: Joerg Schultze-Lutter, 2025
 #
-# This is a stub for the module which generates the outgoing APRS message
-# (based on what the user wants you to do)
-#
+# This is a stub for the module which is responsible for any kind of
+# post-processing operation. From a timeline perspective, post-processing
+# happens _after_ the APRS response has been sent out to the user. 
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
