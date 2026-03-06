@@ -109,6 +109,6 @@ if __name__ == "__main__":
 
     # The preconfigured example assumes that callsign "DF1JSL-1"
     # has sent the APRS message text "helloworld" to your bot.
-    # https://github.com/joergschultzelutter/core-aprs-client/blob/postproc/docs/coreaprsclient_class.md#using-the-pre-processor
+    # h https://github.com/joergschultzelutter/core-aprs-client/blob/master/framework_examples/demo_dryrun_with_preprocessor.py
     #
     client.dryrun_testcall(message_text="helloworld", from_callsign="DF1JSL-1")
