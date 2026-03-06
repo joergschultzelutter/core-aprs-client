@@ -14,9 +14,12 @@
 * [Extending the output generator `output_generator.py`](#extending-the-output-generator-output_generatorpy)
   * [Output generator: Inputs](#output-generator-inputs)
   * [Output generator: Outputs](#output-generator-outputs)
-* [Extending the post processor `post_processor.py`](#extending-the-post-processor-post_processorpy)
-  * [Post processor: Inputs](#post-processor-inputs)
-  * [Post processor: Outputs](#post-processor-outputs)
+* [Extending the pre-processor `pre_processor.py`](#extending-the-pre-processor-pre_processorpy)
+  * [Pre-processor: Inputs](#pre-processor-inputs)
+  * [Pre-processor: Outputs](#pre-processor-outputs)
+* [Extending the post-processor `post_processor.py`](#extending-the-post-processor-post_processorpy)
+  * [Post-processor: Inputs](#post-processor-inputs)
+  * [Post-processor: Outputs](#post-processor-outputs)
 <!--te-->
 
 ## Basic schematics
@@ -178,10 +181,46 @@ The output generator has only one input parameter: the input parser's response o
 | `output_message`             | This is the content that will be sent to the APRS user. `core-aprs-client`'s callback function will take this content, convert it into data chunks of up to 6 bytes in length, and then send it to APRS-IS.                                                                                                                                                                                                   | `str`              |
 | `postprocessor_input_object` | Optional. If you want to use the framecwork's post-processing options (perform an action _after_ the APRS response has been sent to the user, populate this field and add a custom function to `core-aprs-client`'s class instance. Simlar to `input_parser_response_object`, the content is just passed along to the post processor, meaning that you can use e.g. `dict` objects or custom data structures. | `object` or `None` |
 
-## Extending the post processor [`post_processor.py`](/framework_examples/post_processor.py)
+
+## Extending the pre-processor [`pre_processor.py`](/framework_examples/pre_processor.py)
 
 > [!NOTE]
-> Usage of the post processor function is optional. You only want to use if for those cases where an additional action is supposed to be triggered _after_ the APRS response has been sent back to the user.
+> Usage of the pre-processor function is optional. You only want to use if for those cases where an additional action is supposed to be triggered _before_ the incoming APRS request gets parsed by `input_processor.py`. In addition, this option allows you to send an outgoing APRS message to the user before parsing the incoming APRS message. This can be useful, for example, in cases where there is a long delay between parsing the incoming message and sending the outgoing message.
+
+```python
+def pre_processing(instance: CoreAprsClient,
+                        aprs_message: str, 
+                        from_callsign: str, 
+                        **kwargs):
+    ....
+    return  (success, 
+             pre_processor_response_message)
+```
+
+The post processor has only one input parameter: a simple `True`/`False` response whose value currently is of no consequence for the `core-aprs-client` framework.
+
+
+### Post Processor: Inputs
+
+| Field name      | Content                                                            | Field Type       |
+|-----------------|--------------------------------------------------------------------|------------------|
+| `instance`      | Your `core-aprs-client` instance                                   | `CoreAprsClient` |
+| `aprs_message`  | The actual APRS message that we have received from `from_callsign` | `str`            |
+| `from_callsign` | The call sign that has sent the incoming APRS message to us        | `str`            |
+| `**kwargs`      | Optional user-defined parameters                                   | `dict`           |
+
+ 
+### Post Processor: Outputs
+
+| Field name                       | Content                                                                                                                                                                                                                                                                   | Field Type                                     |
+|----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
+| `success`                        | `True` in case of no errors, otherwise `False`. Note that with the current version of `core-aprs-client`, the value is of no consequence. A value of `False` is of no consequence to the next workflow steps, meaning that the `input_processor` will still get triggered | `boolean`          |
+| `pre_processor_response_message` | If `type(pre_processor_response_message) is str` AND `success == True`: send `pre_processor_response_message` as outgoing APRS message to the user _before_ the `input_processor` gets triggered.                                                                         | `str` or `None` |
+
+## Extending the post-processor [`post_processor.py`](/framework_examples/post_processor.py)
+
+> [!NOTE]
+> Usage of the post-processor function is optional. You only want to use if for those cases where an additional action is supposed to be triggered _after_ the APRS response has been sent back to the user.
 
 ```python
 def post_processing(
@@ -196,7 +235,7 @@ def post_processing(
 The post processor has only one input parameter: a simple `True`/`False` response whose value currently is of no consequence for the `core-aprs-client` framework.
 
 
-### Post Processor: Inputs
+### Post-Processor: Inputs
 
 | Field name                   | Content                                                                                                                                                                                                                                                                                                                                 | Field Type                       |
 |------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
@@ -204,8 +243,9 @@ The post processor has only one input parameter: a simple `True`/`False` respons
 | `postprocessor_input_object` | (Dictionary) object where we store the data that is required by the `post_processor` module for the individual post processing action. The data type can be anything from a simple string, dictionary to a class object. Just ensure that both `output_generator` and `post_processor` share the very same structure for this variable. | `dict` (default) or any `object` |
 | `**kwargs`                   | Optional user-defined parameters                                                                                                                                                                                                                                                                                                        | `dict`                           |
  
-### Post Processor: Outputs
+### Post-Processor: Outputs
 
 | Field name | Content                                                                                                                                   | Field Type |
 |------------|-------------------------------------------------------------------------------------------------------------------------------------------|------------|
 | `success`  | `True` in case of no errors, otherwise `False`. Note that with the current version of `core-aprs-client`, the value is of no consequence. | `boolean`  |
+
