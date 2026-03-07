@@ -18,6 +18,9 @@
   * [Framework usage](#framework-usage)
   * [Client schematics](#client-schematics)
 * [Known issues and caveats](#known-issues-and-caveats)
+* [Projects that use `core-aprs-client`](#projects-that-use-core-aprs-client)
+* [Known issues and caveats](#known-issues-and-caveats)
+* [Alternatives to `core-aprs-client`](#alternatives-to-core-aprs-client)
 * [The fine print](#the-fine-print)
 
 <!--te-->
@@ -85,12 +88,18 @@ The steps for using the client framework are described [here](docs/framework_usa
 ### Client schematics
 If you want to learn about the bot's basic processing structure, then have a look at [this diagram](docs/schematics.md).
 
+### Projects that use `core-aprs-client`
+A list of my projects that are dependent on `core-aprs-client` can be found [here](/docs/projectsusingcoac.md)
+
 ## Known issues and caveats
 - This software is single-threaded. Due to APRS-IS's technical nature of resubmitting non-ack'ed messages, this limitation should not be an issue, though. Future versions of this software might support queued processing of incoming requests.
 - This software is intended to be used by licensed ham radio operators. If you are not a licensed ham radio operator, then this program is not (yet) for you. Why not take a look at sites such as [Hamstudy](https://hamstudy.org/) and [50 Ohm](https://50ohm.de/) - and get licensed?
 - You should at least know the APRS basics before you use this software. Acquaint yourself with [the official APRS documentation](https://github.com/wb2osz/aprsspec) and learn about [how APRS works](https://how.aprs.works/) in general. Additionally, have a look at the [APRS Foundation](https://www.aprsfoundation.org/)'s website.
 - You HAVE to assign your personal call sign to the bot.
 - You HAVE to [request your personal APRS TOCALL](https://github.com/aprsorg/aprs-deviceid) for using this bot __in production__. See the [APRS Device ID](https://github.com/aprsorg/aprs-deviceid/blob/main/ALLOCATING.md#development-phase) information section on proper usage.
+
+## Alternatives to `core-aprs-client`
+A great alternative to `core-aprs-client` is KM6LYW's[`aprsd`](https://github.com/craigerl/aprsd). If you don't want to use `core-aprs-client`'s specific functionalities such as pre- and post-processing (which afaik aren't supported by `aprsd`), this program might be a viable alternative.
 
 ## The fine print
 
