@@ -99,7 +99,7 @@ A list of my projects that are dependent on `core-aprs-client` can be found [her
 - You HAVE to [request your personal APRS TOCALL](https://github.com/aprsorg/aprs-deviceid) for using this bot __in production__. See the [APRS Device ID](https://github.com/aprsorg/aprs-deviceid/blob/main/ALLOCATING.md#development-phase) information section on proper usage.
 
 ## Alternatives to `core-aprs-client`
-A great alternative to `core-aprs-client` is KM6LYW's[`aprsd`](https://github.com/craigerl/aprsd). If you don't want to use `core-aprs-client`'s specific functionalities such as pre- and post-processing (which afaik aren't supported by `aprsd`), this program might be a viable alternative.
+A great alternative to `core-aprs-client` is KM6LYW's[`aprsd`](https://github.com/craigerl/aprsd). If you don't intend to use `core-aprs-client`'s specific functionalities such as pre- and post-processing (which afaik aren't supported by `aprsd`), this program might be a viable alternative.
 
 ## The fine print
 
