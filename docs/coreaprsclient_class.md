@@ -92,7 +92,7 @@ Additionally, a [set of specific return codes](coreaprsclient_class.md#input_pro
 
 ### Your responsibilities 
 
-You are responsible for designing the functions associated with the `input_parser` and `output_generator` parameters (plus `post_processor` in case post processing code is required). Check the [Framework Usage](framework_usage.md) help pages for further details. 
+You are responsible for designing the functions associated with the `input_parser` and `output_generator` parameters (plus `post_processor` and `pre_processor` in case post/pre-processing code is required). Check the [Framework Usage](framework_usage.md) help pages for further details. 
 
 ## `activate_client` class method
 
@@ -133,7 +133,7 @@ client.activate_client()
 |-----------------|--------------------------------------------------------------------|------------|
 | `**kwargs`      | Optional user-defined parameters                                   | `dict`     |
 
-Any `**kwargs` arguments will get passed along to both `input_parser` and `output_generator` (and `post_processor` if a custom post processor has been provided by the user).
+Any `**kwargs` arguments will get passed along to both `input_parser` and `output_generator` (and `post_processor`/`pre_processor` if a custom post-/pre-processor has been provided by the user).
 
 ### Return values
 
@@ -142,11 +142,11 @@ This method has no return values
     
 ## `dryrun_testcall` class method
 
-Sample_code: [`demo_dryrun.py`](/framework_examples/demo_dryrun.py) (plain testcall) and [`demo_dryrun_with_postprocessor.py`](/framework_examples/demo_dryrun_with_postprocessor.py). For details on how post-processing works, see [this documentation](/postproc/docs/coreaprsclient_class.md#using-the-post-processor)
+Sample_code: [`demo_dryrun.py`](/framework_examples/demo_dryrun.py) (plain testcall) and [`demo_dryrun_with_postprocessor.py`](/framework_examples/demo_dryrun_with_postprocessor.py). For details on how post-processing works, see [this documentation](/postproc/docs/coreaprsclient_class.md#using-the-post-processor).
 
-This class method can be used for offline testing. There will be no data exchange between [APRS-IS](https://aprs-is.net/) and the bot.
+This class method can be used for 100% offline testing. There will be no data exchange between [APRS-IS](https://aprs-is.net/) and the bot.
 
-Note that this class method will not generate actual APRS response messages but rather generates the outgoing message and splits it up into 1..n message chunks of up to 67 bytes in length.
+Note that this class method will **not** generate actual APRS response messages but rather generates the outgoing message and splits it up into 1..n message chunks of up to 67 bytes in length. If your intention is a test of the whole workflow (without sending any data to APRS-IS), use the [`aprsis_simulate_send`](/docs/configuration_subsections/config_testing.md) in combination with [`activate_client`](#activate_client-class-method).
 
 Dryrun code example:
 
@@ -198,16 +198,20 @@ This method has no return values
 This is the sample output for the `lorem` keyword from the [`demo_dryrun.py`](/framework_examples/demo_dryrun.py) sample code provided [with this repository](/framework_examples):
 
 ``` python
-2025-09-19 22:13:12,419 - CoreAprsClient -INFO - Activating dryrun testcall...
-2025-09-19 22:13:12,420 - CoreAprsClient -INFO - parsing message 'lorem' for callsign 'DF1JSL-1'
-2025-09-19 22:13:12,420 - CoreAprsClient -INFO - Parsed message:
-2025-09-19 22:13:12,420 - CoreAprsClient -INFO - {'command_code': 'loremipsum', 'from_callsign': 'DF1JSL-1'}
-2025-09-19 22:13:12,420 - CoreAprsClient -INFO - return code: CoreAprsClientInputParserStatus.PARSE_OK
-2025-09-19 22:13:12,420 - CoreAprsClient -INFO - Running Output Processor build ...
-2025-09-19 22:13:12,420 - CoreAprsClient -INFO - Output Processor response=True, message:
-2025-09-19 22:13:12,420 - CoreAprsClient -INFO - Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-2025-09-19 22:13:12,420 - CoreAprsClient -INFO - Output processor status successful; building outgoing messages ...
-2025-09-19 22:13:12,421 - CoreAprsClient -INFO - ['Lorem ipsum dolor sit amet, consetetur sadipscing elitr,    (01/11)',
+2026-03-07 11:58:47,559 - demo_dryrun -INFO - Starting demo module: dryrun
+2026-03-07 11:58:47,559 - demo_dryrun -INFO - This is a demo APRS client which performs an offline dry-run on a given APRS message/APRS callsign combination.
+2026-03-07 11:58:47,561 - client_utils -ERROR - 'aprsis_tocall' is still set to default config; change config file ASAP
+2026-03-07 11:58:47,561 - client_utils -ERROR - 'aprsis_callsign' is still set to default config; change config file ASAP
+2026-03-07 11:58:47,561 - CoreAprsClient -INFO - Activating dryrun testcall...
+2026-03-07 11:58:47,562 - CoreAprsClient -INFO - input_parser: Parsing message 'lorem' for callsign 'DF1JSL-1'
+2026-03-07 11:58:47,562 - CoreAprsClient -INFO - Parsed message:
+2026-03-07 11:58:47,563 - CoreAprsClient -INFO - {'command_code': 'loremipsum', 'from_callsign': 'DF1JSL-1'}
+2026-03-07 11:58:47,563 - CoreAprsClient -INFO - return code: CoreAprsClientInputParserStatus.PARSE_OK
+2026-03-07 11:58:47,563 - CoreAprsClient -INFO - output_generator: Running Output Processor build ...
+2026-03-07 11:58:47,563 - CoreAprsClient -INFO - Output Generator response=True, message:
+2026-03-07 11:58:47,563 - CoreAprsClient -INFO - Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+2026-03-07 11:58:47,563 - CoreAprsClient -INFO - Output generator status successful; building outgoing messages ...
+2026-03-07 11:58:47,563 - CoreAprsClient -INFO - ['Lorem ipsum dolor sit amet, consetetur sadipscing elitr,    (01/11)',
  'sed diam nonumy eirmod tempor invidunt ut labore et dolore  (02/11)',
  'magna aliquyam erat, sed diam voluptua. At vero eos et      (03/11)',
  'accusam et justo duo dolores et ea rebum. Stet clita kasd   (04/11)',

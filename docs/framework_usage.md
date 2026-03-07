@@ -252,7 +252,8 @@ The post processor has only one input parameter: a simple `True`/`False` respons
  
 #### Post-Processor: Outputs
 
-| Field name | Content                                                                                                                                   | Field Type |
-|------------|-------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `success`  | `True` in case of no errors, otherwise `False`. Note that with the current version of `core-aprs-client`, the value is of no consequence. | `boolean`  |
+| Field name                        | Content                                                                                                                                                                                                                                                                   | Field Type      |
+|-----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|
+| `success`                         | `True` in case of no errors, otherwise `False`. Used in combination with `post_processor_response_message`,                                                                                                                                                               | `boolean`       |
+| `post_processor_response_message` | If `type(post_processor_response_message)` is `str` AND `len(post_processor_response_message)>0` AND `success` == `True`, then `post_processor_response_message` will be sent out as APRS response to the user **after** the post-processor code has finished processing. | `str` or `None` |
 
