@@ -62,7 +62,7 @@ It's as simple as that.
 - Optional:
     - APRS beacons and bulletins, including [support for dynamic bulletin content](/docs/coreaprsclient_class.md#use-of-dynamic-content-for-aprs-bulletins-additional-to-static-bulletin-content) generated during runtime
     - Program [crash handler](/docs/configuration_subsections/config_crash_handler.md), allowing you to get notified in case the client program crashes
-    - Support for [pre- and post-processing](/docs/framework_usage.md#extending-the-pre-processor-pre_processorpy)
+    - Support for [pre- and post-processing](/docs/framework_usage.md#extending-the-optional-code-stubs)
 - All configuration settings are stored in a single [program configuration file](/docs/configuration.md#program-configuration-file)
 
 ## Installation and Configuration
