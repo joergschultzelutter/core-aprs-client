@@ -96,7 +96,13 @@ You are responsible for designing the functions associated with the `input_parse
 
 ## `activate_client` class method
 
-Sample code: [`demo_aprs_client.py`](/framework_examples/demo_aprs_client.py)
+Sample code: 
+
+- [`demo_aprs_client.py`](/framework_examples/demo_aprs_client.py)
+- [`demo_aprs_client_with_postprocessor.py`](/framework_examples/demo_aprs_client_with_postprocessor.py), and 
+- [`demo_aprs_client_with_preprocessor.py`](/framework_examples/demo_aprs_client_with_preprocessor.py). 
+
+See the documentation on how [post-processing](/docs/coreaprsclient_class.md#using-the-post-processor) and [pre-processing](/docs/coreaprsclient_class.md#using-the-pre-processor) works.
 
 This class method is responsible for the communication between the local APRS bot and [APRS-IS](https://aprs-is.net/). It has no parameters. Full APRS bot client example:
 
@@ -142,11 +148,17 @@ This method has no return values
     
 ## `dryrun_testcall` class method
 
-Sample_code: [`demo_dryrun.py`](/framework_examples/demo_dryrun.py) (plain testcall) and [`demo_dryrun_with_postprocessor.py`](/framework_examples/demo_dryrun_with_postprocessor.py). For details on how post-processing works, see [this documentation](/postproc/docs/coreaprsclient_class.md#using-the-post-processor).
+Sample_code: 
 
-This class method can be used for 100% offline testing. There will be no data exchange between [APRS-IS](https://aprs-is.net/) and the bot.
+- [`demo_dryrun.py`](/framework_examples/demo_dryrun.py) (plain testcall)
+- [`demo_dryrun_with_postprocessor.py`](/framework_examples/demo_dryrun_with_postprocessor.py), and 
+- [`demo_dryrun_with_preprocessor.py`](/framework_examples/demo_dryrun_with_preprocessor.py). 
 
-Note that this class method will **not** generate actual APRS response messages but rather generates the outgoing message and splits it up into 1..n message chunks of up to 67 bytes in length. If your intention is a test of the whole workflow (without sending any data to APRS-IS), use the [`aprsis_simulate_send`](/docs/configuration_subsections/config_testing.md) in combination with [`activate_client`](#activate_client-class-method); see [`test instructions`](/docs/testing.md) for details.
+See the documentation on how [post-processing](/docs/coreaprsclient_class.md#using-the-post-processor) and [pre-processing](/docs/coreaprsclient_class.md#using-the-pre-processor) works.
+
+This class method can be used for 100% offline testing. There will be no data exchange between [APRS-IS](https://aprs-is.net/) and the `core-aprs-client` framework.
+
+Note that this class method will **not** generate actual APRS response messages but rather generates the outgoing message and splits it up into 1..n message chunks of up to 67 bytes in length. If your intention is a test of the whole workflow (without sending any data to APRS-IS), use the [`aprsis_simulate_send`](/docs/configuration_subsections/config_testing.md) in combination with [`activate_client`](#activate_client-class-method); see [test instructions](/docs/testing.md) for details.
 
 Dryrun code example:
 
