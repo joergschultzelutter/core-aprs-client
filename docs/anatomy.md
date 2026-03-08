@@ -104,7 +104,7 @@ Location: [`~/framework_examples`](/framework_examples)
 
 ### APRS bot code examples
 
-All of these examples connect to APRS-IS and provide basic insight on the framework's processing capabilities. You can prevent the sending of outgoing messages from the bot by setting the configuration file's [`aprsis_simulate_send`](/docs/configuration_subsections/config_testing.md) flag to `true`.  
+All of these examples connect to APRS-IS and provide basic insight on the framework's processing capabilities. You can prevent the sending of outgoing messages from the bot by setting the configuration file's [`aprsis_simulate_send`](/docs/configuration_subsections/config_testing.md) flag to `true`. See [`test instructions`](/docs/testing.md) for details. 
 
 | File Name                                                                                                      | Usage                                                                                                                                                                                                                            |
 |----------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

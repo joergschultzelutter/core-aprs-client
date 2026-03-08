@@ -53,7 +53,7 @@
 
 ## Usage of the offline test option for your bot integration
 > [!TIP]
-> - You can use the framework's[`dryrun_testcall`](coreaprsclient_class.md#dryrun_testcall-class-method) method for a 100% offline testing option which does not connect to APRS-IS. `dryrun_testcall` will route a user's call sign and APRS message through both input parser and output generator modules: it also covers the post processor function logic. It does NOT cover the generation of actual (simulated) APRS messages - you can use the [configuration file's [`aprsis_simulate_send`](/docs/configuration_subsections/config_testing.md) configuration setting for this use case.
+> - You can use the framework's[`dryrun_testcall`](coreaprsclient_class.md#dryrun_testcall-class-method) method for a 100% offline testing option which does not connect to APRS-IS. `dryrun_testcall` will route a user's call sign and APRS message through both input parser and output generator modules: it also covers the post processor function logic. It does NOT cover the generation of actual (simulated) APRS messages - you can use the [configuration file's [`aprsis_simulate_send`](/docs/configuration_subsections/config_testing.md) configuration setting for this use case. See [`test instructions`](/docs/testing.md) for details.
 
 ## Implemented APRS Command Stubs
 By default, `core-aprs-client`'s default installation comes with sample keywords that you can send to its associated APRS call sign. In its default demonstration setup, the framework accepts these keywords:

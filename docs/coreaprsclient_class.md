@@ -146,7 +146,7 @@ Sample_code: [`demo_dryrun.py`](/framework_examples/demo_dryrun.py) (plain testc
 
 This class method can be used for 100% offline testing. There will be no data exchange between [APRS-IS](https://aprs-is.net/) and the bot.
 
-Note that this class method will **not** generate actual APRS response messages but rather generates the outgoing message and splits it up into 1..n message chunks of up to 67 bytes in length. If your intention is a test of the whole workflow (without sending any data to APRS-IS), use the [`aprsis_simulate_send`](/docs/configuration_subsections/config_testing.md) in combination with [`activate_client`](#activate_client-class-method).
+Note that this class method will **not** generate actual APRS response messages but rather generates the outgoing message and splits it up into 1..n message chunks of up to 67 bytes in length. If your intention is a test of the whole workflow (without sending any data to APRS-IS), use the [`aprsis_simulate_send`](/docs/configuration_subsections/config_testing.md) in combination with [`activate_client`](#activate_client-class-method); see [`test instructions`](/docs/testing.md) for details.
 
 Dryrun code example:
 
