@@ -1038,6 +1038,8 @@ def finalize_and_send_message(
     new_ackrej_format: bool = False,
 ):
 
+    logger.info(msg="Finalizing and sending APRS messages...")
+
     # Finalize the outgoing message(s) and add the message
     # numbers if the user has requested this in his configuration
     # settings
