@@ -1,7 +1,5 @@
 # Framework & Sample Client Installation
 
-# Introduction
-
 Although `core-aprs-client` is provided [as a Python package](https://pypi.org/project/core-aprs-client/), you should follow the steps below to familiarize yourself with the framework and run first tests with the provided sample code:
 
 - Clone this repository

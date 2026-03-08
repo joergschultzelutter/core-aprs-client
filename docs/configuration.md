@@ -1,5 +1,16 @@
 # Program Configuration File
 
+## Table of Contents
+<!--ts-->
+* [Introduction](#introduction)
+* [Configuration file schema validation](#configuration-file-schema-validation)
+* [Mandatory configuration file sections](#mandatory-configuration-file-sections)
+* [Optional configuration file sections](#optional-configuration-file-sections)
+* [Configuration file sample](#configuration-file-sample)
+<!--te-->
+
+## Introduction
+
 When it comes to the user's individual configuration settings, `core-aprs-client` solely relies on an external config file. Its default file name is `core-aprs-client.cfg` and can be overwritten by specifying an individual file name program parameter during program start.
 
 `core-aprs-client.cfg` is divided into multiple sections whose contents will be described in the following help pages. Each documentation page contains the associated configuration variables along with their data types (`str`, `int`, `float`, and `boolean`). Note that `boolean` value settings in the configuration file are case-insensitive and provide support for custom key values:
@@ -10,7 +21,7 @@ When it comes to the user's individual configuration settings, `core-aprs-client
 | `false`, `no`, or `off` | `False`                  |
 
 > [!NOTE]
-> Except for the first two configuration sections, all other configuration sections are _optional_ and have been pre-configured. If you are happy with the default settings, modify those parts of the config file which _do_ require modifications (e.g. call sign, passcode) — and you're good to go.
+> Except for the first two configuration sections `client_config` and `network_config`, all other configuration sections are _optional_ and have been pre-configured. If you are happy with the default settings, modify those parts of the config file which _do_ require modifications (e.g. call sign, passcode) — and you're good to go.
 
 > [!TIP]
 > Complete sample file templates for both [the configuration file](/framework_examples/core_aprs_client.cfg.TEMPLATE) and the [Apprise configuration file](/framework_examples/apprise.yml.TEMPLATE) can be found in the [`framework_examples`](/framework_examples) directory.

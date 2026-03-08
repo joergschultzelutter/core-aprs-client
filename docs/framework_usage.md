@@ -1,5 +1,29 @@
 # `core-aprs-client` framework usage
 
+## Table of Contents
+<!--ts-->
+* [Basic schematics](#basic-schematics)
+* [Your custom code vs. the `core-aprs-client` framework](#your-custom-code-vs-the-core-aprs-client-framework)
+* [General info](#general-info)
+* [Usage of the offline test option for your bot integration](#usage-of-the-offline-test-option-for-your-bot-integration)
+* [Implemented APRS Command Stubs](#implemented-aprs-command-stubs)
+* [Extending the mandatory code stubs](#extending-the-mandatory-code-stubs)
+  * [Extending the input parser `input_parser.py`](#extending-the-input-parser-input_parserpy)
+    * [Input parser: Inputs](#input-processor-inputs)
+    * [Input parser: Outputs](#input-processor-outputs)
+    * [return_code - Valid values](#return_code---valid-values)
+  * [Extending the output generator `output_generator.py`](#extending-the-output-generator-output_generatorpy)
+    * [Output generator: Inputs](#output-generator-inputs)
+    * [Output generator: Outputs](#output-generator-outputs)
+* [Extending the optional code stubs](#extending-the-optional-code-stubs)
+  * [Extending the pre-processor `pre_processor.py`](#extending-the-pre-processor-pre_processorpy)
+    * [Pre-processor: Inputs](#pre-processor-inputs)
+    * [Pre-processor: Outputs](#pre-processor-outputs)
+  * [Extending the post-processor `post_processor.py`](#extending-the-post-processor-post_processorpy)
+    * [Post-processor: Inputs](#post-processor-inputs)
+    * [Post-processor: Outputs](#post-processor-outputs)
+<!--te-->
+
 ## Basic schematics
 ![Workflow Input-Output Processing](/img/workflow_input_output_processing.svg)
 
@@ -13,19 +37,23 @@
 > [!NOTE]
 > The following documentation references the files located in this repository's [`framework_examples`](/framework_examples) directory
 
-> [!TIP]
-> - [`input_parser.py`](/framework_examples/input_parser.py) digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us. If successful, the desired action is identified and returned back to the `core-aprs-client` framework - which will then forward it to the `output_generator.py` function.
-> - [`output_generator.py`](/framework_examples/output_generator.py) takes the data from [`input_parser.py`](/framework_examples/input_parser.py) and builds the outgoing message which is later to be sent to APRS-IS. Note that this function is only responsible for generating the outgoing _content_ whereas `core-aprs-client` will take that data and split it up into 1...n APRS messages. Dependent on your use case, [`output_generator.py`](/framework_examples/output_generator.py) might also generate data for those edge cases where you want to have `core-aprs-client` execute an action _after_ the APRS response has been sent to the user. That data will get digested by [`post_processor.py`](/framework_examples/post_processor.py) if the user has assigned a post processing function to the class' instance.
-> - [`post_processor.py`](/framework_examples/post_processor.py) takes the data from [`output_generator.py`](/framework_examples/output_generator.py) and executes a custom function _after_ the APRS response has been sent to the user, assuming that the user has assigned such a post-processing function to the class' instance.
-> - Both function names and file names do not need to follow a naming pattern and can reside e.g. in a single file; the file structure in this repository has only been chosen for illustration purposes. 
+| Function | mandatory | Configuration Details | Description |
+| -------- | --------- | ----------------------------------------- | ------------------ |
+| [`input_parser.py`](/framework_examples/input_parser.py)         | :white_check_mark: | [Extending the input parser [`input_parser.py`]](/docs/framework_usage.md#extending-the-input-parser-input_parserpy)                     | Digests the incoming input from APRS. As an input processor, it tries to figure out what the user wants from us. If successful, the desired action is identified and returned back to the `core-aprs-client` framework - which will then forward it to the `output_generator.py` function. |
+| [`output_generator.py`](/framework_examples/output_generator.py) | :white_check_mark: | [Extending the output generator [`output_generator.py`]](/docs/framework_usage.md#extending-the-output-generator-output_generatorpy) | Takes the data from [`input_parser.py`](/framework_examples/input_parser.py) and builds the outgoing message which is later to be sent to APRS-IS. Note that this function is only responsible for generating the outgoing _content_ whereas `core-aprs-client` will take that data and split it up into 1...n APRS messages. Dependent on your use case, [`output_generator.py`](/framework_examples/output_generator.py) might also generate data for those edge cases where you want to have `core-aprs-client` execute an action _after_ the APRS response has been sent to the user. That data will get digested by [`post_processor.py`](/framework_examples/post_processor.py) if the user has assigned a post processing function to the class' instance. |
+| [`pre_processor.py`](/framework_examples/pre_processor.py)       | :x:                | [Extending the pre-processor [`pre_processor.py`]](/docs/framework_usage.md#extending-the-pre-processor-pre_processorpy)                | Initiates a pre-processing workflow _before_ [`input_parser.py`](/framework_examples/input_parser.py) gets triggered. Additionally, you can pass a message text to the framework which will be sent to the user as an APRS message prior to triggering the [`input_parser.py`](/framework_examples/input_parser.py) |
+| [`post_processor.py`](/framework_examples/post_processor.py)     | :x:                | [Extending the post-processor [`post_processor.py`]](/docs/framework_usage.md#extending-the-post-processor-post_processorpy)           | Takes the data from [`output_generator.py`](/framework_examples/output_generator.py) and executes a custom function _after_ the APRS response has been sent to the user, assuming that the user has assigned such a post-processing function to the class' instance. |
 
-`input_parser.py` and `output_generator.py` rely on exchanging data through a mutually equal data structure. That data structure can be defined by the user and is passed through between both user functions; the `core-aprs-client` framework itself does *not* use contents from this data element (`input_parser_response_object`) _in any way_. Just ensure that both custom code modules `input_parser.py` and `output_generator.py` share the same data exchange structure. Note that the same setup also applies to the data exchange between `output_generator.py` and `post_processor.py`.
+> [!TIP]
+> Both function names and file names do not need to follow a naming pattern and can reside e.g. in a single file; the file structure in this repository has only been chosen for illustration purposes. 
+
+`input_parser.py` and `output_generator.py` rely on exchanging data through a mutually equal data structure. **That data structure is defined by the user** and is passed through between both user functions; the `core-aprs-client` framework itself does *not* use contents from this data element (`input_parser_response_object`) _in any way_. Just ensure that both custom code modules `input_parser.py` and `output_generator.py` share the same data exchange structure. Note that the same setup also applies to the data exchange between `output_generator.py` and `post_processor.py` in case you intend to use post-processing. `pre_processor.py` and `input_parser.py` do _not_ share a common data structure.
 
 ![DataExchange](/img/data_exchange.svg)
 
 ## Usage of the offline test option for your bot integration
 > [!TIP]
-> - You can use the framework's[`dryrun_testcall`](coreaprsclient_class.md#dryrun_testcall-class-method) method for a 100% offline testing option which does not connect to APRS-IS. `dryrun_testcall` will route a user's call sign and APRS message through both input parser and output generator modules: it also covers the post processor function logic.
+> - You can use the framework's[`dryrun_testcall`](coreaprsclient_class.md#dryrun_testcall-class-method) method for a 100% offline testing option which does not connect to APRS-IS. `dryrun_testcall` will route a user's call sign and APRS message through both input parser and output generator modules: it also covers the post processor function logic. It does NOT cover the generation of actual (simulated) APRS messages - you can use the [configuration file's [`aprsis_simulate_send`](/docs/configuration_subsections/config_testing.md) configuration setting for this use case. See [test instructions](/docs/testing.md) for details.
 
 ## Implemented APRS Command Stubs
 By default, `core-aprs-client`'s default installation comes with sample keywords that you can send to its associated APRS call sign. In its default demonstration setup, the framework accepts these keywords:
@@ -44,10 +72,11 @@ Any _other_ command that is sent to `core-aprs-client` will generate the bot's _
 > For demonstration purposes, both `input_parser.py` and `output_generator.py` use a _VERY_ simplified processing algorithm. For your future code, you might want to implement proper parsing (e.g. by using regular expressions) and error handling.
 
 > [!NOTE]
-> - All input parameters for `input_parser.py`, `output_generator.py`, and `post_processor.py` are mandatory parameters
+> - All input parameters for `input_parser.py`, `output_generator.py`, `pre_processor.py`, and `post_processor.py` are mandatory parameters
 > - Internally, all input parameters are treated as named parameters.
 
-## Extending the input parser [`input_parser.py`](/framework_examples/input_parser.py)
+## Extending the mandatory code stubs
+### Extending the input parser [`input_parser.py`](/framework_examples/input_parser.py)
 
 ```python
 def parse_input_message(instance: CoreAprsClient,
@@ -61,7 +90,7 @@ def parse_input_message(instance: CoreAprsClient,
 ```
 
 
-### Input processor: Inputs
+#### Input processor: Inputs
 
 | Field name      | Content                                                            | Field Type       |
 |-----------------|--------------------------------------------------------------------|------------------|
@@ -70,7 +99,7 @@ def parse_input_message(instance: CoreAprsClient,
 | `from_callsign` | The call sign that has sent the incoming APRS message to us        | `str`            |
 | `**kwargs`      | Optional user-defined parameters                                   | `dict`           |
 
-### Input processor: Outputs
+#### Input processor: Outputs
 
 | Field name                      | Content                                                                                                                                                                                                                                                                                                | Field Type                       |
 |---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
@@ -125,7 +154,7 @@ The default `input_parser_response_object` object (as provided with the sample c
 | `from_callsign`              | Same value as the input section's `from_callsign`                                                                                                                                                                                                                                                                               | `str`      |
 | `command_code`               | contains an internal code which tells the program's output processor what it needs to do.                                                                                                                                                                                                                                       | `str`      |
 
-## Extending the output generator [`output_generator.py`](/framework_examples/output_generator.py)
+### Extending the output generator [`output_generator.py`](/framework_examples/output_generator.py)
 
 ```python
 def generate_output_message(
@@ -143,7 +172,7 @@ def generate_output_message(
 The output generator has only one input parameter: the input parser's response object.
 
 
-### Output generator: Inputs
+#### Output generator: Inputs
 
 | Field name                     | Content                                                                                                                                                                                                                                                                                                  | Field Type                       |
 |--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
@@ -151,7 +180,7 @@ The output generator has only one input parameter: the input parser's response o
 | `input_parser_response_object` | (Dictionary) object where we store the data that is required by the `output_generator` module for generating the APRS message. Note that you can also return other objects such as classes. Just ensure that both `input_parser` and `output_generator` share the very same structure for this variable. | `dict` (default) or any `object` |
 | `**kwargs`                     | Optional user-defined parameters                                                                                                                                                                                                                                                                         | `dict`                           |
  
-### Output generator: Outputs
+#### Output generator: Outputs
 
 | Field name                   | Content                                                                                                                                                                                                                                                                                                                                                                                                       | Field Type         |
 |------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
@@ -159,10 +188,46 @@ The output generator has only one input parameter: the input parser's response o
 | `output_message`             | This is the content that will be sent to the APRS user. `core-aprs-client`'s callback function will take this content, convert it into data chunks of up to 6 bytes in length, and then send it to APRS-IS.                                                                                                                                                                                                   | `str`              |
 | `postprocessor_input_object` | Optional. If you want to use the framecwork's post-processing options (perform an action _after_ the APRS response has been sent to the user, populate this field and add a custom function to `core-aprs-client`'s class instance. Simlar to `input_parser_response_object`, the content is just passed along to the post processor, meaning that you can use e.g. `dict` objects or custom data structures. | `object` or `None` |
 
-## Extending the post processor [`post_processor.py`](/framework_examples/post_processor.py)
+## Extending the optional code stubs
+### Extending the pre-processor [`pre_processor.py`](/framework_examples/pre_processor.py)
 
 > [!NOTE]
-> Usage of the post processor function is optional. You only want to use if for those cases where an additional action is supposed to be triggered _after_ the APRS response has been sent back to the user.
+> Usage of the pre-processor function is optional. You only want to use if for those cases where an additional action is supposed to be triggered _before_ the incoming APRS request gets parsed by `input_processor.py`. In addition, this option allows you to send an outgoing APRS message to the user before parsing the incoming APRS message. This can be useful, for example, in cases where there is a long delay between parsing the incoming message and sending the outgoing message.
+
+```python
+def pre_processing(instance: CoreAprsClient,
+                        aprs_message: str, 
+                        from_callsign: str, 
+                        **kwargs):
+    ....
+    return  (success, 
+             pre_processor_response_message)
+```
+
+The post processor has only one input parameter: a simple `True`/`False` response whose value currently is of no consequence for the `core-aprs-client` framework.
+
+
+#### Pre-Processor: Inputs
+
+| Field name      | Content                                                            | Field Type       |
+|-----------------|--------------------------------------------------------------------|------------------|
+| `instance`      | Your `core-aprs-client` instance                                   | `CoreAprsClient` |
+| `aprs_message`  | The actual APRS message that we have received from `from_callsign` | `str`            |
+| `from_callsign` | The call sign that has sent the incoming APRS message to us        | `str`            |
+| `**kwargs`      | Optional user-defined parameters                                   | `dict`           |
+
+ 
+#### Pre-Processor: Outputs
+
+| Field name                       | Content                                                                                                                                                                                                                                                                   | Field Type                                     |
+|----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
+| `success`                        | `True` in case of no errors, otherwise `False`. Note that with the current version of `core-aprs-client`, the value is of no consequence. A value of `False` is of no consequence to the next workflow steps, meaning that the `input_processor` will still get triggered | `boolean`          |
+| `pre_processor_response_message` | If `type(pre_processor_response_message) is str` AND `success == True`: send `pre_processor_response_message` as outgoing APRS message to the user _before_ the `input_processor` gets triggered.                                                                         | `str` or `None` |
+
+### Extending the post-processor [`post_processor.py`](/framework_examples/post_processor.py)
+
+> [!NOTE]
+> Usage of the post-processor function is optional. You only want to use if for those cases where an additional action is supposed to be triggered _after_ the APRS response has been sent back to the user.
 
 ```python
 def post_processing(
@@ -177,7 +242,7 @@ def post_processing(
 The post processor has only one input parameter: a simple `True`/`False` response whose value currently is of no consequence for the `core-aprs-client` framework.
 
 
-### Post Processor: Inputs
+#### Post-Processor: Inputs
 
 | Field name                   | Content                                                                                                                                                                                                                                                                                                                                 | Field Type                       |
 |------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
@@ -185,8 +250,10 @@ The post processor has only one input parameter: a simple `True`/`False` respons
 | `postprocessor_input_object` | (Dictionary) object where we store the data that is required by the `post_processor` module for the individual post processing action. The data type can be anything from a simple string, dictionary to a class object. Just ensure that both `output_generator` and `post_processor` share the very same structure for this variable. | `dict` (default) or any `object` |
 | `**kwargs`                   | Optional user-defined parameters                                                                                                                                                                                                                                                                                                        | `dict`                           |
  
-### Post Processor: Outputs
+#### Post-Processor: Outputs
 
-| Field name | Content                                                                                                                                   | Field Type |
-|------------|-------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| `success`  | `True` in case of no errors, otherwise `False`. Note that with the current version of `core-aprs-client`, the value is of no consequence. | `boolean`  |
+| Field name                        | Content                                                                                                                                                                                                                                                                   | Field Type      |
+|-----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|
+| `success`                         | `True` in case of no errors, otherwise `False`. Used in combination with `post_processor_response_message`,                                                                                                                                                               | `boolean`       |
+| `post_processor_response_message` | If `type(post_processor_response_message)` is `str` AND `len(post_processor_response_message)>0` AND `success` == `True`, then `post_processor_response_message` will be sent out as APRS response to the user **after** the post-processor code has finished processing. | `str` or `None` |
+

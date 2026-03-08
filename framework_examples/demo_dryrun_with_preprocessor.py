@@ -9,10 +9,10 @@
 # https://github.com/joergschultzelutter/core-aprs-client/blob/apprise-messaging-method/docs/coreaprsclient_class.md#dryrun_testcall-class-method
 # Same as demo_dryrun.py, but with active postprocessor
 #
-# Details on how post-processing works:
-# https://github.com/joergschultzelutter/core-aprs-client/blob/postproc/docs/coreaprsclient_class.md#using-the-post-processor
+# Details on how pre-processing works:
+# https://github.com/joergschultzelutter/core-aprs-client/blob/postproc/docs/coreaprsclient_class.md#using-the-pre-processor
 #
-# Author: Joerg Schultze-Lutter, 2025
+# Author: Joerg Schultze-Lutter, 2026
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ from CoreAprsClient import CoreAprsClient
 # Your custom input parser and output generator code
 from input_parser import parse_input_message
 from output_generator import generate_output_message
+from pre_processor import pre_processing
 
 # Your custom post processor
 from post_processor import post_processing
@@ -83,7 +84,7 @@ def get_command_line_params():
 
 
 if __name__ == "__main__":
-    logger.info(msg=f"Starting demo module: dryrun with post-processor")
+    logger.info(msg=f"Starting demo module: dryrun with pre-processor")
     logger.info(
         msg="This is a demo APRS client which performs an offline dry-run on a given APRS message/APRS callsign combination."
     )
@@ -103,14 +104,11 @@ if __name__ == "__main__":
         log_level=logging.DEBUG,
         input_parser=parse_input_message,
         output_generator=generate_output_message,
-        post_processor=post_processing,
+        pre_processor=pre_processing,
     )
 
     # The preconfigured example assumes that callsign "DF1JSL-1"
-    # has sent the APRS message text "postprocessor" to your bot.
-    # If you send any other APRS message, the input processor/output generator
-    # stub code will not create post-processing input data, thus effectively
-    # disabling the post-processing code. Details:
-    # https://github.com/joergschultzelutter/core-aprs-client/blob/master/framework_examples/demo_dryrun_with_postprocessor.py
+    # has sent the APRS message text "helloworld" to your bot.
+    # h https://github.com/joergschultzelutter/core-aprs-client/blob/master/framework_examples/demo_dryrun_with_preprocessor.py
     #
-    client.dryrun_testcall(message_text="postprocessor", from_callsign="DF1JSL-1")
+    client.dryrun_testcall(message_text="helloworld", from_callsign="DF1JSL-1")

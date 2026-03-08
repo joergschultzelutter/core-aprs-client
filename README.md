@@ -2,9 +2,34 @@
 
 ![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![PyPi version](https://img.shields.io/pypi/v/core-aprs-client.svg)](https://pypi.python.org/pypi/core-aprs-client)
 
+
+## Table of contents
+<!--ts-->
+
+* [Introduction](#introduction)
+* [Sample APRS Client](#sample-aprs-client)
+* [Core features](#core-features)
+* [Installation and Configuration](#installation-and-configuration)
+  * [Installation instructions](#installation-instructions)
+  * [Client Configuration](#client-configuration)
+  * [Framework examples](#framework-examples)
+  * [`CoreAprsClient` class description](#coreaprsclient-class-description)
+  * [Source Code Anatomy](#source-code-anatomy)
+  * [Framework usage](#framework-usage)
+  * [Client schematics](#client-schematics)
+* [Known issues and caveats](#known-issues-and-caveats)
+* [Projects that use `core-aprs-client`](#projects-that-use-core-aprs-client)
+* [Known issues and caveats](#known-issues-and-caveats)
+* [Alternatives to `core-aprs-client`](#alternatives-to-core-aprs-client)
+* [The fine print](#the-fine-print)
+
+<!--te-->
+
+## Introduction
+
 Core APRS client framework with dupe detection, bulletin/beaconing support, and other APRS-IS related stuff.
 
-```core-aprs-client``` is a modernized version of [mpad](https://github.com/joergschultzelutter/mpad)'s APRS functions which can be used for building your very own APRS client / bot. Its framework supports all of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS messaging functions, such as connecting to APRS-IS, message dupe detection, ACK handling, and other functionality such as APRS bulletins (supporting both static and dynamic contents) and APRS beaconing. However, ```core-aprs-client``` deliberately lacks any _specific_ APRS bot functions such as WX reporting etc. 
+```core-aprs-client``` is a modernized version of [mpad](https://github.com/joergschultzelutter/mpad)'s APRS functions which can be used for building your very own APRS client / bot. Its framework supports all of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS messaging functions, such as connecting to APRS-IS, message dupe detection, ACK handling, and other functionality such as APRS bulletins (supporting both static and dynamic contents) and APRS beaconing. Additionally, support for rare use cases such as [pre- and post-processing](/docs/framework_usage.md#extending-the-pre-processor-pre_processorpy) of APRS requests is provided. However, ```core-aprs-client``` deliberately lacks any _specific_ APRS bot functions such as WX reporting etc. 
 
 This is where _you_ step in. Add your bot-specific code to the client's APRS framework code. Everything else related to APRS messaging and communication with APRS-IS will be covered by the ```core-aprs-client``` framework.
 
@@ -35,8 +60,10 @@ It's as simple as that.
 - Core APRS-IS functionality, covering both 'old' and '[new](http://www.aprs.org/aprs11/replyacks.txt)' ACK processing
 - Configurable dupe message handler
 - Optional:
-    - APRS beacons and bulletins, including support for dynamic bulletin content generated during runtime
-    - Program crash handler, allowing you to get notified in case the client program crashes
+    - APRS beacons and bulletins, including [support for dynamic bulletin content](/docs/coreaprsclient_class.md#use-of-dynamic-content-for-aprs-bulletins-additional-to-static-bulletin-content) generated during runtime
+    - Program [crash handler](/docs/configuration_subsections/config_crash_handler.md), allowing you to get notified in case the client program crashes
+    - Support for [pre- and post-processing](/docs/framework_usage.md#extending-the-optional-code-stubs)
+- All configuration settings are stored in a single [program configuration file](/docs/configuration.md#program-configuration-file)
 
 ## Installation and Configuration
 
@@ -61,6 +88,9 @@ The steps for using the client framework are described [here](docs/framework_usa
 ### Client schematics
 If you want to learn about the bot's basic processing structure, then have a look at [this diagram](docs/schematics.md).
 
+### Projects that use `core-aprs-client`
+A list of my projects that are dependent on `core-aprs-client` can be found [here](/docs/projectsusingcoac.md)
+
 ## Known issues and caveats
 - This software is single-threaded. Due to APRS-IS's technical nature of resubmitting non-ack'ed messages, this limitation should not be an issue, though. Future versions of this software might support queued processing of incoming requests.
 - This software is intended to be used by licensed ham radio operators. If you are not a licensed ham radio operator, then this program is not (yet) for you. Why not take a look at sites such as [Hamstudy](https://hamstudy.org/) and [50 Ohm](https://50ohm.de/) - and get licensed?
@@ -68,7 +98,12 @@ If you want to learn about the bot's basic processing structure, then have a loo
 - You HAVE to assign your personal call sign to the bot.
 - You HAVE to [request your personal APRS TOCALL](https://github.com/aprsorg/aprs-deviceid) for using this bot __in production__. See the [APRS Device ID](https://github.com/aprsorg/aprs-deviceid/blob/main/ALLOCATING.md#development-phase) information section on proper usage.
 
+## Alternatives to `core-aprs-client`
+A great alternative to `core-aprs-client` is KM6LYW's[`aprsd`](https://github.com/craigerl/aprsd). If you don't intend to use `core-aprs-client`'s specific functionalities such as pre- and post-processing (which afaik aren't supported by `aprsd`), this program might be a viable alternative.
+
 ## The fine print
 
 - If you intend to host an instance of this program, you must be a licensed radio amateur. BYOP: Bring your own (APRS-IS) passcode. If you don't know what this is, then this program is not for you.
+
 - APRS is a registered trademark of APRS Software and Bob Bruninga, WB4APR.
+

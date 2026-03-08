@@ -84,7 +84,7 @@ def get_command_line_params():
 
 
 if __name__ == "__main__":
-    logger.info(msg=f"Starting demo module: APRS bot with post processor")
+    logger.info(msg=f"Starting demo module: APRS bot with post-processor")
     logger.info(
         msg="This is a demo APRS client which connects to APRS-IS, processes the incoming message, sends a response back to the client and finally executes post-processing code."
     )
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     # - configuration file name
     # - log level (from Python's 'logging' package)
     # - function names for both input processor and output generator
-    # - function name for the post processor
+    # - function name for the post-processor
     #
     # Note: in order to trigger the post-processor, send the APRS message
     #       "postprocessor" to your core-aprs-client instance. This will tell
