@@ -136,7 +136,7 @@ def __process_postproc_keyword(data_parameters: dict):
     # Finally, indicate to the main process that we were successful
     success = True
 
-    # By returning a data scructure that is (obviously) not 'None', we tell
+    # By returning a data structure that is (obviously) not 'None', we tell
     # core-aprs-client that we want to have this data forwarded to the postprocessor.
     # If the user has selected such a post processor as part of the class' instantiation,
     # that post processor along with this given data will get triggered.

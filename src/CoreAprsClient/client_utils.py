@@ -359,8 +359,8 @@ def generate_apprise_message(
         return success
 
     if not check_if_file_exists(apprise_config_file):
-        logger.error(
-            msg=f"Apprise config file '{apprise_config_file}' does not exist; aborting"
+        logger.warning(
+            msg=f"Apprise config file '{apprise_config_file}' does not exist; aborting apprise processing"
         )
         return success
 
