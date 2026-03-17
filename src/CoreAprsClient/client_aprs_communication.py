@@ -497,9 +497,9 @@ def aprs_callback(
                 if preproc:
                     logger.debug(msg="Executing preprocessor")
                     success, pre_processor_response_message = preproc(
-                        instance=instance,
-                        aprs_message=message_text_string,
-                        from_callsign=from_callsign,
+                        instance,
+                        message_text_string,
+                        from_callsign,
                         **kwargs,
                     )
                     logger.debug(msg=f"Preprocessor result: {success}")
@@ -546,9 +546,9 @@ def aprs_callback(
                 # Note: we call the function which was passed along with the
                 # callback object
                 retcode, input_parser_error_message, response_parameters = parser(
-                    instance=instance,
-                    aprs_message=message_text_string,
-                    from_callsign=from_callsign,
+                    instance,
+                    message_text_string,
+                    from_callsign,
                     **kwargs,
                 )
                 logger.debug(msg=f"Input parser result: {retcode}")
@@ -615,8 +615,8 @@ def aprs_callback(
                         # Note: we call the function which was passed along with the
                         # callback object
                         success, output_string, postproc_data = generator(
-                            instance=instance,
-                            input_parser_response_object=response_parameters,
+                            instance,
+                            response_parameters,
                             **kwargs,
                         )
                         if success:
@@ -699,8 +699,8 @@ def aprs_callback(
                 # is ignored.
                 if postproc_data and postproc:
                     success, post_processor_response_message = postproc(
-                        instance=instance,
-                        postprocessor_input_object=postproc_data,
+                        instance,
+                        postproc_data,
                         **kwargs,
                     )
 
