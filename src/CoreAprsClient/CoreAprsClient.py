@@ -324,12 +324,16 @@ class CoreAprsClient:
         # Set up the exception handler to catch unhandled exceptions
         sys.excepthook = handle_exception
 
+        ###
+        ### BEGIN Pre-Processor Code
+        ###
+
         if self.pre_processor:
             logger.info(msg="Running pre-processor code ...")
             success, pre_processor_response_string = self.pre_processor(
-                instance=self,
-                aprs_message=message_text,
-                from_callsign=from_callsign,
+                self,
+                message_text,
+                from_callsign,
                 **kwargs,
             )
             if success:
@@ -352,16 +356,28 @@ class CoreAprsClient:
                         # Dump the data to the console
                         logger.info(msg=pformat(preproc_message))
 
+        ###
+        ### END Pre-Processor Code
+        ###
+
+        ###
+        ### BEGIN Input-Parser Code
+        ###
+
         logger.info(
             msg=f"input_parser: Parsing message '{message_text}' for callsign '{from_callsign}'"
         )
 
         retcode, input_parser_error_message, response_parameters = self.input_parser(
-            instance=self,
-            aprs_message=message_text,
-            from_callsign=from_callsign,
+            self,
+            message_text,
+            from_callsign,
             **kwargs,
         )
+
+        ###
+        ### END Input-Parser Code
+        ###
 
         logger.info(msg="Parsed message:")
         logger.info(msg=pformat(response_parameters))
@@ -369,12 +385,16 @@ class CoreAprsClient:
         match retcode:
             case CoreAprsClientInputParserStatus.PARSE_OK:
 
+                ###
+                ### BEGIN Output-Generator Code
+                ###
+
                 logger.info("output_generator: Running Output Processor build ...")
 
                 # (Try to) build the outgoing message string
                 success, output_message_string, postproc_data = self.output_generator(
-                    instance=self,
-                    input_parser_response_object=response_parameters,
+                    self,
+                    response_parameters,
                     **kwargs,
                 )
                 logger.info(msg=f"Output Generator response={success}, message:")
@@ -406,16 +426,27 @@ class CoreAprsClient:
                     )
                 logger.info(msg=pformat(output_message))
 
+                ###
+                ### END Output-Generator Code
+                ###
+
+                ###
+                ### BEGIN Post-Processor Code
+                ###
+
                 if self.post_processor and postproc_data:
                     logger.debug(msg="post_processor: Activating post-processor...")
                     success, post_processor_response_string = self.post_processor(
-                        instance=self,
-                        postprocessor_input_object=postproc_data,
+                        self,
+                        postproc_data,
                         **kwargs,
                     )
                     logger.debug(
                         msg=f"post-processor response='{success}', post_processor_response_string='{post_processor_response_string}')"
                     )
+                ###
+                ### END Post-Processor Code
+                ###
 
             case CoreAprsClientInputParserStatus.PARSE_ERROR | _:
                 logger.error(
