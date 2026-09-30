@@ -74,7 +74,7 @@ def _get_aprs_msg_len() -> int:
 
 
 def add_aprs_message_to_cache(
-    message_text: str, message_no: str, target_callsign: str, aprs_cache: ExpiringDict
+    message_text: str, source_callsign: str, aprs_cache: ExpiringDict
 ):
     """
     Creates an entry in our expiring dictionary cache. Later on,
@@ -86,9 +86,7 @@ def add_aprs_message_to_cache(
     ==========
     message_text: str
         APRS message (as extracted from the original incoming message)
-    message_no: str
-        APRS message number (or 'None' if not present)
-    target_callsign: str
+    source_callsign: str
         Call sign of the user who has sent this message
     aprs_cache: ExpiringDict
         Reference to the ExpiringDict cache
@@ -98,12 +96,12 @@ def add_aprs_message_to_cache(
         Reference to the ExpiringDict cache, now containing our entry
     """
     # Create message key which consists of:
-    # - an md5-ed version of the message text (save some bytes on storage)
+    # - a md5-ed version of the message text (save some bytes on storage)
     #   Conversion to string is necessary; otherwise, the lookup won't work
     # - the user's call sign
     # - the message number (note that this field's content can be 'None')
     md5_hash = hashlib.md5(message_text.encode("utf-8")).hexdigest()
-    key = (md5_hash, target_callsign, message_no)
+    key = (md5_hash, source_callsign)
     # Finally, build the key. Convert it to a tuple as the key needs to be immutable
     key = tuple(key)
 
@@ -130,7 +128,7 @@ def check_if_file_exists(file_name: str):
 
 
 def get_aprs_message_from_cache(
-    message_text: str, message_no: str, target_callsign: str, aprs_cache: ExpiringDict
+    message_text: str, source_callsign: str, aprs_cache: ExpiringDict
 ):
     """
     Checks for an entry in our expiring dictionary cache.
@@ -140,9 +138,7 @@ def get_aprs_message_from_cache(
     ==========
     message_text: str
         APRS message (as extracted from the original incoming message)
-    message_no: str
-        APRS message number (or 'None' if not present)
-    target_callsign: str
+    source_callsign: str
         Call sign of the user who has sent this message
     aprs_cache: ExpiringDict
         Reference to the ExpiringDict cache
@@ -152,12 +148,12 @@ def get_aprs_message_from_cache(
         Key tuple (or 'None' if not found / no longer present)
     """
     # Create message key which consists of:
-    # - an md5-ed version of the message text (save some bytes on storage)
+    # - a md5-ed version of the message text (save some bytes on storage)
     #   Conversion to string is necessary; otherwise, the lookup won't work
     # - the user's call sign
     # - the message number (note that this field's content can be 'None')
     md5_hash = hashlib.md5(message_text.encode("utf-8")).hexdigest()
-    key = (md5_hash, target_callsign, message_no)
+    key = (md5_hash, source_callsign)
     # Finally, build the key. Convert it to a tuple as the key needs to be immutable
     key = tuple(key)
 

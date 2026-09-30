@@ -455,8 +455,7 @@ def aprs_callback(
             # request, thus allowing us to ignore this request.
             aprs_message_key = get_aprs_message_from_cache(
                 message_text=message_text_string,
-                message_no=msgno_string,
-                target_callsign=from_callsign,
+                source_callsign=from_callsign,
                 aprs_cache=client_shared.aprs_message_cache,
             )
             if aprs_message_key:
@@ -677,8 +676,7 @@ def aprs_callback(
                 # processing status
                 client_shared.aprs_message_cache = add_aprs_message_to_cache(
                     message_text=message_text_string,
-                    message_no=msgno_string,
-                    target_callsign=from_callsign,
+                    source_callsign=from_callsign,
                     aprs_cache=client_shared.aprs_message_cache,
                 )
 
