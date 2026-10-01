@@ -510,15 +510,11 @@ def aprs_callback(
                     # to send back to the user before we enter the input parser
                     if success and type(pre_processor_response_message) is str:
                         if len(pre_processor_response_message) > 0:
-                            # generate the message list ...
-                            preproc_message = make_pretty_aprs_messages(
-                                message_to_add=pre_processor_response_message
-                            )
 
                             # Finalize the message (if necessary), then send it
                             # to APRS-IS
                             finalize_and_send_message(
-                                message_text_array=preproc_message,
+                                message_text=pre_processor_response_message,
                                 from_callsign=from_callsign,
                                 msg_no_supported=msg_no_supported,
                                 msgno_string=msgno_string,
@@ -554,7 +550,7 @@ def aprs_callback(
                 logger.debug(msg=response_parameters)
 
                 # this is our future output message object
-                output_message = []
+                output_message = ""
 
                 # this is our potential postprocessor input object
                 # If its future value is not 'None' AND a post processor has been
@@ -619,18 +615,14 @@ def aprs_callback(
                             **kwargs,
                         )
                         if success:
-                            output_message = make_pretty_aprs_messages(
-                                message_to_add=output_string
-                            )
+                            output_message = output_string
                         else:
                             # This code branch should never be reached unless there is a
                             # discrepancy between the action determined by the input parser
                             # and the responsive counter-action from the output processor
-                            output_message = make_pretty_aprs_messages(
-                                message_to_add=program_config["coac_client_config"][
-                                    "aprs_input_parser_default_error_message"
-                                ],
-                            )
+                            output_message = program_config["coac_client_config"][
+                                "aprs_input_parser_default_error_message"
+                            ]
                     # This is the branch where the input parser failed to understand
                     # the message. A possible reason: you sent a keyword which requires
                     # an additional parameter but failed to send that one, too.
@@ -640,18 +632,14 @@ def aprs_callback(
                     case CoreAprsClientInputParserStatus.PARSE_ERROR:
                         # Dump the human-readable message to the user if we have one
                         if input_parser_error_message:
-                            output_message = make_pretty_aprs_messages(
-                                message_to_add=f"{input_parser_error_message}",
-                            )
+                            output_message = input_parser_error_message
                         # If not, just dump the link to the instructions
                         # This is the default branch which dumps generic information
                         # to the client whenever there is no generic error text from the input parser
                         else:
-                            output_message = make_pretty_aprs_messages(
-                                message_to_add=program_config["coac_client_config"][
-                                    "aprs_input_parser_default_error_message"
-                                ],
-                            )
+                            output_message = program_config["coac_client_config"][
+                                "aprs_input_parser_default_error_message"
+                            ]
                             logger.debug(
                                 msg=f"Unable to process APRS packet {raw_aprs_packet}"
                             )
@@ -662,7 +650,7 @@ def aprs_callback(
                 # Finalize the message (if necessary), then send it
                 # to APRS-IS
                 finalize_and_send_message(
-                    message_text_array=output_message,
+                    message_text=output_message,
                     from_callsign=from_callsign,
                     msg_no_supported=msg_no_supported,
                     msgno_string=msgno_string,
@@ -704,15 +692,11 @@ def aprs_callback(
 
                     if success and type(post_processor_response_message) is str:
                         if len(post_processor_response_message) > 0:
-                            # generate the message list ...
-                            postproc_message = make_pretty_aprs_messages(
-                                message_to_add=post_processor_response_message
-                            )
 
                             # Finalize the message (if necessary), then send it
                             # to APRS-IS
                             finalize_and_send_message(
-                                message_text_array=postproc_message,
+                                message_text=post_processor_response_message,
                                 from_callsign=from_callsign,
                                 msg_no_supported=msg_no_supported,
                                 msgno_string=msgno_string,
@@ -915,7 +899,7 @@ def remove_scheduler(aprs_scheduler: BackgroundScheduler):
 
 
 def finalize_and_send_message(
-    message_text_array: Iterable[str],
+    message_text: str,
     from_callsign: str,
     msg_no_supported: bool,
     msgno_string: str,
@@ -927,8 +911,8 @@ def finalize_and_send_message(
 
     Parameters
     ==========
-    message_text_array: Iterable[str]
-        our outgoing message without trailing message numbers
+    message_text: str
+        our outgoing message
     from_callsign: str
         Sender's original callsign, now acting as destination callsign
     msg_no_supported: bool
@@ -954,6 +938,14 @@ def finalize_and_send_message(
     """
 
     logger.debug(msg="Finalizing and sending APRS messages...")
+
+    # check if we have actually something to send
+    if len(message_text) == 0:
+        logger.debug(msg="APRS message is empty; nothing to send...")
+        return
+
+    # Convert input string to 1...n list iterables
+    message_text_array = make_pretty_aprs_messages(message_to_add=message_text)
 
     # Finalize the outgoing message(s) and add the message
     # numbers if the user has requested this in his configuration

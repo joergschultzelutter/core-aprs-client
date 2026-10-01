@@ -367,7 +367,7 @@ def generate_apprise_message(
     # Create the Apprise instance
     apobj = apprise.Apprise()
 
-    # Create an Config instance
+    # Create a Config instance
     config = apprise.AppriseConfig()
 
     # Add a configuration source:
