@@ -27,6 +27,13 @@ aprs_client_name = Core APRS Client
 # whenever the input parser was unable to understand the user's message.
 aprs_input_parser_default_error_message = Did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client
 #
+# This is the bot's error message which will be sent out if someone tries
+# to flood the bot with invalid commands (which would then all generate a 
+# default error message). Instead, a final specific error message is sent to the user
+# and the bot won't return default error messages for a specific time. See
+# 'coac_flooding_prevention' section for further details
+aprs_flooding_error_message = Did not understand your request. I will not send out further links to my repo in order to prevent message flooding
+#
 # Enable or disable message enumeration.
 # message enumeration = true:  add trailing two-digit message number to the
 #                              end of each message. Content for the max msg
@@ -206,7 +213,7 @@ aprsis_simulate_send = false
 
 [coac_data_storage]
 #
-# This is the name of the subdiectory where the program will store the
+# This is the name of the subdirectory where the program will store the
 # APRS message counter file. Location: $cwd/<directory>
 # If not present, then the directory will be created by the program
 aprs_data_directory = data_files
@@ -214,6 +221,27 @@ aprs_data_directory = data_files
 # This is the name of the file that will contain the program's message counter
 # If not present, then the file will be created by the program
 aprs_message_counter_file_name = core_aprs_client_message_counter.txt
+
+[coac_flooding_prevention]
+#
+# Message anti-flooding handler
+# This section is responsible for limiting core-aprs-client's number of
+# responses in case the user has sent multiple erroneous requests to the bot
+# Once the threshold has been reached, a final notification will be sent to the
+# userr, indicating that there will be no additional error-related communication
+# from the bot. Valid commands will still get processed, though
+#
+# Number of default error messages before a final notification is sent to the client
+# Default value: 3
+aprs_flooding_default_error_messages = 3
+# 
+# Expiring dictionary: number of entries
+# Default value: 250
+aprs_flooding_dict_number_of_entries = 250
+#
+# Expiring dictionary: time-to-live in seconds
+# Default value: 1800 = 30 min
+aprs_flooding_dict_time_to_live = 1800
 
 [custom_config]
 #
