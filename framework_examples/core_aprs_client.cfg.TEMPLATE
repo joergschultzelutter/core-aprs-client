@@ -32,7 +32,7 @@ aprs_input_parser_default_error_message = Did not understand your request. Have 
 # default error message). Instead, a final specific error message is sent to the user
 # and the bot won't return default error messages for a specific time. See
 # 'coac_flooding_prevention' section for further details
-aprs_flooding_error_message = Did not understand your request. I will not send out further links to my repo in order to prevent message flooding
+aprs_flooding_error_message = Did not understand your request. Note: further help messages will be suppressed in order to prevent message flooding
 #
 # Enable or disable message enumeration.
 # message enumeration = true:  add trailing two-digit message number to the
@@ -225,23 +225,22 @@ aprs_message_counter_file_name = core_aprs_client_message_counter.txt
 [coac_flooding_prevention]
 #
 # Message anti-flooding handler
-# This section is responsible for limiting core-aprs-client's number of
-# responses in case the user has sent multiple erroneous requests to the bot
-# Once the threshold has been reached, a final notification will be sent to the
-# userr, indicating that there will be no additional error-related communication
-# from the bot. Valid commands will still get processed, though
+# This section limits the number of responses from the Core APRS client
+# if the user has sent multiple failed requests to the bot. Once the
+# threshold is reached, the user receives a final notification that no
+# further error messages will be sent by the bot. Valid bot
+# commands, however, will continue to be processed.
 #
-# Number of default error messages before a final notification is sent to the client
-# Default value: 3
+# Number of standard error messages before a different notification is
+# sent to the client and the bot then no longer sends error messages for
+# a certain period of time.
 aprs_flooding_default_error_messages = 3
 # 
-# Expiring dictionary: number of entries
-# Default value: 250
-aprs_flooding_dict_number_of_entries = 250
+# Expiring dictionary for flooding messages: number of entries
+aprs_flooding_number_of_entries = 2160
 #
-# Expiring dictionary: time-to-live in seconds
-# Default value: 1800 = 30 min
-aprs_flooding_dict_time_to_live = 1800
+# Expiring dictionary for flooding messages: time-to-live in seconds
+aprs_flooding_time_to_live = 1800
 
 [custom_config]
 #

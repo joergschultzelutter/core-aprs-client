@@ -187,6 +187,16 @@ class CoreAprsClient:
             ],
         )
 
+        # Create the APRS message flooding cache
+        client_shared.aprs_flooding_cache = create_expiring_dict(
+            max_len=program_config["coac_flooding_prevention"][
+                "aprs_flooding_number_of_entries"
+            ],
+            max_age_seconds=program_config["coac_flooding_prevention"][
+                "aprs_flooding_time_to_live"
+            ],
+        )
+
         # Register the SIGTERM handler; this will allow a safe shutdown of the program
         logger.debug(msg="Registering SIGTERM handler for safe shutdown...")
         signal.signal(signal.SIGTERM, signal_term_handler)

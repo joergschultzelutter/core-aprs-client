@@ -36,6 +36,7 @@ CONFIGURATION_SCHEMA = {
         "aprsis_tocall": str,
         "aprs_client_name": str,
         "aprs_input_parser_default_error_message": str,
+        "aprs_flooding_error_message": str,
         "aprs_message_enumeration": bool,
     },
     "coac_network_config": {
@@ -79,6 +80,11 @@ CONFIGURATION_SCHEMA = {
     "coac_data_storage": {
         "aprs_data_directory": str,
         "aprs_message_counter_file_name": str,
+    },
+    "coac_flooding_prevention": {
+        "aprs_flooding_default_error_messages": int,
+        "aprs_flooding_dict_number_of_entries": int,
+        "aprs_flooding_dict_time_to_live": int,
     },
 }
 
