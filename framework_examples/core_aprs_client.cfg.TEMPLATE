@@ -231,16 +231,19 @@ aprs_message_counter_file_name = core_aprs_client_message_counter.txt
 # further error messages will be sent by the bot. Valid bot
 # commands, however, will continue to be processed.
 #
-# Number of standard error messages before a different notification is
-# sent to the client and the bot then no longer sends error messages for
-# a certain period of time.
-aprs_flooding_default_error_messages = 3
+# If this number is reached by generating a default response n consecutive times,
+# `aprs_flooding_error_message` will be used ONCE instead of `aprs_input_parser_default_error_message`.
+# Once that threshold has been exceeded, NO default error message AT ALL is returned to the user.
+aprs_flooding_default_error_threshold = 3
 # 
 # Expiring dictionary for flooding messages: number of entries
 aprs_flooding_number_of_entries = 2160
 #
 # Expiring dictionary for flooding messages: time-to-live in seconds
 aprs_flooding_time_to_live = 1800
+#
+# Expiring dictionary for flooding messages: reset `aprs_flooding_default_error_threshold` counter to zero in case a positive message has been processed in between
+aprs_flooding_counter_reset_for_good_msgs = false
 
 [custom_config]
 #

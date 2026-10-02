@@ -111,6 +111,39 @@ def add_aprs_message_to_cache(
     return aprs_cache
 
 
+def add_or_increase_callsign_to_flooding_cache(
+    source_callsign: str, aprs_cache: ExpiringDict
+):
+    """
+    Checks if the source_callsign already exists in the expiring dict
+    flooding cache. If it does not exist, create a new entry with
+    key = callsign and value = 1. In any other case, increase the existing value by 1.
+
+    Parameters
+    ==========
+    source_callsign: str
+        Call sign of the user who has sent this message
+    aprs_cache: ExpiringDict
+        Reference to the Flooding ExpiringDict cache
+    Returns
+    =======
+    val: int
+        current value of the callsign - value relationship
+    aprs_cache: ExpiringDict
+        Reference to the Flooding ExpiringDict cache, now containing our entry
+    """
+    val = 1
+    if source_callsign in aprs_cache:
+        val = aprs_cache[source_callsign] + 1
+
+    # we need to start the expiring dict's time period anew. So let's pop the existing
+    # entry (if present) and create a new one.
+    aprs_cache.pop(source_callsign, None)
+    aprs_cache[source_callsign] = val
+
+    return val, aprs_cache
+
+
 def check_if_file_exists(file_name: str):
     """
     Checks if the given file exists. Returns True/False.

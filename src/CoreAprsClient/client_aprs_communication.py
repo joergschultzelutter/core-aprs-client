@@ -28,6 +28,7 @@ from .client_utils import (
     add_aprs_message_to_cache,
     parse_bulletin_data,
     finalize_pretty_aprs_messages,
+    add_or_increase_callsign_to_flooding_cache,
 )
 from ._version import __version__
 from .client_aprsobject import APRSISObject
@@ -615,14 +616,55 @@ def aprs_callback(
                             **kwargs,
                         )
                         if success:
+                            # our future output message
                             output_message = output_string
+
+                            # Check if we are supposed to reset this callsign's flooding
+                            # counter as we have just processed a successful message
+                            if program_config["coac_flooding_prevention"][
+                                "aprs_flooding_counter_reset_for_good_msgs"
+                            ]:
+                                client_shared.aprs_flooding_cache.pop(
+                                    from_callsign, None
+                                )
                         else:
+
                             # This code branch should never be reached unless there is a
                             # discrepancy between the action determined by the input parser
                             # and the responsive counter-action from the output processor
                             output_message = program_config["coac_client_config"][
                                 "aprs_input_parser_default_error_message"
                             ]
+
+                            # check if we are dealing with a potential case of message flooding
+                            curval, client_shared.aprs_flooding_cache = (
+                                add_or_increase_callsign_to_flooding_cache(
+                                    source_callsign=from_callsign,
+                                    aprs_cache=client_shared.aprs_flooding_cache,
+                                )
+                            )
+
+                            # if we REACH the threshold level, switch the default error message
+                            if (
+                                curval
+                                == program_config["coac_flooding_prevention"][
+                                    "aprs_flooding_default_error_threshold"
+                                ]
+                            ):
+                                output_message = program_config["coac_client_config"][
+                                    "aprs_flooding_error_message"
+                                ]
+
+                            # If we EXCEED the threshold level, set the response to an empty string. This will
+                            # prevent the framework from sending anything to the user.
+                            if (
+                                curval
+                                > program_config["coac_flooding_prevention"][
+                                    "aprs_flooding_default_error_threshold"
+                                ]
+                            ):
+                                output_message = ""
+
                     # This is the branch where the input parser failed to understand
                     # the message. A possible reason: you sent a keyword which requires
                     # an additional parameter but failed to send that one, too.
@@ -640,6 +682,36 @@ def aprs_callback(
                             output_message = program_config["coac_client_config"][
                                 "aprs_input_parser_default_error_message"
                             ]
+
+                            # check if we are dealing with a potential case of message flooding
+                            curval, client_shared.aprs_flooding_cache = (
+                                add_or_increase_callsign_to_flooding_cache(
+                                    source_callsign=from_callsign,
+                                    aprs_cache=client_shared.aprs_flooding_cache,
+                                )
+                            )
+
+                            # if we REACH the threshold level, switch the default error message
+                            if (
+                                curval
+                                == program_config["coac_flooding_prevention"][
+                                    "aprs_flooding_default_error_threshold"
+                                ]
+                            ):
+                                output_message = program_config["coac_client_config"][
+                                    "aprs_flooding_error_message"
+                                ]
+
+                            # If we EXCEED the threshold level, set the response to an empty string. This will
+                            # prevent the framework from sending anything to the user.
+                            if (
+                                curval
+                                > program_config["coac_flooding_prevention"][
+                                    "aprs_flooding_default_error_threshold"
+                                ]
+                            ):
+                                output_message = ""
+
                             logger.debug(
                                 msg=f"Unable to process APRS packet {raw_aprs_packet}"
                             )
