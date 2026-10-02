@@ -11,8 +11,8 @@ The Flooding Prevention Handler prevents this. For each standard error message, 
 
 Please note:
 
-- Incoming messages will still be answered with an ACK whenever possible.
-- Valid messages will also continue to be processed.
+- All incoming messages will still be answered with an ACK whenever possible. This will also prevent request flooding on a low protocol level.
+- Valid messages will also continue to be processed. However, due to [dupe detection](config_dupe_detection.md) mechanism, sending an identical APRS message means that even such duplicates will not be answered by the bot.
 
 This configuration section contains three settings:
 
