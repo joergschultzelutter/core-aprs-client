@@ -27,7 +27,7 @@
 
 ## Introduction
 
-Core APRS client framework with dupe detection, bulletin/beaconing support, and other APRS-IS related stuff.
+Core APRS client framework with dupe and anti-flooding detection, bulletin/beaconing support, and other APRS-IS related stuff.
 
 ```core-aprs-client``` is a modernized version of [mpad](https://github.com/joergschultzelutter/mpad)'s APRS functions which can be used for building your very own APRS client / bot. Its framework supports all of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS messaging functions, such as connecting to APRS-IS, message dupe detection, ACK handling, and other functionality such as APRS bulletins (supporting both static and dynamic contents) and APRS beaconing. Additionally, support for rare use cases such as [pre- and post-processing](/docs/framework_usage.md#extending-the-pre-processor-pre_processorpy) of APRS requests is provided. However, ```core-aprs-client``` deliberately lacks any _specific_ APRS bot functions such as WX reporting etc. 
 
