@@ -14,8 +14,8 @@
 
 You have already noticed that `core-aprs-client` provides two types of testing options:
 
-Option 1: Testing using the [`dryrun`](/docs/coreaprsclient_class.md#dryrun_testcall-class-method) class method
-Option 2: Testing using the [`aprsis_simulate_send`](/docs/configuration_subsections/config_testing.md) flag
+- Option 1: Testing using the [`dryrun`](/docs/coreaprsclient_class.md#dryrun_testcall-class-method) class method
+- Option 2: Testing using the [`aprsis_simulate_send`](/docs/configuration_subsections/config_testing.md) flag
 
 So what is the difference between the two? Let's first take a look at the output of both options; both use the `lorem` demo command code from the provided [framework_examples](/framework_examples) folder:
 
