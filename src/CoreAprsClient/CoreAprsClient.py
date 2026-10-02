@@ -30,6 +30,7 @@ from typing import Dict, Any, Mapping
 import threading
 import copy
 from types import MappingProxyType
+from expiringdict import ExpiringDict
 
 from . import client_shared
 from .client_utils import (
@@ -45,7 +46,6 @@ from .client_utils import (
 from .client_configuration import load_config, program_config
 from .client_aprsobject import APRSISObject
 from .client_message_counter import APRSMessageCounter
-from .client_expdict import create_expiring_dict
 from .client_aprs_communication import (
     aprs_callback,
     init_scheduler_jobs,
@@ -180,7 +180,10 @@ class CoreAprsClient:
         )
 
         # Create the APRS-IS dupe message cache
-        client_shared.aprs_message_cache = create_expiring_dict(
+        logger.debug(
+            msg=f"APRS message dupe cache set to {str(program_config["coac_dupe_detection"]["msg_cache_max_entries"])} max possible entries and a TTL of {str(program_config["coac_dupe_detection"]["msg_cache_time_to_live"] / 60)} mins"
+        )
+        client_shared.aprs_message_cache = ExpiringDict(
             max_len=program_config["coac_dupe_detection"]["msg_cache_max_entries"],
             max_age_seconds=program_config["coac_dupe_detection"][
                 "msg_cache_time_to_live"
@@ -188,7 +191,10 @@ class CoreAprsClient:
         )
 
         # Create the APRS message flooding cache
-        client_shared.aprs_flooding_cache = create_expiring_dict(
+        logger.debug(
+            msg=f"APRS message flooding cache set to {str(program_config["coac_dupe_detection"]["msg_cache_max_entries"])} max possible entries and a TTL of {str(program_config["coac_dupe_detection"]["msg_cache_time_to_live"] / 60)} mins"
+        )
+        client_shared.aprs_flooding_cache = ExpiringDict(
             max_len=program_config["coac_flooding_prevention"][
                 "aprs_flooding_number_of_entries"
             ],
