@@ -26,7 +26,8 @@ This configuration section contains four settings:
 | `aprs_flooding_time_to_live`                | `int`  | `1800`        | Expiring dictionary for flooding messages: time-to-live in seconds                                                                                                                                                                                                                    |
 | `aprs_flooding_counter_reset_for_good_msgs` | `bool` | `false`       | Expiring dictionary for flooding messages: reset `aprs_flooding_default_error_threshold` counter to zero in case a positive message has been processed in between                                                                                                                     |
  
-
+> [!TIP]
+> The Flooding Prevention is related to `core-aprs-client`'s [Dupe Detection](config_dupe_detection.md). While the Flooding Prevention ensures that erroneous commands to the bot (resulting in a default response message to the user) won't flood [APRS-IS](https://aprs-is.net/), the Dupe Detection takes care of valid commands to the bot. Both have their very own configuration settings, though.
 
 The respective section from `core-aprs-client`'s config file lists as follows:
 
