@@ -17,6 +17,7 @@
   * [Source Code Anatomy](#source-code-anatomy)
   * [Framework usage](#framework-usage)
   * [Client schematics](#client-schematics)
+  * [Dupe Detection and Flooding Prevention](#dupe-detection-and-flooding-prevention)
 * [Known issues and caveats](#known-issues-and-caveats)
 * [Projects that use `core-aprs-client`](#projects-that-use-core-aprs-client)
 * [Known issues and caveats](#known-issues-and-caveats)
@@ -87,6 +88,9 @@ The steps for using the client framework are described [here](docs/framework_usa
 
 ### Client schematics
 If you want to learn about the bot's basic processing structure, then have a look at [this diagram](docs/schematics.md).
+
+### Dupe Detection and Flooding Prevention
+Information on the framework's dupe detection and flooding prevention mechanisms are described [here](docs/dupe_and_flooding_detection.md).
 
 ### Projects that use `core-aprs-client`
 A list of my projects that are dependent on `core-aprs-client` can be found [here](/docs/projectsusingcoac.md)
