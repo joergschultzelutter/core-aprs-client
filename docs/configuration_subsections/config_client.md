@@ -49,7 +49,14 @@ aprs_client_name = Core APRS Client
 #
 # This is the bot's default error message. It will be sent to the user
 # whenever the input parser was unable to understand the user's message.
-aprs_input_parser_default_error_message = Did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client
+aprs_input_parser_default_error_message = Invalid command; check documentation at https://github.com/joergschultzelutter/core-aprs-client
+#
+# This is the bot's error message which will be sent out if someone tries
+# to flood the bot with invalid commands (which would then all generate a
+# default error message). Instead, a final specific error message is sent to the user
+# and the bot won't return default error messages for a specific time. See
+# 'coac_flooding_prevention' section for further details
+aprs_flooding_error_message = Invalid command. Further error msgs will get suppressed in order to prevent message flooding
 #
 # Enable or disable message enumeration.
 # message enumeration = True:  add trailing two-digit message number to the
