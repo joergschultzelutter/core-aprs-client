@@ -82,9 +82,9 @@ CONFIGURATION_SCHEMA = {
         "aprs_message_counter_file_name": str,
     },
     "coac_flooding_prevention": {
-        "aprs_flooding_default_error_schema": int,
-        "aprs_flooding_dict_number_of_entries": int,
-        "aprs_flooding_dict_time_to_live": int,
+        "aprs_flooding_default_error_threshold": int,
+        "aprs_flooding_number_of_entries": int,
+        "aprs_flooding_time_to_live": int,
         "aprs_flooding_counter_reset_for_good_msgs": bool,
     },
 }
