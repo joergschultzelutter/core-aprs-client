@@ -29,6 +29,7 @@ from .client_configuration_schema import (
     CONFIGURATION_SCHEMA,
     EXCLUDED_CONFIGURATION_SCHEMA,
 )
+from .client_logger import logger
 
 config = configparser.ConfigParser()
 program_config = {}
@@ -153,8 +154,11 @@ def validate_config_schema(cfg: dict):
         # a) Check all required keys are present
         missing_keys = set(expected_schema.keys()) - set(values.keys())
         if missing_keys:
+            logger.error(msg=f"Configuration file section '{section}' has missing keys: '{missing_keys}' and did not pass validation.")
+            logger.error(msg=f"Usually, this means that you have upgraded the core-aprs-client framework without applying potential")
+            logger.error(msg=f"required changes to the configuration file. Check the framework's documentation.")
             raise KeyError(
-                f"Configuration file section '{section}': missing keys {missing_keys}"
+                f"Configuration file section '{section}': missing keys '{missing_keys}'"
             )
 
         # b) Check type correctness
