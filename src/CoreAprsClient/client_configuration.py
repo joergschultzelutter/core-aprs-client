@@ -24,6 +24,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 import configparser
+import sys
 from os import path
 from .client_configuration_schema import (
     CONFIGURATION_SCHEMA,
@@ -142,12 +143,16 @@ def validate_config_schema(cfg: dict):
     # Check all schema sections are present in the configuration
     missing_sections = set(CONFIGURATION_SCHEMA.keys()) - set(cfg.keys())
     if missing_sections:
-        logger.error(msg=f"Configuration file has missing sections: '{missing_sections}' and did not pass validation.")
-        logger.error(msg=f"Usually, this means that you have upgraded the core-aprs-client framework without applying potential")
-        logger.error(msg=f"required changes to the configuration file. Check the framework's documentation.")
-        raise KeyError(
-            f"Configuration file: missing sections '{missing_sections}'"
+        logger.error(
+            msg=f"Configuration file has missing sections: '{missing_sections}' and did not pass validation."
         )
+        logger.error(
+            msg=f"Usually, this means that you have upgraded the core-aprs-client framework without applying potential"
+        )
+        logger.error(
+            msg=f"required changes to the configuration file. Check the framework's documentation."
+        )
+        sys.exit(1)
 
     for section, values in cfg.items():
         if not section.startswith("coac_"):
@@ -158,19 +163,30 @@ def validate_config_schema(cfg: dict):
             if section in EXCLUDED_CONFIGURATION_SCHEMA:
                 continue
             else:
-                raise KeyError(
-                    f"Schema definition for section '{section}' is missing from the configuration file"
+                logger.error(
+                    msg=f"Schema definition for section '{section}' is missing from the configuration file"
                 )
+                logger.error(
+                    msg=f"Usually, this means that you have upgraded the core-aprs-client framework without applying potential"
+                )
+                logger.error(
+                    msg=f"required changes to the configuration file. Check the framework's documentation."
+                )
+                sys.exit(1)
 
         # a) Check all required keys are present
         missing_keys = set(expected_schema.keys()) - set(values.keys())
         if missing_keys:
-            logger.error(msg=f"Configuration file section '{section}' has missing keys: '{missing_keys}' and did not pass validation.")
-            logger.error(msg=f"Usually, this means that you have upgraded the core-aprs-client framework without applying potential")
-            logger.error(msg=f"required changes to the configuration file. Check the framework's documentation.")
-            raise KeyError(
-                f"Configuration file section '{section}': missing keys '{missing_keys}'"
+            logger.error(
+                msg=f"Configuration file section '{section}' has missing keys: '{missing_keys}' and did not pass validation."
             )
+            logger.error(
+                msg=f"Usually, this means that you have upgraded the core-aprs-client framework without applying potential"
+            )
+            logger.error(
+                msg=f"required changes to the configuration file. Check the framework's documentation."
+            )
+            sys.exit(1)
 
         # b) Check type correctness
         for key, expected_type in expected_schema.items():
@@ -178,10 +194,16 @@ def validate_config_schema(cfg: dict):
                 continue
             actual_value = values[key]
             if not isinstance(actual_value, expected_type):
-                raise TypeError(
-                    f"Configuration file section '{section}': key '{key}' has wrong type "
-                    f"(expected {expected_type.__name__}, got {type(actual_value).__name__})"
+                logger.error(
+                    msg=f"Configuration file section '{section}': key '{key}' has wrong type (expected {expected_type.__name__}, got {type(actual_value).__name__})"
                 )
+                logger.error(
+                    msg=f"Usually, this means that you have upgraded the core-aprs-client framework without applying potential"
+                )
+                logger.error(
+                    msg=f"required changes to the configuration file. Check the framework's documentation."
+                )
+                sys.exit(1)
 
 
 if __name__ == "__main__":
