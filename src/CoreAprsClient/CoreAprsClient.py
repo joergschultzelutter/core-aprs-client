@@ -192,7 +192,7 @@ class CoreAprsClient:
 
         # Create the APRS message flooding cache
         logger.debug(
-            msg=f"APRS message flooding cache set to {str(program_config["coac_dupe_detection"]["msg_cache_max_entries"])} max possible entries and a TTL of {str(program_config["coac_dupe_detection"]["msg_cache_time_to_live"] / 60)} mins"
+            msg=f"APRS message flooding cache set to {str(program_config["coac_flooding_prevention"]["aprs_flooding_number_of_entries"])} max possible entries and a TTL of {str(program_config["coac_flooding_prevention"]["aprs_flooding_time_to_live"] / 60)} mins"
         )
         client_shared.aprs_flooding_cache = ExpiringDict(
             max_len=program_config["coac_flooding_prevention"][
