@@ -174,7 +174,7 @@ msg_cache_time_to_live = 3600
 # Unit of measure: seconds
 packet_delay_message = 6.0
 #
-# packet delay after sending an ackknowledgment
+# packet delay after sending an acknowledgment
 # Unit of measure: seconds
 packet_delay_ack = 2.0
 #
