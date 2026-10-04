@@ -138,6 +138,17 @@ def validate_config_schema(cfg: dict):
     Returns
     =======
     """
+
+    # Check all schema sections are present in the configuration
+    missing_sections = set(CONFIGURATION_SCHEMA.keys()) - set(cfg.keys())
+    if missing_sections:
+        logger.error(msg=f"Configuration file has missing sections: '{missing_sections}' and did not pass validation.")
+        logger.error(msg=f"Usually, this means that you have upgraded the core-aprs-client framework without applying potential")
+        logger.error(msg=f"required changes to the configuration file. Check the framework's documentation.")
+        raise KeyError(
+            f"Configuration file: missing sections '{missing_sections}'"
+        )
+
     for section, values in cfg.items():
         if not section.startswith("coac_"):
             continue
