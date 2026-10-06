@@ -17,6 +17,7 @@
   * [Source Code Anatomy](#source-code-anatomy)
   * [Framework usage](#framework-usage)
   * [Client schematics](#client-schematics)
+  * [Dupe Detection and Flooding Prevention](#dupe-detection-and-flooding-prevention)
 * [Known issues and caveats](#known-issues-and-caveats)
 * [Projects that use `core-aprs-client`](#projects-that-use-core-aprs-client)
 * [Known issues and caveats](#known-issues-and-caveats)
@@ -27,7 +28,7 @@
 
 ## Introduction
 
-Core APRS client framework with dupe detection, bulletin/beaconing support, and other APRS-IS related stuff.
+Core APRS client framework with dupe and anti-flooding detection, bulletin/beaconing support, and other APRS-IS related stuff.
 
 ```core-aprs-client``` is a modernized version of [mpad](https://github.com/joergschultzelutter/mpad)'s APRS functions which can be used for building your very own APRS client / bot. Its framework supports all of [mpad](https://github.com/joergschultzelutter/mpad)'s core APRS messaging functions, such as connecting to APRS-IS, message dupe detection, ACK handling, and other functionality such as APRS bulletins (supporting both static and dynamic contents) and APRS beaconing. Additionally, support for rare use cases such as [pre- and post-processing](/docs/framework_usage.md#extending-the-pre-processor-pre_processorpy) of APRS requests is provided. However, ```core-aprs-client``` deliberately lacks any _specific_ APRS bot functions such as WX reporting etc. 
 
@@ -87,6 +88,9 @@ The steps for using the client framework are described [here](docs/framework_usa
 
 ### Client schematics
 If you want to learn about the bot's basic processing structure, then have a look at [this diagram](docs/schematics.md).
+
+### Dupe Detection and Flooding Prevention
+Information on the framework's dupe detection and flooding prevention mechanisms are described [here](docs/dupe_and_flooding_detection.md).
 
 ### Projects that use `core-aprs-client`
 A list of my projects that are dependent on `core-aprs-client` can be found [here](/docs/projectsusingcoac.md)

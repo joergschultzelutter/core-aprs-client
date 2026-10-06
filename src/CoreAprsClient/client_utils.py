@@ -74,7 +74,7 @@ def _get_aprs_msg_len() -> int:
 
 
 def add_aprs_message_to_cache(
-    message_text: str, message_no: str, target_callsign: str, aprs_cache: ExpiringDict
+    message_text: str, message_no: str, source_callsign: str, aprs_cache: ExpiringDict
 ):
     """
     Creates an entry in our expiring dictionary cache. Later on,
@@ -88,7 +88,7 @@ def add_aprs_message_to_cache(
         APRS message (as extracted from the original incoming message)
     message_no: str
         APRS message number (or 'None' if not present)
-    target_callsign: str
+    source_callsign: str
         Call sign of the user who has sent this message
     aprs_cache: ExpiringDict
         Reference to the ExpiringDict cache
@@ -98,12 +98,12 @@ def add_aprs_message_to_cache(
         Reference to the ExpiringDict cache, now containing our entry
     """
     # Create message key which consists of:
-    # - an md5-ed version of the message text (save some bytes on storage)
+    # - a md5-ed version of the message text (save some bytes on storage)
     #   Conversion to string is necessary; otherwise, the lookup won't work
     # - the user's call sign
     # - the message number (note that this field's content can be 'None')
     md5_hash = hashlib.md5(message_text.encode("utf-8")).hexdigest()
-    key = (md5_hash, target_callsign, message_no)
+    key = (md5_hash, source_callsign, message_no)
     # Finally, build the key. Convert it to a tuple as the key needs to be immutable
     key = tuple(key)
 
@@ -111,6 +111,39 @@ def add_aprs_message_to_cache(
     # just need to give the dictionary entry a value
     aprs_cache[key] = datetime.datetime.now()
     return aprs_cache
+
+
+def add_or_increase_callsign_to_flooding_cache(
+    source_callsign: str, aprs_cache: ExpiringDict
+):
+    """
+    Checks if the source_callsign already exists in the expiring dict
+    flooding cache. If it does not exist, create a new entry with
+    key = callsign and value = 1. In any other case, increase the existing value by 1.
+
+    Parameters
+    ==========
+    source_callsign: str
+        Call sign of the user who has sent this message
+    aprs_cache: ExpiringDict
+        Reference to the Flooding ExpiringDict cache
+    Returns
+    =======
+    val: int
+        current value of the callsign - value relationship
+    aprs_cache: ExpiringDict
+        Reference to the Flooding ExpiringDict cache, now containing our entry
+    """
+    val = 1
+    if source_callsign in aprs_cache:
+        val = aprs_cache[source_callsign] + 1
+
+    # we need to start the expiring dict's time period anew. So let's pop the existing
+    # entry (if present) and create a new one.
+    aprs_cache.pop(source_callsign, None)
+    aprs_cache[source_callsign] = val
+
+    return val, aprs_cache
 
 
 def check_if_file_exists(file_name: str):
@@ -130,7 +163,7 @@ def check_if_file_exists(file_name: str):
 
 
 def get_aprs_message_from_cache(
-    message_text: str, message_no: str, target_callsign: str, aprs_cache: ExpiringDict
+    message_text: str, message_no: str, source_callsign: str, aprs_cache: ExpiringDict
 ):
     """
     Checks for an entry in our expiring dictionary cache.
@@ -142,7 +175,7 @@ def get_aprs_message_from_cache(
         APRS message (as extracted from the original incoming message)
     message_no: str
         APRS message number (or 'None' if not present)
-    target_callsign: str
+    source_callsign: str
         Call sign of the user who has sent this message
     aprs_cache: ExpiringDict
         Reference to the ExpiringDict cache
@@ -152,12 +185,12 @@ def get_aprs_message_from_cache(
         Key tuple (or 'None' if not found / no longer present)
     """
     # Create message key which consists of:
-    # - an md5-ed version of the message text (save some bytes on storage)
+    # - a md5-ed version of the message text (save some bytes on storage)
     #   Conversion to string is necessary; otherwise, the lookup won't work
     # - the user's call sign
     # - the message number (note that this field's content can be 'None')
     md5_hash = hashlib.md5(message_text.encode("utf-8")).hexdigest()
-    key = (md5_hash, target_callsign, message_no)
+    key = (md5_hash, source_callsign, message_no)
     # Finally, build the key. Convert it to a tuple as the key needs to be immutable
     key = tuple(key)
 
@@ -371,7 +404,7 @@ def generate_apprise_message(
     # Create the Apprise instance
     apobj = apprise.Apprise()
 
-    # Create an Config instance
+    # Create a Config instance
     config = apprise.AppriseConfig()
 
     # Add a configuration source:

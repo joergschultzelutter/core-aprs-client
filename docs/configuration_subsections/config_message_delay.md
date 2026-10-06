@@ -20,7 +20,7 @@ The respective section from `core-aprs-client`'s config file lists as follows:
 # Unit of measure: seconds
 packet_delay_message = 6.0
 #
-# packet delay after sending an ackknowledgment
+# packet delay after sending an acknowledgment
 # Unit of measure: seconds
 packet_delay_ack = 2.0
 #

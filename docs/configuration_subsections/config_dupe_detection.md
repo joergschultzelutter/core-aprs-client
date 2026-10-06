@@ -5,6 +5,9 @@
 
 Due to the nature of APRS, we might receive the same APRS message as a resubmission. In order to avoid processing that same message again, `core-aprs-client` provides you with a duplicate message detection. Whenever an ingress APRS message is processed, `core-aprs-client` will first check if that message wasn't already processed within a given time span (`msg_cache_time_to_live`). When still present in that dictionary, such a message is identified as a duplicate and will not get processed again. 
 
+> [!TIP]
+> The Dupe Detection is related to `core-aprs-client`'s [Flooding Prevention](config_flooding.md). While the Flooding Prevention ensures that erroneous commands to the bot (resulting in a default response message to the user) won't flood [APRS-IS](https://aprs-is.net/), the Dupe Detection takes care of valid commands to the bot. Both have their very own configuration settings, though.
+
 | Config variable          | Type  | Default value     | Description                                                                                                                                                                                                                                                                                                                                                                                             |
 |--------------------------|-------|-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `msg_cache_max_entries`  | `int` | `2160`            | Defines the maximum number of incoming APRS messages that are checked for ingress duplicates.                                                                                                                                                                                                                                                                                                           |
@@ -22,4 +25,8 @@ msg_cache_max_entries = 2160
 #
 # max time span of dupe detection in seconds (3600 sec = 1 hour)
 msg_cache_time_to_live = 3600
+#
+# Perform the dupe check only on the callsingn/ APRS message body; do not
+# include the message ID (whereas present) as distinguishing element
+dupe_check_ignore_msgid = false
 ```

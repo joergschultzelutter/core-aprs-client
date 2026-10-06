@@ -25,6 +25,7 @@
 AIS = None
 aprs_message_counter = None
 aprs_message_cache = None
+aprs_flooding_cache = None
 
 if __name__ == "__main__":
     pass

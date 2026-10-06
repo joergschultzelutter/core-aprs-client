@@ -52,6 +52,7 @@ During initialization, `core-aprs-client` performs a generic validation of the i
 | [message_delay](configuration_subsections/config_message_delay.md)                                                                             | Configures the delays between outgoing multiple [APRS-IS](https://aprs-is.net/) messages                            |
 | [testing](configuration_subsections/config_testing.md)                                                                                         | Configuration settings for software and integration testing                                                         |
 | [data_storage](configuration_subsections/config_data_storage.md)                                                                               | Configuration settings for the storage of data files, e.g. the data file which persists the APRS message counter    |
+| [flooding_prevention](configuration_subsections/config_flooding.md)                                                                            | Configuration settings for the expiring dict which will take care of accidental message flooding by the user        |
 
 ## Configuration file sample
 
@@ -85,18 +86,25 @@ aprs_client_name = Core APRS Client
 #
 # This is the bot's default error message. It will be sent to the user
 # whenever the input parser was unable to understand the user's message.
-aprs_input_parser_default_error_message = Did not understand your request. Have a look at my documentation at https://github.com/joergschultzelutter/core-aprs-client
+aprs_input_parser_default_error_message = Invalid command; check documentation at https://github.com/joergschultzelutter/core-aprs-client
+#
+# This is the bot's error message which will be sent out if someone tries
+# to flood the bot with invalid commands (which would then all generate a
+# default error message). Instead, a final specific error message is sent to the user
+# and the bot won't return default error messages for a specific time. See
+# 'coac_flooding_prevention' section for further details
+aprs_flooding_error_message = Invalid command. Further error msgs will get suppressed in order to prevent message flooding
 #
 # Enable or disable message enumeration.
-# message enumeration = True:  add trailing two-digit message number to the
+# message enumeration = true:  add trailing two-digit message number to the
 #                              end of each message. Content for the max msg
 #                              len gets reduced to 59 characters (excluding
 #                              message number)
-# message enumeration = False: do not add trailing message number to the end
+# message enumeration = false: do not add trailing message number to the end
 #                              of each message. Message len stays at 67 chars
 #
-# Default setting: message enumeration = False
-aprs_message_enumeration = False
+# Default setting: message enumeration = false
+aprs_message_enumeration = false
 
 [coac_network_config]
 #
@@ -227,7 +235,7 @@ msg_cache_time_to_live = 3600
 # Unit of measure: seconds
 packet_delay_message = 6.0
 #
-# packet delay after sending an ackknowledgment
+# packet delay after sending an acknowledgment
 # Unit of measure: seconds
 packet_delay_ack = 2.0
 #
@@ -266,7 +274,7 @@ aprsis_simulate_send = false
 
 [coac_data_storage]
 #
-# This is the name of the subdiectory where the program will store the
+# This is the name of the subdirectory where the program will store the
 # APRS message counter file. Location: $cwd/<directory>
 # If not present, then the directory will be created by the program
 aprs_data_directory = data_files
@@ -274,6 +282,29 @@ aprs_data_directory = data_files
 # This is the name of the file that will contain the program's message counter
 # If not present, then the file will be created by the program
 aprs_message_counter_file_name = core_aprs_client_message_counter.txt
+
+[coac_flooding_prevention]
+#
+# Message anti-flooding handler
+# This section limits the number of responses from the Core APRS client
+# if the user has sent multiple failed requests to the bot. Once the
+# threshold is reached, the user receives a final notification that no
+# further error messages will be sent by the bot. Valid bot
+# commands, however, will continue to be processed.
+#
+# If this number is reached by generating a default response n consecutive times, 
+# `aprs_flooding_error_message` will be used ONCE instead of `aprs_input_parser_default_error_message`. 
+# Once that threshold has been exceeded, NO default error message AT ALL is returned to the user.
+aprs_flooding_default_error_threshold = 3
+# 
+# Expiring dictionary for flooding messages: number of entries
+aprs_flooding_number_of_entries = 2160
+#
+# Expiring dictionary for flooding messages: time-to-live in seconds
+aprs_flooding_time_to_live = 1800
+#
+# Expiring dictionary for flooding messages: reset `aprs_flooding_default_error_threshold` counter to zero in case a positive message has been processed in between 
+aprs_flooding_counter_reset_for_good_msgs = false
 
 [custom_config]
 #
