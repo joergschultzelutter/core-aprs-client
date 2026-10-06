@@ -65,6 +65,7 @@ CONFIGURATION_SCHEMA = {
     "coac_dupe_detection": {
         "msg_cache_max_entries": int,
         "msg_cache_time_to_live": int,
+        "dupe_check_ignore_msgid": bool,
     },
     "coac_message_delay": {
         "packet_delay_message": float,
