@@ -448,6 +448,11 @@ def aprs_callback(
             and response_string not in ["ack", "rej"]
         ):
             # This is a message that belongs to us
+
+            # Set the cache's APRS message ID to None if the user wants us to perform
+            # the dupe check solely on the message body and the APRS callsign
+            __msgno_string = None if program_config["coac_dupe_detection"]["dupe_check_ignore_msgid"] else msgno_string
+
             #
             # Check if the message is present in our decaying message cache
             # If the message can be located, then we can assume that we have
@@ -456,7 +461,7 @@ def aprs_callback(
             # request, thus allowing us to ignore this request.
             aprs_message_key = get_aprs_message_from_cache(
                 message_text=message_text_string,
-                message_no=msgno_string,
+                message_no=__msgno_string,
                 source_callsign=from_callsign,
                 aprs_cache=client_shared.aprs_message_cache,
             )
@@ -730,6 +735,10 @@ def aprs_callback(
                     new_ackrej_format=new_ackrej_format,
                 )
 
+                # Set the cache's APRS message ID to None if the user wants us to perform
+                # the dupe check solely on the message body and the APRS callsign
+                __msgno_string = None if program_config["coac_dupe_detection"]["dupe_check_ignore_msgid"] else msgno_string
+                
                 # We've finished processing this message. Update the decaying
                 # cache with our message.
                 # Store the core message data in our decaying APRS message cache
@@ -737,7 +746,7 @@ def aprs_callback(
                 # processing status
                 client_shared.aprs_message_cache = add_aprs_message_to_cache(
                     message_text=message_text_string,
-                    message_no=msgno_string,
+                    message_no=__msgno_string,
                     source_callsign=from_callsign,
                     aprs_cache=client_shared.aprs_message_cache,
                 )
