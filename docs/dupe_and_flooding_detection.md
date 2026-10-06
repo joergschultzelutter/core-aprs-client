@@ -71,9 +71,6 @@ Now, assume that the very same command `sayhello` is again sent to the bot more 
 
 As both messages have different message ID's (00016 and 00017), these messages are NOT considered as duplicates and will get processed by the bot - even though their message body contains the very same content. Note that this filter is obviously only possible when sending a message with a message ID - if you send APRS requests without message ID, `core-aprs-client` can neither ACK those requests nor it can distinguish request A from request B.
 
-> [!TIP]
-> If necessary, you can remove the message ID as distinguishing element from the dupe detection process by setting [config_dupe_detection.md](./configuration_subsections/config_dupe_detection.md)'s `dupe_check_ignore_msgid` configuration to `true`. If you do so, `core-aprs-client` will perform the dupe check only on the user`s call sign and the message body.
-
 ## [config_flooding.md](./configuration_subsections/config_flooding.md)
 
 This configuration section detects failed requests which are answered by the bot via [config_client.md](/docs/configuration_subsections/config_client.md)'s `aprs_input_parser_default_error_message` setting. Assume that someone sends the same erroneous command to the bot over and over again - which would result in receiving the very same bot error message over and over again.

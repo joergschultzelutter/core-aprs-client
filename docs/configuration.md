@@ -228,10 +228,6 @@ msg_cache_max_entries = 2160
 #
 # max time span of dupe detection in seconds (3600 sec = 1 hour)
 msg_cache_time_to_live = 3600
-#
-# Perform the dupe check only on the callsingn/ APRS message body; do not
-# include the message ID (whereas present) as distinguishing element
-dupe_check_ignore_msgid = false
 
 [coac_message_delay]
 #
