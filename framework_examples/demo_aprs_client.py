@@ -126,6 +126,28 @@ def start_detached(logfile_name: str):
         print(f"Process ID: {p.pid}")
 
 
+def main():
+    # Get the configuration file name
+    configfile, daemon, logfile, daemon_child = get_command_line_params()
+
+    if daemon:
+        start_detached(logfile_name=logfile)
+        return
+
+    logger.info(msg=f"Starting demo module: APRS bot")
+    logger.info(
+        msg="This is a demo APRS client which connects to APRS-IS, listens to messages and processes them."
+    )
+
+    run_client_loop(
+        cfg_file=configfile,
+        log_level=logging.DEBUG,
+        input_parser=parse_input_message,
+        output_generator=generate_output_message,
+        daemon_mode=daemon_child,
+    )
+
+
 def run_client_loop(
     cfg_file: str,
     log_level: int,
@@ -155,28 +177,6 @@ def run_client_loop(
 
     # Activate the APRS client and connect to APRS-IS
     client.activate_client()
-
-
-def main():
-    # Get the configuration file name
-    configfile, daemon, logfile, daemon_child = get_command_line_params()
-
-    if daemon:
-        start_detached(logfile_name=logfile)
-        return
-
-    logger.info(msg=f"Starting demo module: APRS bot")
-    logger.info(
-        msg="This is a demo APRS client which connects to APRS-IS, listens to messages and processes them."
-    )
-
-    run_client_loop(
-        cfg_file=configfile,
-        log_level=logging.DEBUG,
-        input_parser=parse_input_message,
-        output_generator=generate_output_message,
-        daemon_mode=daemon_child,
-    )
 
 
 if __name__ == "__main__":
