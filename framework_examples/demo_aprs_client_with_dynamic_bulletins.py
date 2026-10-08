@@ -50,6 +50,7 @@ import logging
 import random
 import string
 from apscheduler.schedulers.background import BackgroundScheduler
+import subprocess
 
 logging.basicConfig(
     level=logging.INFO,
@@ -138,12 +139,19 @@ def get_command_line_params():
 
     Returns
     =======
-    cfg: str
+    __configfile: str
         name of the configuration file
+    __daemon: bool
+        run in daemon mode
+    __logfile: str
+        name of the log file (daemon mode only)
+    __daemon_child: bool
+        internally set when daemon mode is active
     """
 
     parser = argparse.ArgumentParser()
 
+    # Config file name
     parser.add_argument(
         "--configfile",
         default="core_aprs_client.cfg",
@@ -151,19 +159,105 @@ def get_command_line_params():
         help="Program config file name (default is 'core_aprs_client.cfg')",
     )
 
+    # run as daemon yes/no
+    parser.add_argument(
+        "--daemon",
+        default=False,
+        action="store_true",
+        help="Run as a daemon",
+    )
+
+    # logfile name
+    parser.add_argument(
+        "--logfile",
+        default="nohup.out",
+        help="Name of log file (only used with active daemon mode)",
+    )
+
+    # internal switch which will indicate to the spawned process
+    # that no further spawning is necessary
+    parser.add_argument(
+        "--daemon-child",
+        default=False,
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+
+    # Parse the arguments
     args = parser.parse_args()
 
-    cfg = args.configfile.name
+    # retrieve the parsed arguments
+    __configfile = args.configfile.name
+    __daemon = args.daemon
+    __logfile = args.logfile
+    __daemon_child = args.daemon_child
 
-    if not os.path.isfile(cfg):
-        logger.error(msg=f"Config file '{cfg}' does not exist; exiting")
-        sys.exit(0)
+    # check if the log file exists
+    if not os.path.isfile(__configfile):
+        logger.error(msg=f"Config file '{__configfile}' does not exist; exiting")
+        sys.exit(1)
 
-    return cfg
+    return __configfile, __daemon, __logfile, __daemon_child
 
 
-if __name__ == "__main__":
+def start_detached(configfile_name: str, logfile_name: str):
+    """
+    (Re)Starts the current program as a detached process
 
+    Parameters
+    ==========
+
+    Returns
+    =======
+    """
+
+    # Set the fully qualified filename to our Python program
+    script_path = os.path.abspath(__file__)
+
+    print(f"Spawning {script_path} into daemon mode ....")
+
+    # Spawn the process
+    with open(logfile_name, "ab", buffering=0) as log_file:
+        p = subprocess.Popen(
+            [
+                sys.executable,
+                script_path,
+                "--daemon-child",
+                "--configfile",
+                configfile_name,
+                "--logfile",
+                logfile_name,
+            ],
+            stdin=subprocess.DEVNULL,
+            stdout=log_file,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+            close_fds=True,
+            cwd=os.getcwd(),
+        )
+        print(f"Process ID: {p.pid}")
+
+
+def main():
+    """
+    Our main function
+
+    Parameters
+    ==========
+
+    Returns
+    =======
+    """
+
+    # Get the configuration file name
+    configfile, daemon, logfile, daemon_child = get_command_line_params()
+
+    # If daemon mode has been requested, spawn the process and then exit
+    if daemon:
+        start_detached(configfile_name=configfile, logfile_name=logfile)
+        return
+
+    # Startup code for both the spawned process and the standalone approach
     logger.info(msg=f"Starting demo module: APRS bot with dynamic bulletins")
     logger.info(
         msg="This is a demo APRS client which connects to APRS-IS and extends the set of static bulletins with dynamic bulletin data"
@@ -171,9 +265,6 @@ if __name__ == "__main__":
     logger.info(
         msg="Remember that the configuration file needs to have bulletins enabled (aprsis_broadcast_bulletins = true)"
     )
-
-    # Get the configuration file name
-    configfile = get_command_line_params()
 
     # Create the CoreAprsClient object. Supply the
     # following parameters:
@@ -242,3 +333,7 @@ if __name__ == "__main__":
         # Pause the scheduler and remove all jobs afterwards.
         my_scheduler.pause()
         my_scheduler.remove_all_jobs()
+
+
+if __name__ == "__main__":
+    main()

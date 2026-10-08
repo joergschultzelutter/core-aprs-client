@@ -22,6 +22,10 @@ The provided stubs are provided for demonstration purposes only. You are require
 
 Demo clients, illustrating the framework's various use cases.
 
+> [!NOTE]
+> All demo clients starting with `demo_aprs_...` can be started as either standalone software or in daemon mode. For becoming acquainted with the code, the standalone mode is recommended. However, if you intend to run your code on production, using the `--daemon` switch can spawn your program as a separate process without the hassle of having to use `nohup python mydemoclient.py &`.
+
+
 | File Name                                                                                | Description                                                                                                                                                                                                                                                             |
 |------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [demo_apprise_message.py](demo_apprise_message.py)                                       | Demo code which sends a demo message via the [Apprise messaging](/docs/coreaprsclient_class.md#send_apprise_message-class-method) method                                                                                                                                |
